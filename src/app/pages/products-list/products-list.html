@@ -1,0 +1,165 @@
+<div class="products-page container py-3">
+    <!-- Toolbar (search, sort, mobile filter btn) -->
+    <div class="products-toolbar mb-3">
+        <div class="row g-2 align-items-center">
+            <div class="col-12 col-md-6 col-lg-5">
+                <nz-input-group [nzPrefix]="searchPrefix" nzSize="large">
+                    <input nz-input placeholder="Tìm kiếm sản phẩm..." [ngModel]="searchKeyword()"
+                        (ngModelChange)="searchKeyword.set($event)" (keyup.enter)="applyFilters()" />
+                </nz-input-group>
+                <ng-template #searchPrefix>
+                    <nz-icon nzType="search"></nz-icon>
+                </ng-template>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-3">
+                <nz-select nzSize="large" style="width: 100%" [ngModel]="sortBy()"
+                    (ngModelChange)="sortBy.set($event); applyFilters()">
+                    @for (opt of sortOptions; track opt.value) {
+                    <nz-option [nzLabel]="opt.label" [nzValue]="opt.value"></nz-option>
+                    }
+                </nz-select>
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-3">
+                <button nz-button nzType="default" nzSize="large" class="w-100 d-lg-none" (click)="openFilterDrawer()">
+                    <nz-icon nzType="filter"></nz-icon>
+                    Bộ lọc
+                </button>
+            </div>
+        </div>
+
+        <div class="toolbar-meta mt-2 text-muted small">
+            Tìm thấy <strong>{{ total() }}</strong> sản phẩm
+            @if (searchKeyword() || selectedCategoryID() != null || selectedStatus() != null || minPrice() != null
+            || maxPrice() != null || selectedUnitCountID() != null) {
+            <button nz-button nzType="link" nzSize="small" (click)="clearFilters()">
+                <nz-icon nzType="close-circle"></nz-icon> Xóa bộ lọc
+            </button>
+            }
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Filter sidebar (desktop) -->
+        <aside class="col-lg-3 products-filter-aside">
+            <div class="filter-card sticky-filter">
+                <ng-container *ngTemplateOutlet="filterPanel"></ng-container>
+                <button nz-button nzType="primary" nzBlock class="mt-3" (click)="applyFilters()">
+                    <nz-icon nzType="search"></nz-icon> Áp dụng
+                </button>
+            </div>
+        </aside>
+
+        <!-- Product list -->
+        <main class="col-12 col-lg-9">
+            <nz-spin [nzSpinning]="isLoading()">
+                @if (pagedProducts().length === 0 && !isLoading()) {
+                <div class="empty-state">
+                    <nz-empty nzNotFoundContent="Không tìm thấy sản phẩm nào"></nz-empty>
+                </div>
+                } @else {
+                <div class="row products-grid">
+                    @for (p of pagedProducts(); track p.ID) {
+                    <div class="col-6 col-sm-4 col-lg-3 mb-2 d-flex justify-content-center">
+                        <div class="product-card">
+                            <div class="badge">MỚI</div>
+                            <div class="product-img">
+                                <a [routerLink]="['/detail']" [queryParams]="{ id: p.ID }">
+                                    <img [src]="p.ImageURL" [alt]="p.ProductName" loading="lazy" />
+                                </a>
+                            </div>
+                            <div class="product-name px-2">
+                                <a [routerLink]="['/detail']" [queryParams]="{ id: p.ID }">{{ p.ProductName }}</a>
+                            </div>
+                            <div class="product-bottom px-2">
+                                <div class="price">
+                                    {{ p.UnitPrice | number }} <small>VND</small>
+                                </div>
+                                <div class="favorite" [ngClass]="{ active: isFavourite(p) }">
+                                    <a (click)="onToggleFavourite(p)">
+                                        <i nz-icon [nzType]="isFavourite(p) ? 'heart' : 'heart'"
+                                            [nzTheme]="isFavourite(p) ? 'fill' : 'outline'"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="p-2">
+                                <button class="btn-buy" (click)="onAddToCart(p)">Mua Hàng</button>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <div class="pagination-wrapper mt-4 d-flex justify-content-center">
+                    <nz-pagination [nzPageIndex]="pageIndex()" [nzPageSize]="pageSize()" [nzTotal]="total()"
+                        [nzShowSizeChanger]="false" (nzPageIndexChange)="onPageChange($event)">
+                    </nz-pagination>
+                </div>
+                }
+            </nz-spin>
+        </main>
+    </div>
+</div>
+
+<!-- Mobile filter drawer -->
+<nz-drawer [nzVisible]="isFilterDrawerOpen()" nzPlacement="bottom" [nzHeight]="'85vh'" nzTitle="Bộ lọc sản phẩm"
+    (nzOnClose)="closeFilterDrawer()">
+    <ng-container *nzDrawerContent>
+        <div class="drawer-filter-body">
+            <ng-container *ngTemplateOutlet="filterPanel"></ng-container>
+            <div class="drawer-actions">
+                <button nz-button nzBlock (click)="clearFilters()">
+                    <nz-icon nzType="close-circle"></nz-icon> Xóa bộ lọc
+                </button>
+                <button nz-button nzType="primary" nzBlock (click)="applyFilters(); closeFilterDrawer()">
+                    <nz-icon nzType="search"></nz-icon> Áp dụng ({{ total() }})
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</nz-drawer>
+
+<!-- Shared filter panel template -->
+<ng-template #filterPanel>
+    <div class="filter-section">
+        <label class="filter-label">Danh mục</label>
+        <nz-tree-select style="width: 100%" [nzNodes]="categoryTree()" nzShowSearch nzHideUnMatched
+            nzPlaceHolder="-- Tất cả danh mục --" [ngModel]="selectedCategoryID()"
+            (ngModelChange)="selectedCategoryID.set($event)">
+        </nz-tree-select>
+    </div>
+
+    <div class="filter-section">
+        <label class="filter-label">Tình trạng</label>
+        <nz-select style="width: 100%" nzPlaceHolder="-- Tất cả --" [nzAllowClear]="true"
+            [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+            @for (s of statusOptions; track s.value) {
+            <nz-option [nzLabel]="s.label" [nzValue]="s.value"></nz-option>
+            }
+        </nz-select>
+    </div>
+
+    <div class="filter-section">
+        <label class="filter-label">Khoảng giá (VND)</label>
+        <div class="price-input-row">
+            <nz-input-number [nzMin]="0" [nzStep]="10000" nzPlaceHolder="Từ" style="width: 100%"
+                [ngModel]="minPrice()" (ngModelChange)="minPrice.set($event)">
+            </nz-input-number>
+            <span class="price-sep">—</span>
+            <nz-input-number [nzMin]="0" [nzStep]="10000" nzPlaceHolder="Đến" style="width: 100%"
+                [ngModel]="maxPrice()" (ngModelChange)="maxPrice.set($event)">
+            </nz-input-number>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <label class="filter-label">Đơn vị tính</label>
+        <nz-select style="width: 100%" nzShowSearch nzPlaceHolder="-- Tất cả --" [nzAllowClear]="true"
+            [ngModel]="selectedUnitCountID()" (ngModelChange)="selectedUnitCountID.set($event)">
+            @for (u of unitCounts(); track u.ID) {
+            <nz-option [nzLabel]="u.UnitName" [nzValue]="u.ID"></nz-option>
+            }
+        </nz-select>
+    </div>
+</ng-template>

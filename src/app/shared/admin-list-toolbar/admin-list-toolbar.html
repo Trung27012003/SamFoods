@@ -1,0 +1,35 @@
+<div class="admin-list-toolbar">
+	<div class="search-box">
+		<nz-input-group [nzPrefix]="searchIcon" nzSize="default">
+			<input
+				type="text"
+				nz-input
+				[placeholder]="placeholder"
+				[ngModel]="searchValue"
+				(ngModelChange)="onSearchInput($event)" />
+		</nz-input-group>
+		<ng-template #searchIcon>
+			<nz-icon nzType="search"></nz-icon>
+		</ng-template>
+	</div>
+
+	@for (f of filters; track f.key) {
+		<nz-select
+			class="filter-select"
+			[nzPlaceHolder]="f.placeholder"
+			[nzAllowClear]="true"
+			[ngModel]="f.value"
+			(ngModelChange)="onFilterChange(f.key, $event)">
+			@for (opt of f.options; track opt.value) {
+				<nz-option [nzLabel]="opt.label" [nzValue]="opt.value"></nz-option>
+			}
+		</nz-select>
+	}
+
+	@if (showClear) {
+		<button nz-button nzType="default" (click)="onClear()">
+			<nz-icon nzType="reload"></nz-icon>
+			<span class="ms-1">{{ clearLabel }}</span>
+		</button>
+	}
+</div>

@@ -1,0 +1,102 @@
+<div class="checkout-success-page">
+	<!-- Confetti animation -->
+	<div class="confetti-container" aria-hidden="true">
+		@for (piece of confettiPieces; track $index) {
+			<span
+				class="confetti-piece"
+				[style.left.%]="piece.left"
+				[style.animation-delay]="piece.delay + 's'"
+				[style.animation-duration]="piece.duration + 's'"
+				[style.transform]="'rotate(' + piece.rotate + 'deg)'"
+				[style.background]="piece.color"
+			></span>
+		}
+	</div>
+
+	<div class="success-card">
+		<!-- Animated success badge -->
+		<div class="success-badge">
+			<svg class="success-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+				<circle class="success-circle" cx="40" cy="40" r="36" fill="none" stroke="#52c41a" stroke-width="4" />
+				<path class="success-check" fill="none" stroke="#52c41a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+					d="M22 42 L35 55 L58 28" />
+			</svg>
+		</div>
+
+		<h1 class="success-title">Đặt hàng thành công!</h1>
+		<p class="success-subtitle">
+			Cảm ơn <strong>{{ customerName || 'quý khách' }}</strong> đã mua hàng.
+			Đơn hàng của bạn đã được gửi tới hệ thống và đang chờ xử lý.
+		</p>
+
+		<!-- Bill code section -->
+		<div class="bill-code-section">
+			<span class="bill-code-label">Mã đơn hàng</span>
+			<div class="bill-code-row">
+				<span class="bill-code">{{ billCode || '—' }}</span>
+				@if (billCode) {
+					<button class="copy-btn" type="button" (click)="copyBillCode()" title="Sao chép mã đơn">
+						<span nz-icon nzType="copy" nzTheme="outline"></span>
+					</button>
+				}
+			</div>
+		</div>
+
+		<!-- Order summary -->
+		<div class="order-summary">
+			<div class="summary-row">
+				<span class="summary-label"><span nz-icon nzType="calendar"></span> Ngày đặt</span>
+				<span class="summary-value">{{ orderDateText }}</span>
+			</div>
+			<div class="summary-row">
+				<span class="summary-label"><span nz-icon nzType="user"></span> Khách hàng</span>
+				<span class="summary-value">{{ customerName || '—' }}</span>
+			</div>
+			<div class="summary-row">
+				<span class="summary-label"><span nz-icon nzType="phone"></span> Số điện thoại</span>
+				<span class="summary-value">{{ phoneNumber || '—' }}</span>
+			</div>
+			<div class="summary-row">
+				<span class="summary-label"><span nz-icon nzType="environment"></span> Địa chỉ</span>
+				<span class="summary-value">{{ address || '—' }}</span>
+			</div>
+			@if (note) {
+				<div class="summary-row">
+					<span class="summary-label"><span nz-icon nzType="message"></span> Ghi chú</span>
+					<span class="summary-value">{{ note }}</span>
+				</div>
+			}
+			<div class="summary-row">
+				<span class="summary-label"><span nz-icon nzType="credit-card"></span> Thanh toán</span>
+				<span class="summary-value">{{ paymentMethod }} (khi nhận hàng)</span>
+			</div>
+			<div class="summary-row total-row">
+				<span class="summary-label"><span nz-icon nzType="gift"></span> Tổng thanh toán</span>
+				<span class="summary-value total-value">{{ totalText }}</span>
+			</div>
+		</div>
+
+		<!-- Notice box -->
+		<div class="notice-box">
+			<span class="notice-icon" nz-icon nzType="info-circle" nzTheme="fill"></span>
+			<div>
+				<strong>Đơn hàng của bạn đang được xử lý.</strong>
+				<br />
+				Chúng tôi sẽ liên hệ xác nhận trong thời gian sớm nhất.
+				Mọi thắc mắc vui lòng liên hệ hotline trên website.
+			</div>
+		</div>
+
+		<!-- Action buttons -->
+		<div class="action-buttons">
+			<button class="btn-primary" type="button" (click)="goHome()">
+				<span nz-icon nzType="home"></span>
+				Về trang chủ
+			</button>
+			<button class="btn-secondary" type="button" (click)="goShopping()">
+				<span nz-icon nzType="shopping"></span>
+				Tiếp tục mua sắm
+			</button>
+		</div>
+	</div>
+</div>

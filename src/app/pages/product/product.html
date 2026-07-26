@@ -1,0 +1,84 @@
+<app-admin-page-header
+	title="Quản lý Sản phẩm"
+	subtitle="Danh sách sản phẩm trong hệ thống"
+	[breadcrumbs]="['Quản lý', 'Sản phẩm']">
+	<div actions class="d-flex gap-2">
+		<button nz-button nzType="primary" (click)="onCreate()">
+			<i class="fa-solid fa-plus me-1"></i>
+			Thêm sản phẩm
+		</button>
+		<button nz-button nzType="default" (click)="onEdit()" [disabled]="!selectedItem?.ID">
+			<i class="fa-solid fa-pen me-1"></i>
+			Sửa
+		</button>
+		<button nz-button nzType="default" nzDanger (click)="onDelete()" [disabled]="!selectedItem?.ID">
+			<i class="fa-solid fa-trash me-1"></i>
+			Xóa
+		</button>
+	</div>
+</app-admin-page-header>
+
+<app-admin-list-toolbar
+	placeholder="Tìm theo mã hoặc tên sản phẩm..."
+	[searchValue]="searchValue()"
+	[filters]="[
+		{ key: 'category', placeholder: '-- Danh mục --', options: categoryOptions, value: selectedCategory() },
+		{ key: 'status', placeholder: '-- Tình trạng --', options: statusOptions, value: selectedStatus() }
+	]"
+	(searchChange)="onSearch($event)"
+	(filterChange)="onFilterChange($event)"
+	(clear)="clearFilters()">
+</app-admin-list-toolbar>
+
+<div class="admin-card p-0">
+	<p-table
+		size="small"
+		[columns]="cols"
+		[value]="products"
+		[tableStyle]="{ 'min-width': '70rem' }"
+		[loading]="isLoadingData()"
+		selectionMode="single"
+		[(selection)]="selectedItem"
+		(onRowSelect)="onRowSelect($event)"
+		(onRowUnselect)="onRowUnselect($event)"
+		[scrollable]="true"
+		scrollHeight="calc(100vh - 360px)"
+		showGridlines
+		[paginator]="true"
+		[rows]="20"
+		[rowsPerPageOptions]="[10, 20, 50, 100]">
+		<ng-template #header let-columns>
+			<tr>
+				@for (col of columns; track col) {
+				<th>
+					{{ col.header }}
+				</th>
+				}
+			</tr>
+		</ng-template>
+		<ng-template #body let-rowData let-columns="columns">
+			<tr [pSelectableRow]="rowData" (dblclick)="onEdit()">
+				@for (col of columns; track col) {
+				<td>
+					@if (col.field === 'StatusName') {
+					<app-admin-status-tag
+						[status]="rowData['Status']"
+						[label]="rowData[col.field]" />
+					} @else if (col.field === 'UnitPrice') {
+					<span class="fw-semibold text-danger">{{ rowData[col.field] }}</span>
+					} @else {
+					{{ rowData[col.field] }}
+					}
+				</td>
+				}
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td [attr.colspan]="cols.length" class="text-center p-4">
+					<nz-empty nzNotFoundContent="Không có sản phẩm nào"></nz-empty>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</div>

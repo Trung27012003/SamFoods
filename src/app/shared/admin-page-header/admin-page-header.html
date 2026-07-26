@@ -1,0 +1,27 @@
+<div class="admin-page-header">
+	@if (breadcrumbs.length > 0) {
+		<nz-breadcrumb class="mb-2">
+			<nz-breadcrumb-item>
+				<nz-icon nzType="home"></nz-icon>
+			</nz-breadcrumb-item>
+			@for (crumb of breadcrumbs; track crumb; let last = $last) {
+				<nz-breadcrumb-item>
+					{{ crumb }}
+				</nz-breadcrumb-item>
+			}
+		</nz-breadcrumb>
+	}
+
+	<div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+		<div>
+			<h1>{{ title }}</h1>
+			@if (subtitle) {
+				<p class="subtitle">{{ subtitle }}</p>
+			}
+		</div>
+
+		<div class="actions">
+			<ng-content select="[actions]"></ng-content>
+		</div>
+	</div>
+</div>

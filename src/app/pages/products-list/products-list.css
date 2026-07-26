@@ -1,0 +1,240 @@
+/* Products List page */
+
+.products-page {
+    min-height: 60vh;
+}
+
+/* Product card styles for /products page
+   (copy từ shopping-layout.css vì Angular ViewEncapsulation không leak CSS
+   giữa ShoppingLayout và ProductsList component) */
+.products-grid .product-card {
+    width: 100%;
+    max-width: 220px;
+    position: relative;
+    background: #fff;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.products-grid .product-card:hover {
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
+
+.products-grid .badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 12px;
+    padding: 0.5rem 1rem;
+    border-radius: 0 !important;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.products-grid .product-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    flex-shrink: 0;
+}
+
+.products-grid .product-img img {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.products-grid .product-name {
+    margin-top: 10px;
+    font-size: 14px;
+    height: 40px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.products-grid .product-name a {
+    color: #000;
+    text-decoration: none;
+}
+
+.products-grid .product-name a:hover {
+    color: var(--primary-color);
+}
+
+.products-grid .product-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.products-grid .price {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.products-grid .price small {
+    font-size: 11px;
+    font-weight: normal !important;
+}
+
+.products-grid .favorite {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.products-grid .favorite:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.products-grid .favorite.active {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.products-grid .btn-buy {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+}
+
+.products-grid .btn-buy:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+/* Toolbar */
+.products-toolbar {
+    background: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.toolbar-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Filter card (desktop sidebar) */
+.filter-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sticky-filter {
+    position: sticky;
+    top: 16px;
+}
+
+/* Show/hide filter sidebar with explicit fallback in case Bootstrap utility classes are scoped */
+.products-filter-aside {
+    display: none;
+}
+
+@media (min-width: 992px) {
+    .products-filter-aside {
+        display: block;
+    }
+}
+
+.filter-section {
+    margin-bottom: 16px;
+}
+
+.filter-section:last-child {
+    margin-bottom: 0;
+}
+
+.filter-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 14px;
+}
+
+/* Price range: 2 input number */
+.price-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-sep {
+    color: #999;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* Products grid - responsive columns via Bootstrap */
+/* .products-grid uses row + col-* classes from template */
+
+/* Empty state */
+.empty-state {
+    background: #fff;
+    border-radius: 8px;
+    padding: 40px 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Pagination */
+.pagination-wrapper ::ng-deep .ant-pagination {
+    justify-content: center;
+}
+
+/* Mobile drawer actions */
+.drawer-filter-body {
+    padding-bottom: 16px;
+}
+
+.drawer-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding-top: 12px;
+}
+
+.drawer-actions button {
+    flex: 1;
+}
+
+/* Favorite icon outline/fill align */
+.favorite i[nz-icon] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* placeholder for rebuild */

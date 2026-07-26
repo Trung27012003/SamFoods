@@ -1,0 +1,66 @@
+<app-admin-page-header
+	title="Quản lý Danh mục"
+	subtitle="Cấu trúc cây phân cấp danh mục sản phẩm"
+	[breadcrumbs]="['Quản lý', 'Danh mục']">
+	<div actions class="d-flex gap-2">
+		<button nz-button nzType="primary" (click)="onCreate()">
+			<i class="fa-solid fa-plus me-1"></i>
+			Thêm danh mục
+		</button>
+		<button nz-button nzType="default" (click)="onEdit()" [disabled]="!hasSelection">
+			<i class="fa-solid fa-pen me-1"></i>
+			Sửa
+		</button>
+		<button nz-button nzType="default" nzDanger (click)="onDelete()" [disabled]="!hasSelection">
+			<i class="fa-solid fa-trash me-1"></i>
+			Ngừng/Kích hoạt
+		</button>
+	</div>
+</app-admin-page-header>
+
+<app-admin-list-toolbar
+	placeholder="Tìm theo mã hoặc tên danh mục..."
+	[searchValue]="searchValue()"
+	(searchChange)="onSearch($event)">
+</app-admin-list-toolbar>
+
+<div class="admin-card p-0">
+	<p-treetable class="p-treetable-sm" [value]="categorys" [columns]="cols" [scrollable]="true" [tableStyle]="{ 'min-width': '60rem' }" [loading]="isLoadingData()" sortMode="multiple" [resizableColumns]="true" columnResizeMode="expand" showGridlines selectionMode="single" [(selection)]="selectedNode">
+		<ng-template #header let-columns>
+			<tr>
+				@for (col of columns; track col) {
+				<th ttResizableColumn>
+					{{ col.header }}
+				</th>
+				}
+			</tr>
+		</ng-template>
+		<ng-template #body let-rowNode let-rowData="rowData" let-columns="columns">
+			<tr [ttRow]="rowNode" [ttSelectableRow]="rowNode">
+				@for (col of columns; let first = $first; track col) {
+				<td>
+					@if (first) {
+					<div class="flex items-center gap-2">
+						<p-treetable-toggler [rowNode]="rowNode"></p-treetable-toggler>
+						<span>{{ rowData[col.field] }}</span>
+					</div>
+					} @else if (col.field === 'StatusText') {
+					<app-admin-status-tag
+						[color]="rowData['IsDeleted'] ? 'error' : 'success'"
+						[label]="rowData[col.field]" />
+					} @else {
+					{{ rowData[col.field] }}
+					}
+				</td>
+				}
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td [attr.colspan]="cols.length" class="text-center p-4">
+					<nz-empty nzNotFoundContent="Không có dữ liệu danh mục"></nz-empty>
+				</td>
+			</tr>
+		</ng-template>
+	</p-treetable>
+</div>

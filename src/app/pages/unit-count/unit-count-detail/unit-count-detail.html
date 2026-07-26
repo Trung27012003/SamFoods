@@ -1,0 +1,36 @@
+<form nz-form [nzLayout]="'vertical'" [formGroup]="validateForm" (ngSubmit)="handleOk()">
+	<div class="admin-form-card">
+	<h3 class="admin-form-section-title">Thông tin đơn vị tính</h3>
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Mã đơn vị tính</nz-form-label>
+				<nz-form-control nzErrorTip="Mã từ 1-20 ký tự!">
+					<input nz-input formControlName="UnitCode" placeholder="VD: KG, G, L" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Tên đơn vị tính</nz-form-label>
+				<nz-form-control nzErrorTip="Tên từ 1-100 ký tự!">
+					<input nz-input formControlName="UnitName" placeholder="VD: Kilogram, Gram, Lít" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+			<nz-form-item>
+				<nz-form-label>Mô tả</nz-form-label>
+				<nz-form-control>
+					<textarea nz-input formControlName="Descriptions" rows="3"
+						placeholder="Mô tả chi tiết về đơn vị tính..."></textarea>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+	</div>
+</form>

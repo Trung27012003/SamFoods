@@ -1,0 +1,55 @@
+<nz-spin [nzSpinning]="isLoadingDetail()">
+<form nz-form [nzLayout]="'vertical'" [formGroup]="validateForm" (ngSubmit)="handleOk()">
+	<div class="admin-form-card">
+	<h3 class="admin-form-section-title">Thông tin danh mục</h3>
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8">
+			<nz-form-item>
+				<nz-form-label nzRequired>STT</nz-form-label>
+				<nz-form-control nzErrorTip="Vui lòng nhập STT hợp lệ!">
+					<nz-input-number class="w-100" formControlName="STT" nzMin="1" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="12" nzMd="16" nzLg="16">
+			<nz-form-item>
+				<nz-form-label nzRequired>Mã danh mục</nz-form-label>
+				<nz-form-control nzErrorTip="Mã danh mục từ 2-50 ký tự!">
+					<input nz-input formControlName="CategoryCode" placeholder="VD: FOOD-001" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+
+	<nz-form-item>
+		<nz-form-label nzRequired>Tên danh mục</nz-form-label>
+		<nz-form-control nzErrorTip="Tên danh mục từ 2-200 ký tự!">
+			<input nz-input formControlName="CategoryName" placeholder="Nhập tên danh mục" />
+		</nz-form-control>
+	</nz-form-item>
+
+	<nz-form-item>
+		<nz-form-label>Danh mục cha</nz-form-label>
+		<nz-form-control>
+			<nz-tree-select
+				[nzNodes]="categoryNodes"
+				nzShowSearch
+				nzPlaceHolder="Chọn danh mục cha (không chọn = danh mục gốc)"
+				nzVirtualHeight="20vh"
+				nzHideUnMatched
+				formControlName="ParentID">
+			</nz-tree-select>
+		</nz-form-control>
+	</nz-form-item>
+
+	<nz-form-item>
+		<nz-form-control>
+			<label nz-checkbox formControlName="IsDeleted">
+				<span>Ngừng hoạt động</span>
+			</label>
+		</nz-form-control>
+	</nz-form-item>
+	</div>
+</form>
+</nz-spin>

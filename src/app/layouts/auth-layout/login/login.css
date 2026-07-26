@@ -1,0 +1,75 @@
+.gradient-custom-2 {
+    /* fallback for old browsers */
+    background: #fccb90;
+
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
+
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
+}
+
+@media (min-width: 768px) {
+    .gradient-form {
+        height: 100vh !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .gradient-custom-2 {
+        border-top-right-radius: .3rem;
+        border-bottom-right-radius: .3rem;
+    }
+}
+
+/* Card style - remove border/shadow */
+.card {
+	box-shadow: none;
+	border: none;
+	background: transparent;
+}
+
+/* Form label-control layout */
+.form-row {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 16px;
+}
+
+.form-label {
+	margin-bottom: 4px;
+}
+
+.form-control {
+	width: 100%;
+}
+
+.form-control input,
+.form-control .ant-input {
+	width: 100%;
+}
+
+/* Remove form-control border/wrapper styling */
+.form-control .ant-form-item-control {
+	border: none !important;
+	box-shadow: none !important;
+}
+
+.form-control .ant-form-item-control-wrapper {
+	border: none !important;
+	box-shadow: none !important;
+}
+
+/* Back to home link */
+.back-home-link {
+	color: #ffffff;
+	text-decoration: none;
+	font-weight: 500;
+	transition: opacity 0.2s;
+}
+
+.back-home-link:hover {
+	opacity: 0.8;
+	color: #ffffff;
+	text-decoration: none;
+}

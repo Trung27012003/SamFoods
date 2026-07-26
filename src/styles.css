@@ -1,0 +1,412 @@
+/* ============================================================
+   SamFoods – Global Stylesheet
+   Design tokens + PrimeNG/ng-zorro overrides
+   ============================================================ */
+
+:root {
+	/* Brand */
+	--brand-primary: #80001c;
+	--brand-primary-hover: #a30026;
+	--brand-primary-active: #5a0014;
+	--brand-primary-soft: rgba(128, 0, 28, 0.08);
+
+	/* Semantic */
+	--color-success: #52c41a;
+	--color-warning: #faad14;
+	--color-error: #ff4d4f;
+	--color-info: #1890ff;
+	--color-processing: #1677ff;
+
+	/* Surface */
+	--surface-bg: #f0f2f5;
+	--surface-card: #ffffff;
+	--surface-hover: #fafafa;
+	--surface-border: #e8e8e8;
+	--surface-sider: #001529;
+	--surface-sider-active: var(--brand-primary);
+
+	/* Text */
+	--text-primary: rgba(0, 0, 0, 0.88);
+	--text-secondary: rgba(0, 0, 0, 0.65);
+	--text-tertiary: rgba(0, 0, 0, 0.45);
+	--text-disabled: rgba(0, 0, 0, 0.25);
+	--text-on-brand: #ffffff;
+	--text-on-sider: rgba(255, 255, 255, 0.85);
+
+	/* Radius */
+	--radius-sm: 4px;
+	--radius-md: 8px;
+	--radius-lg: 12px;
+
+	/* Shadow */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+	--shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+	--shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+	/* Spacing (4px scale) */
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 20px;
+	--space-6: 24px;
+	--space-8: 32px;
+
+	/* Layout */
+	--sider-width: 256px;
+	--header-height: 64px;
+	--content-padding: 24px;
+
+	/* Z-index */
+	--z-sider: 10;
+	--z-header: 5;
+	--z-drawer: 50;
+	--z-modal: 1000;
+
+	/* Backward-compat */
+	--primary-color: var(--brand-primary);
+}
+
+/* ============================================================
+   Body baseline
+   ============================================================ */
+html,
+body {
+	height: 100%;
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	background-color: var(--surface-bg);
+	color: var(--text-primary);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+/* ============================================================
+   Admin Layout (.admin-layout)
+   Scope mọi rule admin để không ảnh hưởng shopping-layout
+   ============================================================ */
+.admin-layout {
+	height: 100vh;
+}
+
+.admin-layout .menu-sidebar {
+	position: relative;
+	z-index: var(--z-sider);
+	min-height: 100vh;
+	background: linear-gradient(180deg, #1f050d 0%, #001529 100%);
+	box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+}
+
+.admin-layout .sidebar-logo {
+	position: relative;
+	height: var(--header-height);
+	padding-left: var(--space-6);
+	overflow: hidden;
+	line-height: var(--header-height);
+	background: var(--brand-primary);
+	transition: all 0.3s;
+}
+
+.admin-layout .sidebar-logo img {
+	display: inline-block;
+	height: 32px;
+	width: 32px;
+	vertical-align: middle;
+}
+
+.admin-layout .sidebar-logo h1 {
+	display: inline-block;
+	margin: 0 0 0 20px;
+	color: var(--text-on-brand);
+	font-weight: 600;
+	font-size: 18px;
+	font-family: inherit;
+	vertical-align: middle;
+	letter-spacing: 0.5px;
+}
+
+/* Override ng-zorro sider menu to use brand color */
+.admin-layout ul[nz-menu][nzTheme='dark'] {
+	background: transparent;
+}
+
+.admin-layout ul[nz-menu][nzTheme='dark'] li[nz-menu-item-selected] {
+	background-color: var(--brand-primary) !important;
+	color: var(--text-on-brand) !important;
+}
+
+.admin-layout ul[nz-menu][nzTheme='dark'] li[nz-menu-item]:hover {
+	color: var(--text-on-brand) !important;
+}
+
+.admin-layout ul[nz-menu] li[nz-menu-item] > a[nz-icon],
+.admin-layout ul[nz-menu] li[nz-menu-item] a nz-icon {
+	margin-right: 10px;
+	font-size: 16px;
+	vertical-align: middle;
+}
+
+.admin-layout .header-trigger {
+	height: var(--header-height);
+	padding: var(--space-5) var(--space-6);
+	font-size: 20px;
+	cursor: pointer;
+	transition: all 0.3s, padding 0s;
+	color: var(--text-secondary);
+}
+
+.admin-layout .header-trigger:hover {
+	color: var(--brand-primary);
+}
+
+.admin-layout nz-header {
+	padding: 0;
+	width: 100%;
+	z-index: var(--z-header);
+}
+
+.admin-layout .app-header {
+	position: relative;
+	height: var(--header-height);
+	padding: 0;
+	background: var(--surface-card);
+	box-shadow: var(--shadow-sm);
+	border-bottom: 1px solid var(--surface-border);
+}
+
+.admin-layout nz-content {
+	margin: var(--space-6);
+}
+
+.admin-layout .inner-content {
+	padding: var(--space-6);
+	background: var(--surface-card);
+	height: 100%;
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm);
+	overflow: auto;
+}
+
+/* ============================================================
+   Admin Buttons (ng-zorro) – brand color override
+   ============================================================ */
+.ant-btn-primary {
+	background-color: var(--brand-primary) !important;
+	border-color: var(--brand-primary) !important;
+}
+
+.ant-btn-primary:not(:disabled):hover,
+.ant-btn-primary:not(:disabled):focus {
+	background-color: var(--brand-primary-hover) !important;
+	border-color: var(--brand-primary-hover) !important;
+}
+
+.ant-btn-primary:not(:disabled):active {
+	background-color: var(--brand-primary-active) !important;
+	border-color: var(--brand-primary-active) !important;
+}
+
+/* ============================================================
+   Admin PrimeNG overrides
+   ============================================================ */
+.admin-layout .p-menubar {
+	background: var(--surface-card);
+	border: 1px solid var(--surface-border);
+	border-radius: var(--radius-md);
+	padding: var(--space-2) var(--space-3);
+	box-shadow: var(--shadow-sm);
+}
+
+.admin-layout .p-menubar .p-menuitem-link:focus {
+	box-shadow: none;
+}
+
+.admin-layout .p-datatable {
+	border-radius: var(--radius-md);
+	overflow: hidden;
+}
+
+.admin-layout .p-datatable .p-datatable-thead > tr > th {
+	background: var(--surface-bg);
+	color: var(--text-secondary);
+	font-weight: 600;
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+	border-bottom: 2px solid var(--surface-border);
+}
+
+.admin-layout .p-datatable .p-datatable-tbody > tr {
+	transition: background-color 0.15s ease;
+}
+
+.admin-layout .p-datatable .p-datatable-tbody > tr:hover {
+	background-color: var(--brand-primary-soft) !important;
+}
+
+.admin-layout .p-datatable .p-datatable-tbody > tr.p-datatable-row-selected {
+	background-color: var(--brand-primary-soft) !important;
+	color: var(--text-primary);
+}
+
+.admin-layout .p-paginator {
+	background: transparent;
+	padding: var(--space-3) 0;
+}
+
+/* ============================================================
+   Admin shared utility classes
+   ============================================================ */
+.admin-card {
+	background: var(--surface-card);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm);
+	border: 1px solid var(--surface-border);
+	padding: var(--space-4);
+	margin-top: var(--space-4);
+}
+
+.admin-page-header {
+	margin-bottom: var(--space-5);
+	padding-bottom: var(--space-4);
+	border-bottom: 1px solid var(--surface-border);
+}
+
+.admin-page-header h1 {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.admin-page-header .subtitle {
+	margin: var(--space-1) 0 0 0;
+	color: var(--text-tertiary);
+	font-size: 13px;
+}
+
+.admin-page-header .actions {
+	display: flex;
+	gap: var(--space-2);
+	align-items: center;
+}
+
+/* Form labels a bit heavier for readability */
+.admin-layout .ant-form-item-label > label {
+	font-weight: 500;
+	color: var(--text-secondary);
+}
+
+/* nz-tag: rounded pill */
+.admin-layout .ant-tag {
+	border-radius: 999px;
+	padding: 0 var(--space-2);
+	font-weight: 500;
+}
+
+/* ============================================================
+   Admin Modal / Form patterns (dùng trong các *-detail)
+   ============================================================ */
+.admin-layout .ant-modal-content {
+	border-radius: var(--radius-md) !important;
+}
+
+.admin-layout .ant-modal-header {
+	border-radius: var(--radius-md) var(--radius-md) 0 0;
+	padding: var(--space-4) var(--space-5);
+	background: var(--surface-card);
+}
+
+.admin-layout .ant-modal-title {
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.admin-layout .ant-modal-body {
+	padding: var(--space-5);
+	background: var(--surface-bg);
+}
+
+.admin-layout .ant-modal-footer {
+	padding: var(--space-3) var(--space-5);
+	border-top: 1px solid var(--surface-border);
+	background: var(--surface-card);
+	border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.admin-form-card {
+	background: var(--surface-card);
+	border-radius: var(--radius-md);
+	padding: var(--space-4) var(--space-5);
+	margin-bottom: var(--space-4);
+	border: 1px solid var(--surface-border);
+}
+
+.admin-form-section-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin: var(--space-4) 0 var(--space-3) 0;
+	padding-bottom: var(--space-2);
+	border-bottom: 1px dashed var(--surface-border);
+}
+
+.admin-form-section-title:first-child {
+	margin-top: 0;
+}
+
+.admin-image-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: var(--space-3);
+	margin-top: var(--space-3);
+}
+
+.admin-image-item {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	border: 2px solid var(--surface-border);
+	border-radius: var(--radius-md);
+	overflow: hidden;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	background: var(--surface-bg);
+}
+
+.admin-image-item:hover {
+	border-color: var(--brand-primary);
+	box-shadow: var(--shadow-md);
+	transform: translateY(-1px);
+}
+
+.admin-image-item.selected {
+	border-color: var(--brand-primary);
+	box-shadow: 0 0 0 3px var(--brand-primary-soft);
+}
+
+.admin-image-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.admin-image-item .primary-badge {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	background: var(--brand-primary);
+	color: var(--text-on-brand);
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+}

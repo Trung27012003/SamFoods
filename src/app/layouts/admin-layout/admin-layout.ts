@@ -1,0 +1,57 @@
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzLayoutModule } from 'ng-zorro-antd/layout';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { CommonModule } from '@angular/common';
+import { LOGO_URL } from '../../shared/common.config';
+import { AuthService } from '../auth-layout/auth-service';
+import { UserInfo } from '../auth-layout/auth-service';
+
+@Component({
+	selector: 'app-admin-layout',
+	imports: [
+		RouterLink,
+		RouterOutlet,
+		NzIconModule,
+		NzLayoutModule,
+		NzMenuModule,
+		NzAvatarModule,
+		NzDropDownModule,
+		NzButtonModule,
+		CommonModule
+	],
+	templateUrl: './admin-layout.html',
+	styleUrl: '../../app.css',
+})
+export class AdminLayout {
+	isCollapsed = false;
+	logoURL = LOGO_URL;
+	currentUser: UserInfo | null = null;
+
+	private authService = inject(AuthService);
+	private notification = inject(NzNotificationService);
+	private router = inject(Router);
+
+	constructor() {
+		this.loadUserInfo();
+	}
+
+	loadUserInfo(): void {
+		this.currentUser = this.authService.getCurrentUser();
+	}
+
+	logout(): void {
+		this.authService.logout();
+		this.notification.success('Đăng xuất', 'Hẹn gặp lại!');
+		this.router.navigate(['/login']);
+	}
+
+	goToHome(): void {
+		this.router.navigate(['/home']);
+	}
+}

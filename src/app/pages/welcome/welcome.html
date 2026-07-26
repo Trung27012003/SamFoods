@@ -1,0 +1,53 @@
+<app-admin-page-header
+	title="Dashboard"
+	subtitle="Tổng quan hệ thống SamFoods">
+</app-admin-page-header>
+
+<div class="kpi-grid">
+	@for (kpi of kpis(); track kpi.label) {
+	<a class="kpi-card" [style.--kpi-color]="kpi.color" [routerLink]="kpi.route">
+		<div class="kpi-icon">
+			<nz-icon [nzType]="kpi.icon" nzTheme="outline"></nz-icon>
+		</div>
+		<div class="kpi-body">
+			<div class="kpi-label">{{ kpi.label }}</div>
+			@if (kpi.loading) {
+				<div class="kpi-value skeleton">—</div>
+			} @else {
+				<div class="kpi-value">{{ kpi.value }}</div>
+			}
+		</div>
+		<nz-icon class="kpi-arrow" nzType="arrow-right"></nz-icon>
+	</a>
+	}
+</div>
+
+<div class="quick-row mt-4">
+	<div class="admin-card">
+		<h3 class="admin-form-section-title">Lối tắt nhanh</h3>
+		<div class="quick-actions">
+			<button nz-button nzType="primary" routerLink="/admin/product">
+				<i class="fa-solid fa-plus me-1"></i> Thêm sản phẩm
+			</button>
+			<button nz-button routerLink="/admin/invoice">
+				<i class="fa-solid fa-list me-1"></i> Xem đơn hàng
+			</button>
+			<button nz-button routerLink="/admin/promotion">
+				<i class="fa-solid fa-gift me-1"></i> Tạo khuyến mãi
+			</button>
+			<button nz-button routerLink="/admin/banner">
+				<i class="fa-solid fa-image me-1"></i> Quản lý banner
+			</button>
+		</div>
+	</div>
+
+	<div class="admin-card">
+		<h3 class="admin-form-section-title">Hướng dẫn</h3>
+		<ul class="tip-list">
+			<li><nz-icon nzType="check-circle" nzTheme="fill" style="color: var(--color-success);"></nz-icon> Double-click 1 dòng trong bảng để mở form sửa nhanh.</li>
+			<li><nz-icon nzType="check-circle" nzTheme="fill" style="color: var(--color-success);"></nz-icon> Dùng thanh filter phía trên bảng để lọc theo trạng thái / danh mục.</li>
+			<li><nz-icon nzType="check-circle" nzTheme="fill" style="color: var(--color-success);"></nz-icon> Trang admin phân quyền theo mã chức năng (N1, N2, ...).</li>
+			<li><nz-icon nzType="info-circle" nzTheme="fill" style="color: var(--color-info);"></nz-icon> Màu thương hiệu: <strong style="color: var(--brand-primary);">đỏ đô #80001c</strong>.</li>
+		</ul>
+	</div>
+</div>

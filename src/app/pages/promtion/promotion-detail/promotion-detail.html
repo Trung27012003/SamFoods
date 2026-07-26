@@ -1,0 +1,205 @@
+<form nz-form [nzLayout]="'vertical'" [formGroup]="validateForm" (ngSubmit)="handleOk()">
+	<div class="admin-form-card">
+	<h3 class="admin-form-section-title">Thông tin chung</h3>
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="8" nzMd="6" nzLg="6">
+			<nz-form-item>
+				<nz-form-label nzRequired>STT</nz-form-label>
+				<nz-form-control nzErrorTip="STT phải >= 1!">
+					<nz-input-number class="w-100" formControlName="STT" nzMin="1" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="8" nzMd="9" nzLg="9">
+			<nz-form-item>
+				<nz-form-label nzRequired>Mã khuyến mại</nz-form-label>
+				<nz-form-control nzErrorTip="Mã từ 2-50 ký tự!">
+					<input nz-input formControlName="PromotionCode" placeholder="VD: KM-001" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="8" nzMd="9" nzLg="9">
+			<nz-form-item>
+				<nz-form-label nzRequired>Tên khuyến mại</nz-form-label>
+				<nz-form-control nzErrorTip="Vui lòng nhập tên khuyến mại!">
+					<input nz-input formControlName="PromotionName" placeholder="VD: Giảm giá mùa hè" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+	</div>
+
+	<div class="admin-form-card">
+	<h3 class="admin-form-section-title">Cấu hình giảm giá</h3>
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Loại giảm giá</nz-form-label>
+				<nz-form-control nzErrorTip="Vui lòng chọn loại giảm giá!">
+					<nz-select class="w-100" formControlName="DiscountType" nzPlaceHolder="-- Chọn loại --">
+						@for (option of discountTypeOptions; track option.value) {
+						<nz-option [nzLabel]="option.label" [nzValue]="option.value" />
+						}
+					</nz-select>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Giá trị giảm</nz-form-label>
+				<nz-form-control nzErrorTip="Giá trị phải >= 0!">
+					<nz-input-number
+						class="w-100"
+						formControlName="DiscountValue"
+						nzMin="0"
+						[nzMax]="validateForm.get('DiscountType')?.value === 1 ? 100 : undefined"
+						[nzFormatter]="validateForm.get('DiscountType')?.value === 1 ? (v) => v + '%' : undefined" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label>Đơn tối thiểu (VNĐ)</nz-form-label>
+				<nz-form-control>
+					<nz-input-number
+						class="w-100"
+						formControlName="MinOrderAmount"
+						nzMin="0"
+						nzPlaceHolder="VD: 100000" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label>Giảm tối đa (VNĐ)</nz-form-label>
+				<nz-form-control>
+					<nz-input-number
+						class="w-100"
+						formControlName="MaxDiscountAmount"
+						nzMin="0"
+						nzPlaceHolder="VD: 50000"
+						[nzDisabled]="validateForm.get('DiscountType')?.value !== 1" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label>Số lần sử dụng tối đa</nz-form-label>
+				<nz-form-control>
+					<nz-input-number
+						class="w-100"
+						formControlName="UsageLimit"
+						nzMin="0"
+						nzPlaceHolder="VD: 100 (để trống = không giới hạn)" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label>Đã sử dụng</nz-form-label>
+				<nz-form-control>
+					<nz-input-number
+						class="w-100"
+						formControlName="UsedCount"
+						nzMin="0"
+						nzDisabled />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+	</div>
+
+	<div class="admin-form-card">
+	<h3 class="admin-form-section-title">Nội dung &amp; thời gian</h3>
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+			<nz-form-item>
+				<nz-form-label nzRequired>Nội dung khuyến mại</nz-form-label>
+				<nz-form-control nzErrorTip="Vui lòng nhập nội dung khuyến mại!">
+					<textarea
+						nz-input
+						formControlName="PromotionContent"
+						rows="4"
+						placeholder="Mô tả chi tiết nội dung khuyến mại..."></textarea>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Ngày bắt đầu</nz-form-label>
+				<nz-form-control nzErrorTip="Vui lòng chọn ngày bắt đầu!">
+					<nz-date-picker
+						class="w-100"
+						formControlName="DateStart"
+						[nzFormat]="dateFormat"
+						[nzShowTime]="{ nzFormat: 'HH:mm' }"
+						[nzDisabled]="false">
+					</nz-date-picker>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Ngày kết thúc</nz-form-label>
+				<nz-form-control nzErrorTip="Vui lòng chọn ngày kết thúc!">
+					<nz-date-picker
+						class="w-100"
+						formControlName="DateEnd"
+						[nzFormat]="dateFormat"
+						[nzShowTime]="{ nzFormat: 'HH:mm' }"
+						[nzDisabledDate]="disabledDate">
+					</nz-date-picker>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+			<nz-form-item>
+				<nz-form-label>Trạng thái</nz-form-label>
+				<nz-form-control>
+					<label nz-checkbox formControlName="IsActive">
+						<span>Khuyến mại đang hoạt động</span>
+					</label>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+	</div>
+
+	<div class="admin-form-card">
+	<h3 class="admin-form-section-title">Banner khuyến mại</h3>
+	<nz-form-item>
+		<nz-form-control>
+			<nz-upload
+				class="w-100"
+				[nzAction]="''"
+				nzListType="picture"
+				[(nzFileList)]="promotionFiles"
+				[nzRemove]="onRemoveFile"
+				[nzBeforeUpload]="() => false">
+				<button nz-button type="button">
+					<nz-icon nzType="upload" />
+					<span>Chọn ảnh banner</span>
+				</button>
+			</nz-upload>
+		</nz-form-control>
+	</nz-form-item>
+	</div>
+</form>

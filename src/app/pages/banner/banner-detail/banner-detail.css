@@ -1,0 +1,66 @@
+/* Banner Detail Styles */
+.mt-lbl {
+	margin-top: 26px;
+}
+
+.image-preview {
+	width: 80px;
+	height: 80px;
+	border: 1px solid #d9d9d9;
+	border-radius: 4px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fafafa;
+}
+
+.image-preview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.banner-image-card {
+	position: relative;
+	border: 1px solid #e8e8e8;
+	border-radius: 6px;
+	background: #fff;
+	padding-right: 40px !important;
+}
+
+.banner-image-card .remove-btn {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	z-index: 2;
+}
+
+.banner-image-card .remove-btn:hover {
+	background-color: #fff1f0;
+}
+
+.add-image-btn {
+	width: 104px;
+	height: 104px;
+	border: 1px dashed #d9d9d9;
+	border-radius: 6px;
+	background: #fafafa;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	color: #999;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.add-image-btn:hover {
+	border-color: #1890ff;
+	color: #1890ff;
+}
+
+.add-image-btn nz-icon {
+	font-size: 24px;
+	margin-bottom: 4px;
+}

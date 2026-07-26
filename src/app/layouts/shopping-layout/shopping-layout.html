@@ -1,0 +1,282 @@
+<header>
+    <!-- <div class="header-top d-none d-md-block">
+        <div class="container">
+            <div class="row py-2">
+
+                <div class="col-3 header-login" *ngIf="isLoggedIn">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <span class="text-light me-2">Xin chào, <strong>{{ currentUser?.FullName || currentUser?.UserName }}</strong></span>
+                        <a *ngIf="isAdmin" routerLink="/admin/welcome" class="header-link me-2">Quản trị</a>
+                        <span class="px-2 text-light">|</span>
+                        <a (click)="logout()" class="header-link" style="cursor: pointer;">Đăng xuất</a>
+                    </div>
+                </div>
+                <div class="col-3 header-login" *ngIf="!isLoggedIn"></div>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="header-container">
+        <div class="card container">
+            <!-- Mobile header bar (hamburger + logo + cart) -->
+            <div class="mobile-header d-flex d-md-none align-items-center justify-content-between py-2">
+                <button type="button" class="mobile-menu-trigger" (click)="toggleMobileMenu()" aria-label="Mở menu">
+                    <nz-icon nzType="menu" nzTheme="outline"></nz-icon>
+                </button>
+                <a routerLink="/home" class="mobile-header-logo">
+                    <img [src]="logoURL" height="40" alt="SamFoods">
+                </a>
+                <a routerLink="/cart" class="mobile-header-cart" aria-label="Giỏ hàng">
+                    <nz-badge [nzCount]="totalQuantity()">
+                        <i class="fa-solid fa-cart-shopping fa-lg"></i>
+                    </nz-badge>
+                </a>
+            </div>
+
+            <!-- Desktop megamenu -->
+            <p-megamenu [model]="megaMenuItems() ?? []" styleClass="custom-megamenu d-none d-md-flex">
+
+                <!-- Login bên trái -->
+                <ng-template #start>
+                    <a routerLink="/home">
+                        <img [src]="logoURL" height="50">
+                    </a>
+                </ng-template>
+
+                <!-- Avatar bên phải -->
+                <ng-template #end>
+
+                    <nz-input-search nzAllowClear (nzSearch)="onSearch($event)">
+                        <input nz-input [(ngModel)]="keyword" placeholder="Bạn đang muốn tìm kiếm gì?" (ngModelChange)="onChange($event)" [nzAutocomplete]="auto" />
+                        <nz-autocomplete [nzDataSource]="autoCompleteKeywords()" #auto></nz-autocomplete>
+                    </nz-input-search>
+
+                    <a *ngIf="!isOnCartPage()" nz-dropdown [nzDropdownMenu]="menu" [nzTrigger]="'click'" [(nzVisible)]="isVisibleShopingCard" nzClickHide="true" class="ms-2">
+                        <nz-badge [nzCount]="totalQuantityNumber">
+                            <i class="fa-solid fa-cart-shopping fa-xl text-light"></i>
+                        </nz-badge>
+                    </a>
+                    <nz-dropdown-menu #menu="nzDropdownMenu">
+                        <nz-card [nzTitle]="nzTitleCard" [nzExtra]="extraTemplate">
+                            <app-shopping-cart></app-shopping-cart>
+                        </nz-card>
+
+                        <ng-template #nzTitleCard>
+                            <p class="m-0 fw-bold">Giỏ hàng ({{totalQuantity()}})</p>
+                        </ng-template>
+                        <ng-template #extraTemplate>
+                            <a (click)="onCloseShoppingCard($event)">
+                                <nz-icon nzType="close" />
+                            </a>
+                        </ng-template>
+                    </nz-dropdown-menu>
+                </ng-template>
+
+            </p-megamenu>
+        </div>
+    </div>
+
+    <!-- Mobile navigation drawer -->
+    <nz-drawer [nzVisible]="isMobileMenuOpen" nzPlacement="left" nzTitle="Menu" [nzWidth]="280" (nzOnClose)="closeMobileMenu()">
+        <ng-container *nzDrawerContent>
+            <div class="mobile-drawer-menu">
+                <a class="mobile-drawer-link" routerLink="/home" (click)="closeMobileMenu()">
+                    <nz-icon nzType="home" nzTheme="outline"></nz-icon>
+                    <span>Trang chủ</span>
+                </a>
+                <a class="mobile-drawer-link" routerLink="/products" (click)="closeMobileMenu()">
+                    <nz-icon nzType="appstore" nzTheme="outline"></nz-icon>
+                    <span>Tất cả sản phẩm</span>
+                </a>
+                <a class="mobile-drawer-link" routerLink="/home" (click)="closeMobileMenu()">
+                    <nz-icon nzType="fire" nzTheme="outline"></nz-icon>
+                    <span>Hàng mới</span>
+                </a>
+                <a class="mobile-drawer-link" routerLink="/cart" (click)="closeMobileMenu()">
+                    <nz-icon nzType="shopping-cart" nzTheme="outline"></nz-icon>
+                    <span>Giỏ hàng ({{ totalQuantity() }})</span>
+                </a>
+
+                <nz-divider></nz-divider>
+
+                <div class="mobile-drawer-section-title">Danh mục</div>
+                @if (mobileMenuCategories().length > 0) {
+                    @for (item of mobileMenuCategories(); track item.label) {
+                    <a class="mobile-drawer-link mobile-drawer-category" href="javascript:void(0)" (click)="item.command?.($event); closeMobileMenu()">
+                        {{ item.label }}
+                    </a>
+                    }
+                }
+
+                <nz-divider></nz-divider>
+
+                <ng-template #loggedInMobile>
+                    <a *ngIf="isAdmin" class="mobile-drawer-link" routerLink="/admin/welcome" (click)="closeMobileMenu()">
+                        <nz-icon nzType="setting" nzTheme="outline"></nz-icon>
+                        <span>Quản trị</span>
+                    </a>
+                    <a class="mobile-drawer-link" (click)="logout(); closeMobileMenu()">
+                        <nz-icon nzType="logout" nzTheme="outline"></nz-icon>
+                        <span>Đăng xuất</span>
+                    </a>
+                </ng-template>
+            </div>
+        </ng-container>
+    </nz-drawer>
+</header>
+
+<main>
+
+    <router-outlet></router-outlet>
+    <div class="group">
+        <nz-float-button-group nzShape="circle">
+            <!-- @for (item of socials; track $index) {
+               <nz-float-button [nzIcon]="zalo" [nzHref]="item.name === 'phone' ? 'tel:' + item.link : item.link"
+                    nzType="default" />
+
+               } -->
+
+            <nz-float-button [nzIcon]="zalo" [nzHref]="socials[0].link" nzType="default" />
+            <nz-float-button [nzIcon]="facebook" [nzHref]="socials[1].link" nzType="default" />
+            <nz-float-button [nzIcon]="messenger" [nzHref]="socials[2].link" nzType="default" />
+            <nz-float-button [nzIcon]="phone" [nzHref]="socials[3].link" nzType="default" />
+
+            <nz-float-button-top [nzVisibilityHeight]="600" />
+        </nz-float-button-group>
+
+        <ng-template #zalo>
+            <img src="assets/image/social/icons8-zalo-32.png" alt="">
+        </ng-template>
+
+        <ng-template #facebook>
+            <img src="assets/image/social/icons8-facebook-32.png" alt="">
+        </ng-template>
+        <ng-template #messenger>
+            <img src="assets/image/social/icons8-messenger-32.png" alt="">
+        </ng-template>
+        <ng-template #phone>
+            <img src="assets/image/social/icons8-phone-32.png" alt="">
+        </ng-template>
+
+    </div>
+</main>
+<footer class="footer-container">
+    <div class="footer-top">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Cột 1: Logo + mô tả + liên hệ -->
+                <div class="col-12 col-lg-4 col-md-12">
+                    <div class="footer-brand">
+                        <a routerLink="/home" class="footer-logo-link">
+                            <img [src]="logoURL" alt="SamFoods" class="footer-logo">
+                        </a>
+                        <p class="footer-tagline">
+                            SamFoods – Đặt đồ ăn nhanh, giao tận nơi. Thực đơn đa dạng, nguyên liệu tươi sạch, giao hàng siêu tốc trong 30 phút.
+                        </p>
+                    </div>
+
+                    <ul class="footer-contact list-unstyled">
+                        <li>
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>123 Nguyễn Văn Cừ, Long Biên, Hà Nội</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-phone"></i>
+                            <a href="tel:0384657756">0384 657 756</a>
+                            <span class="dot-sep">·</span>
+                            <a href="tel:0966669001">0966 669 001</a>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-envelope"></i>
+                            <a href="mailto:support@samfoods.vn">support&#64;samfoods.vn</a>
+                        </li>
+                        <li>
+                            <i class="fa-regular fa-clock"></i>
+                            <span>Mở cửa: 8:00 – 22:00 (Tất cả các ngày)</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cột 2: Về SamFoods -->
+                <div class="col-6 col-lg-2 col-md-4">
+                    <h6 class="footer-title">Về SamFoods</h6>
+                    <ul class="footer-links list-unstyled">
+                        @for (item of aboutLinks; track item.id) {
+                        <li><a [routerLink]="item.link">{{ item.label }}</a></li>
+                        }
+                    </ul>
+                </div>
+
+                <!-- Cột 3: Hỗ trợ khách hàng -->
+                <div class="col-6 col-lg-2 col-md-4">
+                    <h6 class="footer-title">Hỗ trợ khách hàng</h6>
+                    <ul class="footer-links list-unstyled">
+                        @for (item of supportLinks; track item.id) {
+                        <li><a [routerLink]="item.link">{{ item.label }}</a></li>
+                        }
+                    </ul>
+                </div>
+
+                <!-- Cột 4: Chính sách -->
+                <div class="col-6 col-lg-2 col-md-4">
+                    <h6 class="footer-title">Chính sách</h6>
+                    <ul class="footer-links list-unstyled">
+                        @for (item of policyLinks; track item.id) {
+                        <li><a [routerLink]="item.link">{{ item.label }}</a></li>
+                        }
+                    </ul>
+                </div>
+
+                <!-- Cột 5: Đăng ký + MXH -->
+                <div class="col-6 col-lg-2 col-md-12">
+                    <h6 class="footer-title">Kết nối với chúng tôi</h6>
+                    <div class="footer-socials">
+                        <a href="https://zalo.me/0966669001" target="_blank" rel="noopener" title="Zalo" aria-label="Zalo">
+                            <img src="assets/image/social/icons8-zalo-32.png" alt="Zalo">
+                        </a>
+                        <a href="https://www.facebook.com/NguyenVietHaiLong" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook">
+                            <img src="assets/image/social/icons8-facebook-32.png" alt="Facebook">
+                        </a>
+                        <a href="https://m.me/NguyenVietHaiLong" target="_blank" rel="noopener" title="Messenger" aria-label="Messenger">
+                            <img src="assets/image/social/icons8-messenger-32.png" alt="Messenger">
+                        </a>
+                        <a href="tel:0384657756" title="Gọi điện" aria-label="Phone">
+                            <img src="assets/image/social/icons8-phone-32.png" alt="Phone">
+                        </a>
+                    </div>
+
+                    <h6 class="footer-title mt-3">Phương thức thanh toán</h6>
+                    <div class="footer-payments">
+                        <span class="payment-badge" title="Tiền mặt">
+                            <i class="fa-solid fa-money-bill-wave"></i> COD
+                        </span>
+                        <span class="payment-badge" title="Chuyển khoản">
+                            <i class="fa-solid fa-building-columns"></i> Bank
+                        </span>
+                        <span class="payment-badge" title="Ví MoMo">
+                            <i class="fa-solid fa-wallet"></i> MoMo
+                        </span>
+                        <span class="payment-badge" title="VNPay">
+                            <i class="fa-solid fa-credit-card"></i> VNPay
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="footer-bottom-row">
+                <p class="copyright">
+                    © 2026 <strong>SamFoods</strong>. Đã đăng ký bản quyền. Phát triển bởi
+                    <a href="https://www.facebook.com/NguyenVietHaiLong" target="_blank" rel="noopener">SamFoods Team</a>.
+                </p>
+                <p class="cert">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Đã thông báo Bộ Công Thương · Số GP-1234/GPCĐ-XXX
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

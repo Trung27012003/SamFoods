@@ -1,0 +1,48 @@
+/* Invoice Detail Styles */
+.invoice-detail-container {
+	padding: 16px;
+}
+
+.section {
+	margin-bottom: 16px;
+}
+
+.section-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: #1890ff;
+	margin-bottom: 16px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.text-right {
+	text-align: right !important;
+}
+
+.text-danger {
+	color: #ff4d4f;
+}
+
+.fw-bold {
+	font-weight: 600;
+}
+
+.fs-5 {
+	font-size: 18px;
+}
+
+:host ::ng-deep .ant-descriptions-item-label {
+	font-weight: 500;
+}
+
+:host ::ng-deep .ant-table-tfoot > tr > td {
+	background: #fafafa;
+}
+
+:host ::ng-deep .nz-table {
+	border: 1px solid #f0f0f0;
+	border-radius: 8px;
+	overflow: hidden;
+}

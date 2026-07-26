@@ -1,0 +1,108 @@
+<section class="gradient-form">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-xl-10">
+                <div class="card rounded-3 text-black">
+                    <div class="row g-0">
+                        <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+                            <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                                <a routerLink="/home" class="back-home-link">
+                                    <i class="fa-solid fa-arrow-left me-2"></i>Quay lại trang chủ
+                                </a>
+                                <h4 class="mb-4 mt-3">Đăng ký tài khoản</h4>
+                                <p class="small mb-0">Tạo tài khoản để trải nghiệm dịch vụ của SamFoods.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card-body p-md-5 mx-md-4">
+                                <div class="text-center">
+                                    <img src="assets/image/logo.jpg" style="width: 100px;" alt="logo">
+                                    <h4 class="mt-3 mb-4 pb-1">Tạo tài khoản mới</h4>
+                                </div>
+
+                                <form [formGroup]="validateForm" (ngSubmit)="handleOk()">
+                                    <nz-spin [nzSpinning]="isLoading">
+                                        <div class="form-row">
+                                            <div class="form-label">
+                                                <nz-form-label nzRequired>Tên đăng nhập</nz-form-label>
+                                            </div>
+                                            <nz-form-control nzErrorTip="Vui lòng nhập tên đăng nhập (ít nhất 3 ký tự)!">
+                                                <input nz-input formControlName="UserName" placeholder="Nhập tên đăng nhập" autocomplete="username" />
+                                            </nz-form-control>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-label">
+                                                <nz-form-label nzRequired>Họ và tên</nz-form-label>
+                                            </div>
+                                            <nz-form-control nzErrorTip="Vui lòng nhập họ và tên (ít nhất 2 ký tự)!">
+                                                <input nz-input formControlName="FullName" placeholder="Nhập họ và tên" autocomplete="name" />
+                                            </nz-form-control>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-label">
+                                                <nz-form-label>Email</nz-form-label>
+                                            </div>
+                                            <nz-form-control nzErrorTip="Email không hợp lệ!">
+                                                <input nz-input type="email" formControlName="Email" placeholder="Nhập email (không bắt buộc)" autocomplete="email" />
+                                            </nz-form-control>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-label">
+                                                <nz-form-label>Số điện thoại</nz-form-label>
+                                            </div>
+                                            <nz-form-control nzErrorTip="Số điện thoại không hợp lệ (10-11 số)!">
+                                                <input nz-input formControlName="PhoneNumber" placeholder="Nhập số điện thoại (không bắt buộc)" autocomplete="tel" />
+                                            </nz-form-control>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-label">
+                                                <nz-form-label nzRequired>Mật khẩu</nz-form-label>
+                                            </div>
+                                            <nz-form-control nzErrorTip="Vui lòng nhập mật khẩu (ít nhất 6 ký tự)!">
+                                                <nz-input-group [nzSuffix]="passwordSuffixTemplate">
+                                                    <input [type]="showPassword ? 'text' : 'password'" nz-input formControlName="Password" placeholder="Nhập mật khẩu" autocomplete="new-password" />
+                                                </nz-input-group>
+                                                <ng-template #passwordSuffixTemplate>
+                                                    <nz-icon nzType="eye" nzTheme="outline" style="cursor: pointer;" (click)="togglePassword()"></nz-icon>
+                                                </ng-template>
+                                            </nz-form-control>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-label">
+                                                <nz-form-label nzRequired>Xác nhận mật khẩu</nz-form-label>
+                                            </div>
+                                            <nz-form-control nzErrorTip="Mật khẩu xác nhận không khớp!">
+                                                <nz-input-group [nzSuffix]="confirmPasswordSuffixTemplate">
+                                                    <input [type]="showConfirmPassword ? 'text' : 'password'" nz-input formControlName="ConfirmPassword" placeholder="Nhập lại mật khẩu" autocomplete="new-password" />
+                                                </nz-input-group>
+                                                <ng-template #confirmPasswordSuffixTemplate>
+                                                    <nz-icon nzType="eye" nzTheme="outline" style="cursor: pointer;" (click)="toggleConfirmPassword()"></nz-icon>
+                                                </ng-template>
+                                            </nz-form-control>
+                                        </div>
+
+                                        <div class="text-center pt-1 mb-3 pb-1">
+                                            <button nz-button nzType="primary" nzBlock class="register-btn">
+                                                Đăng ký
+                                            </button>
+                                        </div>
+
+                                        <div class="d-flex align-items-center justify-content-center pb-4">
+                                            <p class="mb-0 me-2">Bạn đã có tài khoản?</p>
+                                            <button nz-button nzType="link" (click)="goToLogin()">Đăng nhập</button>
+                                        </div>
+                                    </nz-spin>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

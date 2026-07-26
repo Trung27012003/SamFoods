@@ -1,0 +1,17 @@
+:host {
+	display: block;
+}
+
+:host ::ng-deep .ant-form-item-label > label {
+	font-weight: 500;
+}
+
+:host ::ng-deep .nz-tabs-nav {
+	margin-bottom: var(--space-4);
+}
+
+:host ::ng-deep .ant-card {
+	border-radius: var(--radius-md);
+}
+
+/* Reuse global admin-image-* classes from styles.css */

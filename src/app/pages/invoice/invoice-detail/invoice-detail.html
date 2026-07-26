@@ -1,0 +1,106 @@
+<nz-spin [nzSpinning]="isLoading()">
+	<div class="invoice-detail p-2">
+		<div class="admin-form-card">
+		<h3 class="admin-form-section-title">Thông tin đơn hàng</h3>
+		<nz-descriptions
+			[nzBordered]="true"
+			[nzSize]="'small'"
+			[nzColumn]="{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2, xxl: 2 }"
+			[nzTitle]="'Thông tin đơn hàng'">
+			<nz-descriptions-item nzTitle="Mã đơn">
+				<strong>{{ invoice?.BillCode || '-' }}</strong>
+			</nz-descriptions-item>
+			<nz-descriptions-item nzTitle="Ngày đặt">
+				{{ formatDateTime(invoice?.BillDate) }}
+			</nz-descriptions-item>
+			<nz-descriptions-item nzTitle="Khách hàng">
+				{{ invoice?.CustomerName || '-' }}
+			</nz-descriptions-item>
+			<nz-descriptions-item nzTitle="Số điện thoại">
+				{{ invoice?.PhoneNumber || '-' }}
+			</nz-descriptions-item>
+			<nz-descriptions-item nzTitle="Địa chỉ" [nzSpan]="2">
+				{{ invoice?.Address || '-' }}
+			</nz-descriptions-item>
+		</nz-descriptions>
+		</div>
+
+		<div class="admin-form-card">
+		<h3 class="admin-form-section-title">Chi tiết sản phẩm</h3>
+
+		@if (details.length > 0) {
+		<table class="table table-bordered table-sm mb-0">
+			<thead class="table-light">
+				<tr>
+					<th style="width: 50px;">#</th>
+					<th>Sản phẩm</th>
+					<th style="width: 110px;" class="text-end">Đơn giá</th>
+					<th style="width: 80px;" class="text-center">SL</th>
+					<th style="width: 130px;" class="text-end">Thành tiền</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for (item of details; track $index) {
+				<tr>
+					<td>{{ $index + 1 }}</td>
+					<td>{{ item.ProductName || item.ProductCode || ('SP #' + item.ProductID) }}</td>
+					<td class="text-end">{{ formatCurrency(item.UnitPrice) }}</td>
+					<td class="text-center">{{ item.Quantity }}</td>
+					<td class="text-end fw-bold">{{ formatCurrency(getSubTotal(item)) }}</td>
+				</tr>
+				}
+			</tbody>
+			<tfoot>
+				<tr class="table-light">
+					<td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
+					<td class="text-end fw-bold text-danger">
+						{{ formatCurrency(invoice?.TotalAmount ?? getTotal()) }}
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+		} @else {
+		<div class="text-center text-muted p-3">
+			<nz-empty nzNotFoundContent="Không có chi tiết sản phẩm"></nz-empty>
+		</div>
+		}
+		</div>
+
+		@if (!isReadonly) {
+		<div class="admin-form-card">
+		<h3 class="admin-form-section-title">Cập nhật trạng thái</h3>
+
+		<form nz-form [formGroup]="validateForm" nzLayout="vertical">
+			<nz-form-item>
+				<nz-form-label>Trạng thái</nz-form-label>
+				<nz-form-control>
+					<nz-radio-group formControlName="Status">
+						@for (opt of statusOptions; track opt.value) {
+						<label nz-radio [nzValue]="opt.value">{{ opt.label }}</label>
+						}
+					</nz-radio-group>
+				</nz-form-control>
+			</nz-form-item>
+
+			<nz-form-item>
+				<nz-form-label>Ghi chú</nz-form-label>
+				<nz-form-control>
+					<textarea
+						nz-input
+						formControlName="Note"
+						rows="3"
+						placeholder="Nhập ghi chú (nếu có)"></textarea>
+				</nz-form-control>
+			</nz-form-item>
+		</form>
+		</div>
+		} @else {
+		@if (invoice?.Note) {
+		<div class="admin-form-card">
+		<h3 class="admin-form-section-title">Ghi chú</h3>
+		<div class="p-2 bg-light rounded">{{ invoice.Note }}</div>
+		</div>
+		}
+		}
+	</div>
+</nz-spin>

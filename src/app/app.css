@@ -1,0 +1,13 @@
+/* ============================================================
+   App-wide shared styles
+   Admin-specific rules live in styles.css under .admin-layout
+   Shopping-layout, auth-layout, etc. can override per-host below.
+   ============================================================ */
+
+:host {
+	display: flex;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	width: 100%;
+}

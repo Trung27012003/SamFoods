@@ -1,0 +1,70 @@
+<nz-layout class="app-layout admin-layout">
+      <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" nzBreakpoint="md" [(nzCollapsed)]="isCollapsed"
+            [nzTrigger]="null">
+            <div class="sidebar-logo">
+                  <a (click)="goToHome()" style="cursor: pointer;">
+                        <img [src]="logoURL" alt="logo" />
+                        <h1>SamFoods</h1>
+                  </a>
+            </div>
+            <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+                  <li nz-menu-item nzMatchRouter>
+                        <a routerLink="/admin/welcome">Dashboard</a>
+                  </li>
+                  <li nz-submenu nzOpen nzTitle="Quản lý" nzIcon="setting">
+                        <ul>
+                              <li nz-menu-item nzMatchRouter>
+                                    <a routerLink="/admin/product"><nz-icon nzType="shopping"></nz-icon> Sản phẩm</a>
+                              </li>
+                              <li nz-menu-item nzMatchRouter>
+                                    <a routerLink="/admin/category"><nz-icon nzType="appstore"></nz-icon> Danh mục</a>
+                              </li>
+                              <li nz-menu-item nzMatchRouter>
+                                    <a routerLink="/admin/unit-count"><nz-icon nzType="calculator"></nz-icon> Đơn vị tính</a>
+                              </li>
+                              <li nz-menu-item nzMatchRouter>
+                                    <a routerLink="/admin/promotion"><nz-icon nzType="gift"></nz-icon> Khuyến mãi</a>
+                              </li>
+                              <li nz-menu-item nzMatchRouter>
+                                    <a routerLink="/admin/banner"><nz-icon nzType="picture"></nz-icon> Banner</a>
+                              </li>
+                              <li nz-menu-item nzMatchRouter>
+                                    <a routerLink="/admin/invoice"><nz-icon nzType="file-text"></nz-icon> Đơn hàng</a>
+                              </li>
+                        </ul>
+                  </li>
+                  <li nz-menu-item nzMatchRouter>
+                        <a routerLink="/home">Xem trang web</a>
+                  </li>
+            </ul>
+      </nz-sider>
+      <nz-layout>
+            <nz-header>
+                  <div class="app-header d-flex justify-content-between align-items-center">
+                        <div>
+                              <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
+                                    <nz-icon class="trigger" [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'" />
+                              </span>
+                        </div>
+                        <div class="d-flex align-items-center">
+						<nz-avatar [nzText]="currentUser?.FullName?.charAt(0) || currentUser?.UserName?.charAt(0) || 'U'"
+								nzSize="default" style="background-color: var(--brand-primary); margin-right: 8px;">
+							</nz-avatar>
+                              <span class="me-3">
+                                   <strong>{{ currentUser?.FullName || currentUser?.UserName }}</strong>
+                                   <small class="d-block text-muted">{{ currentUser?.RoleCodes }}</small>
+                              </span>
+							<button nz-button nzType="default" nzDanger nzSize="small" (click)="logout()">
+								<i class="fa-solid fa-sign-out-alt me-1"></i>
+								Đăng xuất
+							</button>
+                        </div>
+                  </div>
+            </nz-header>
+            <nz-content>
+                  <div class="inner-content">
+                        <router-outlet></router-outlet>
+                  </div>
+            </nz-content>
+      </nz-layout>
+</nz-layout>

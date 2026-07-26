@@ -1,0 +1,122 @@
+<nz-spin [nzSpinning]="isLoadingDetail()">
+<form nz-form [nzLayout]="'vertical'" [formGroup]="validateForm" (ngSubmit)="handleOk()">
+	<div class="admin-form-card">
+	<h3 class="admin-form-section-title">Thông tin banner</h3>
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Mã Banner</nz-form-label>
+				<nz-form-control [nzErrorTip]="bannerCodeErrorTpl">
+					<input nz-input formControlName="BannerCode" placeholder="VD: BANNER-001" />
+					<ng-template #bannerCodeErrorTpl let-control>
+						@if (control.hasError('required')) {
+							Mã Banner không được để trống!
+						} @else if (control.hasError('minlength') || control.hasError('maxlength')) {
+							Mã Banner từ 2-50 ký tự!
+						} @else if (control.hasError('pattern')) {
+							Mã Banner chỉ chứa chữ cái (A-Z, a-z), số (0-9), dấu gạch ngang (-) và gạch dưới (_)!
+						}
+					</ng-template>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Tên Banner</nz-form-label>
+				<nz-form-control nzErrorTip="Tên Banner từ 2-200 ký tự!">
+					<input nz-input formControlName="BannerName" placeholder="Nhập tên banner" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+			<nz-form-item>
+				<nz-form-label>Mô tả</nz-form-label>
+				<nz-form-control>
+					<textarea nz-input formControlName="Description" rows="3"
+						placeholder="Nhập mô tả banner..."></textarea>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+
+	<div nz-row [nzGutter]="16">
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-label nzRequired>Khoảng giãn slideshow (giây)</nz-form-label>
+				<nz-form-control nzErrorTip="Khoảng giãn từ 1-60 giây!">
+					<nz-input-number class="w-100" formControlName="SlideshowInterval" nzMin="1" nzMax="60" />
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+
+		<div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+			<nz-form-item>
+				<nz-form-control>
+					<label class="d-flex align-items-center gap-2">
+						<nz-switch formControlName="IsActive"></nz-switch>
+						<span>Kích hoạt (chỉ 1 banner được kích hoạt tại 1 thời điểm)</span>
+					</label>
+				</nz-form-control>
+			</nz-form-item>
+		</div>
+	</div>
+	</div>
+
+	<div class="admin-form-card">
+	<h3 class="admin-form-section-title">Danh sách ảnh Banner</h3>
+	<nz-form-item>
+		<nz-form-control>
+			<div formArrayName="Details">
+				@for (item of details.controls; track $index; let i = $index) {
+				<div [formGroupName]="i" class="banner-image-card p-2 mb-2">
+					<button nz-button nzType="text" nzDanger type="button"
+						(click)="removeDetail(i)" class="remove-btn"
+						title="Xóa ảnh">
+						<nz-icon nzType="delete" />
+					</button>
+					<div nz-row [nzGutter]="12" nzAlign="middle">
+						<div nz-col nzXs="6" nzSm="4" nzMd="3" nzLg="3">
+							<div class="image-preview">
+								@if (getImagePreview(i)) {
+								<img [src]="getImagePreview(i)" alt="preview" />
+								} @else {
+								<nz-icon nzType="picture" nzTheme="outline"></nz-icon>
+								}
+							</div>
+						</div>
+						<div nz-col nzXs="18" nzSm="10" nzMd="9" nzLg="9">
+							<nz-form-item>
+								<nz-form-label>Link URL</nz-form-label>
+								<nz-form-control>
+									<input nz-input formControlName="LinkURL" placeholder="https://..." />
+								</nz-form-control>
+							</nz-form-item>
+						</div>
+						<div nz-col nzXs="12" nzSm="6" nzMd="4" nzLg="4">
+							<nz-form-item>
+								<nz-form-label>Thứ tự</nz-form-label>
+								<nz-form-control>
+									<nz-input-number class="w-100" formControlName="SortOrder" nzMin="0" />
+								</nz-form-control>
+							</nz-form-item>
+						</div>
+					</div>
+				</div>
+				}
+			</div>
+
+			<div class="add-image-btn" (click)="fileInput.click()">
+				<nz-icon nzType="plus" />
+				<div>Thêm ảnh</div>
+				<input #fileInput type="file" multiple accept="image/*"
+					(change)="onFileChange($event)" hidden />
+			</div>
+		</nz-form-control>
+	</nz-form-item>
+	</div>
+</form>
+</nz-spin>

@@ -1,0 +1,23 @@
+/* Category Page Styles */
+.search-input {
+    max-width: 250px;
+}
+
+:host ::ng-deep .p-treetable .p-treetable-toggler {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* UnitCount Page Styles */
+.search-input {
+    padding: 6px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    min-width: 220px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
