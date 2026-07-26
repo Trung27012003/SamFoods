@@ -1,5 +1,5 @@
 export const environment = {
-	host: 'https://localhost:7237/',
+	host: 'http://localhost:5253/',
 	baseHref: '/samfood',
 	title: 'SamFood'
 };

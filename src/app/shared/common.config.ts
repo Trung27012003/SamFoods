@@ -34,28 +34,12 @@ export const CART_PRODUCT_KEY = 'cart_products';
 export const IMAGE_URL = environment.host + 'api/shared/images';
 export const LOGO_URL = 'assets/image/logo.png';
 
-export const SOCIALS = [
-	{
-		name: 'zalo',
-		icon: 'assets/image/social/icons8-zalo-32.png',
-		link: 'https://zalo.me/0966669001',
-	},
-	{
-		name: 'facebook',
-		icon: 'assets/image/social/icons8-facebook-32.png',
-		link: 'https://www.facebook.com/NguyenVietHaiLong',
-	},
-	{
-		name: 'messenger',
-		icon: 'assets/image/social/icons8-messenger-32.png',
-		link: 'https://m.me/NguyenVietHaiLong',
-	},
-	{
-		name: 'phone',
-		icon: 'assets/image/social/icons8-phone-32.png',
-		link: 'tel:0384657756',
-	},
-];
+export const SOCIAL_DEFAULT_ICONS = {
+	zalo: 'assets/image/social/icons8-zalo-32.png',
+	facebook: 'assets/image/social/icons8-facebook-32.png',
+	messenger: 'assets/image/social/icons8-messenger-32.png',
+	phone: 'assets/image/social/icons8-phone-32.png'
+};
 
 // Helper Functions
 export function formatCurrency(value: number | null | undefined, currency = 'VND'): string {

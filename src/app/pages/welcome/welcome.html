@@ -22,6 +22,47 @@
 	}
 </div>
 
+<div class="admin-card stats-section mt-4">
+	<h3 class="admin-form-section-title">Thống kê đơn hàng</h3>
+	<div class="stats-grid">
+		<div class="stat-card processing">
+			<div class="stat-icon"><i class="fa-solid fa-bell"></i></div>
+			<div class="stat-info">
+				<span class="stat-label">Mới</span>
+				<span class="stat-value">{{ stats()?.NewCount ?? 0 }}</span>
+			</div>
+		</div>
+		<div class="stat-card warning">
+			<div class="stat-icon"><i class="fa-solid fa-truck"></i></div>
+			<div class="stat-info">
+				<span class="stat-label">Đang giao</span>
+				<span class="stat-value">{{ stats()?.ShippingCount ?? 0 }}</span>
+			</div>
+		</div>
+		<div class="stat-card success">
+			<div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+			<div class="stat-info">
+				<span class="stat-label">Hoàn thành</span>
+				<span class="stat-value">{{ stats()?.CompletedCount ?? 0 }}</span>
+			</div>
+		</div>
+		<div class="stat-card error">
+			<div class="stat-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+			<div class="stat-info">
+				<span class="stat-label">Đã huỷ</span>
+				<span class="stat-value">{{ stats()?.CancelledCount ?? 0 }}</span>
+			</div>
+		</div>
+		<div class="stat-card revenue">
+			<div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+			<div class="stat-info">
+				<span class="stat-label">Doanh thu tháng này</span>
+				<span class="stat-value">{{ stats()?.MonthRevenue ?? 0 | currencyVnd }}</span>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div class="quick-row mt-4">
 	<div class="admin-card">
 		<h3 class="admin-form-section-title">Lối tắt nhanh</h3>

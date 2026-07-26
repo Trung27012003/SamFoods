@@ -54,3 +54,55 @@
 .admin-status-menu li[nz-menu-item].danger:hover i {
     color: var(--color-error);
 }
+
+/* Invoice summary chips */
+.invoice-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-3);
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--surface-hover);
+    border: 1px solid var(--surface-border);
+    cursor: default;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+
+.chip[role="button"] {
+    cursor: pointer;
+}
+
+.chip[role="button"]:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.chip b {
+    font-weight: 700;
+}
+
+.chip.processing { border-left: 3px solid var(--color-processing, #1677ff); color: var(--color-processing, #1677ff); }
+.chip.warning   { border-left: 3px solid var(--color-warning, #faad14);    color: var(--color-warning, #faad14); }
+.chip.success   { border-left: 3px solid var(--color-success, #52c41a);    color: var(--color-success, #52c41a); }
+.chip.error     { border-left: 3px solid var(--color-error, #ff4d4f);      color: var(--color-error, #ff4d4f); }
+.chip.revenue   { border-left: 3px solid var(--brand-primary, #80001c);    color: var(--brand-primary, #80001c); }
+
+.chip.processing b,
+.chip.warning b,
+.chip.success b,
+.chip.error b,
+.chip.revenue b {
+    color: inherit;
+}

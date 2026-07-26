@@ -13,6 +13,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { ColumnTable } from '../../models/column-table';
 import { InvoiceDetail } from './invoice-detail/invoice-detail';
+import { InvoiceStatsModel } from '../../models/invoice-stats-model';
 import {
 	NOTIFICATION_TITLE_MAP,
 	NOTIFICATION_TYPE_MAP,
@@ -20,7 +21,7 @@ import {
 	formatCurrency,
 	formatDateTime
 } from '../../shared/common.config';
-import { AdminPageHeader, AdminListToolbar, AdminStatusTag, AdminStatusColor } from '../../shared';
+import { AdminPageHeader, AdminListToolbar, AdminStatusTag, AdminStatusColor, CurrencyVndPipe } from '../../shared';
 
 interface StatusOption {
 	label: string;
@@ -41,7 +42,8 @@ interface StatusOption {
 		NzMenuModule,
 		AdminPageHeader,
 		AdminListToolbar,
-		AdminStatusTag
+		AdminStatusTag,
+		CurrencyVndPipe
 	],
 	templateUrl: './invoice.html',
 	styleUrl: './invoice.css',
@@ -59,6 +61,8 @@ export class Invoice implements OnInit {
 
 	isLoadingData = signal(false);
 	isLoadingModal = signal(false);
+
+	stats = signal<InvoiceStatsModel | null>(null);
 
 	selectedItem: any = {};
 	selectedItemRaw: any = {};
@@ -106,7 +110,21 @@ export class Invoice implements OnInit {
 	];
 
 	ngOnInit(): void {
+		this.reloadAll();
+	}
+
+	reloadAll(): void {
 		this.loadData();
+		this.loadStats();
+	}
+
+	loadStats(): void {
+		this.invoiceService.getStats().subscribe({
+			next: (res) => {
+				if (res?.data) this.stats.set(res.data);
+			},
+			error: () => this.stats.set(null)
+		});
 	}
 
 	loadData(): void {
@@ -276,7 +294,7 @@ export class Invoice implements OnInit {
 		});
 
 		modalRef.afterClose.subscribe((result: any) => {
-			if (result) this.loadData();
+			if (result) this.reloadAll();
 			this.isLoadingModal.set(false);
 		});
 	}
@@ -340,7 +358,7 @@ export class Invoice implements OnInit {
 							NOTIFICATION_TITLE_MAP[res.status as RESPONSE_STATUS] || 'Thành công',
 							res.message || `Đã chuyển đơn sang trạng thái "${targetOpt.label}".`
 						);
-						this.loadData();
+						this.reloadAll();
 					},
 					error: (err) => {
 						this.notification.create(
@@ -375,7 +393,7 @@ export class Invoice implements OnInit {
 			nzOnOk: () => {
 				this.invoiceService.softDelete(target.ID).subscribe({
 					next: (res) => {
-						this.loadData();
+						this.reloadAll();
 						this.selectedItem = {};
 						this.selectedItemRaw = {};
 						this.notification.success(

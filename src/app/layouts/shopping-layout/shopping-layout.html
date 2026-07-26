@@ -1,30 +1,12 @@
 <header>
-    <!-- <div class="header-top d-none d-md-block">
-        <div class="container">
-            <div class="row py-2">
-
-                <div class="col-3 header-login" *ngIf="isLoggedIn">
-                    <div class="d-flex justify-content-center align-items-center">
-                        <span class="text-light me-2">Xin chào, <strong>{{ currentUser?.FullName || currentUser?.UserName }}</strong></span>
-                        <a *ngIf="isAdmin" routerLink="/admin/welcome" class="header-link me-2">Quản trị</a>
-                        <span class="px-2 text-light">|</span>
-                        <a (click)="logout()" class="header-link" style="cursor: pointer;">Đăng xuất</a>
-                    </div>
-                </div>
-                <div class="col-3 header-login" *ngIf="!isLoggedIn"></div>
-            </div>
-        </div>
-    </div> -->
-
     <div class="header-container">
         <div class="card container">
-            <!-- Mobile header bar (hamburger + logo + cart) -->
             <div class="mobile-header d-flex d-md-none align-items-center justify-content-between py-2">
                 <button type="button" class="mobile-menu-trigger" (click)="toggleMobileMenu()" aria-label="Mở menu">
                     <nz-icon nzType="menu" nzTheme="outline"></nz-icon>
                 </button>
                 <a routerLink="/home" class="mobile-header-logo">
-                    <img [src]="logoURL" height="40" alt="SamFoods">
+                    <img [src]="logoURL()" height="40" alt="SamFoods">
                 </a>
                 <a routerLink="/cart" class="mobile-header-cart" aria-label="Giỏ hàng">
                     <nz-badge [nzCount]="totalQuantity()">
@@ -33,17 +15,14 @@
                 </a>
             </div>
 
-            <!-- Desktop megamenu -->
             <p-megamenu [model]="megaMenuItems() ?? []" styleClass="custom-megamenu d-none d-md-flex">
 
-                <!-- Login bên trái -->
                 <ng-template #start>
                     <a routerLink="/home">
-                        <img [src]="logoURL" height="50">
+                        <img [src]="logoURL()" height="50">
                     </a>
                 </ng-template>
 
-                <!-- Avatar bên phải -->
                 <ng-template #end>
 
                     <nz-input-search nzAllowClear (nzSearch)="onSearch($event)">
@@ -76,7 +55,6 @@
         </div>
     </div>
 
-    <!-- Mobile navigation drawer -->
     <nz-drawer [nzVisible]="isMobileMenuOpen" nzPlacement="left" nzTitle="Menu" [nzWidth]="280" (nzOnClose)="closeMobileMenu()">
         <ng-container *nzDrawerContent>
             <div class="mobile-drawer-menu">
@@ -101,11 +79,11 @@
 
                 <div class="mobile-drawer-section-title">Danh mục</div>
                 @if (mobileMenuCategories().length > 0) {
-                    @for (item of mobileMenuCategories(); track item.label) {
-                    <a class="mobile-drawer-link mobile-drawer-category" href="javascript:void(0)" (click)="item.command?.($event); closeMobileMenu()">
-                        {{ item.label }}
-                    </a>
-                    }
+                @for (item of mobileMenuCategories(); track item.label) {
+                <a class="mobile-drawer-link mobile-drawer-category" href="javascript:void(0)" (click)="item.command?.($event); closeMobileMenu()">
+                    {{ item.label }}
+                </a>
+                }
                 }
 
                 <nz-divider></nz-divider>
@@ -129,118 +107,132 @@
 
     <router-outlet></router-outlet>
     <div class="group">
-        <nz-float-button-group nzShape="circle">
-            <!-- @for (item of socials; track $index) {
-               <nz-float-button [nzIcon]="zalo" [nzHref]="item.name === 'phone' ? 'tel:' + item.link : item.link"
-                    nzType="default" />
-
-               } -->
-
-            <nz-float-button [nzIcon]="zalo" [nzHref]="socials[0].link" nzType="default" />
-            <nz-float-button [nzIcon]="facebook" [nzHref]="socials[1].link" nzType="default" />
-            <nz-float-button [nzIcon]="messenger" [nzHref]="socials[2].link" nzType="default" />
-            <nz-float-button [nzIcon]="phone" [nzHref]="socials[3].link" nzType="default" />
+        <!-- <nz-float-button-group nzShape="circle">
+            <nz-float-button [nzHref]="socialZaloUrl()" nzType="default">
+                <img src="assets/image/social/icons8-zalo-32.png" alt="Zalo">
+            </nz-float-button>
+            <nz-float-button [nzHref]="socialFacebookUrl()" nzType="default">
+                <img src="assets/image/social/icons8-facebook-32.png" alt="Facebook">
+            </nz-float-button>
+            <nz-float-button [nzHref]="socialMessengerUrl()" nzType="default">
+                <img src="assets/image/social/icons8-messenger-32.png" alt="Messenger">
+            </nz-float-button>
+            <nz-float-button [nzHref]="socialPhone()" nzType="default">
+                <img src="assets/image/social/icons8-phone-32.png" alt="Phone">
+            </nz-float-button>
 
             <nz-float-button-top [nzVisibilityHeight]="600" />
-        </nz-float-button-group>
+        </nz-float-button-group> -->
+        <nz-float-button-group nzShape="circle">
 
+            <nz-float-button [nzHref]="socialZaloUrl()" [nzIcon]="zalo">
+            </nz-float-button>
+
+            <nz-float-button [nzHref]="socialFacebookUrl()" [nzIcon]="facebook">
+            </nz-float-button>
+
+            <nz-float-button [nzHref]="socialMessengerUrl()" [nzIcon]="messenger">
+            </nz-float-button>
+
+            <nz-float-button [nzHref]="socialPhone()" [nzIcon]="phone">
+            </nz-float-button>
+
+            <nz-float-button-top [nzVisibilityHeight]="600"></nz-float-button-top>
+
+        </nz-float-button-group>
         <ng-template #zalo>
-            <img src="assets/image/social/icons8-zalo-32.png" alt="">
+            <img src="assets/image/social/icons8-zalo-32.png" width="24" height="24">
         </ng-template>
 
         <ng-template #facebook>
-            <img src="assets/image/social/icons8-facebook-32.png" alt="">
-        </ng-template>
-        <ng-template #messenger>
-            <img src="assets/image/social/icons8-messenger-32.png" alt="">
-        </ng-template>
-        <ng-template #phone>
-            <img src="assets/image/social/icons8-phone-32.png" alt="">
+            <img src="assets/image/social/icons8-facebook-32.png" width="24" height="24">
         </ng-template>
 
+        <ng-template #messenger>
+            <img src="assets/image/social/icons8-messenger-32.png" width="24" height="24">
+        </ng-template>
+
+        <ng-template #phone>
+            <img src="assets/image/social/icons8-phone-32.png" width="24" height="24">
+        </ng-template>
     </div>
 </main>
 <footer class="footer-container">
     <div class="footer-top">
         <div class="container">
             <div class="row g-4">
-                <!-- Cột 1: Logo + mô tả + liên hệ -->
                 <div class="col-12 col-lg-4 col-md-12">
                     <div class="footer-brand">
                         <a routerLink="/home" class="footer-logo-link">
-                            <img [src]="logoURL" alt="SamFoods" class="footer-logo">
+                            <img [src]="footerLogoURL()" alt="SamFoods" class="footer-logo">
                         </a>
                         <p class="footer-tagline">
-                            SamFoods – Đặt đồ ăn nhanh, giao tận nơi. Thực đơn đa dạng, nguyên liệu tươi sạch, giao hàng siêu tốc trong 30 phút.
+                            {{ footerTagline() }}
                         </p>
                     </div>
 
                     <ul class="footer-contact list-unstyled">
                         <li>
                             <i class="fa-solid fa-location-dot"></i>
-                            <span>123 Nguyễn Văn Cừ, Long Biên, Hà Nội</span>
+                            <span>{{ contactAddress() }}</span>
                         </li>
                         <li>
                             <i class="fa-solid fa-phone"></i>
-                            <a href="tel:0384657756">0384 657 756</a>
-                            <span class="dot-sep">·</span>
-                            <a href="tel:0966669001">0966 669 001</a>
+                            <a *ngIf="contactPhone1()" [href]="'tel:' + contactPhone1()">{{ contactPhone1() }}</a>
+                            <span class="dot-sep" *ngIf="contactPhone1() && contactPhone2()">·</span>
+                            <a *ngIf="contactPhone2()" [href]="'tel:' + contactPhone2()">{{ contactPhone2() }}</a>
                         </li>
                         <li>
                             <i class="fa-solid fa-envelope"></i>
-                            <a href="mailto:support@samfoods.vn">support&#64;samfoods.vn</a>
+                            <a *ngIf="contactEmail()" [href]="'mailto:' + contactEmail()">{{ contactEmail() }}</a>
                         </li>
                         <li>
                             <i class="fa-regular fa-clock"></i>
-                            <span>Mở cửa: 8:00 – 22:00 (Tất cả các ngày)</span>
+                            <span>{{ contactHours() }}</span>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Cột 2: Về SamFoods -->
                 <div class="col-6 col-lg-2 col-md-4">
                     <h6 class="footer-title">Về SamFoods</h6>
                     <ul class="footer-links list-unstyled">
-                        @for (item of aboutLinks; track item.id) {
+                        @for (item of aboutLinks(); track item.id) {
                         <li><a [routerLink]="item.link">{{ item.label }}</a></li>
                         }
                     </ul>
                 </div>
 
-                <!-- Cột 3: Hỗ trợ khách hàng -->
                 <div class="col-6 col-lg-2 col-md-4">
                     <h6 class="footer-title">Hỗ trợ khách hàng</h6>
                     <ul class="footer-links list-unstyled">
-                        @for (item of supportLinks; track item.id) {
+                        @for (item of supportLinks(); track item.id) {
                         <li><a [routerLink]="item.link">{{ item.label }}</a></li>
                         }
                     </ul>
                 </div>
 
-                <!-- Cột 4: Chính sách -->
                 <div class="col-6 col-lg-2 col-md-4">
                     <h6 class="footer-title">Chính sách</h6>
                     <ul class="footer-links list-unstyled">
-                        @for (item of policyLinks; track item.id) {
+                        @for (item of policyLinks(); track item.id) {
                         <li><a [routerLink]="item.link">{{ item.label }}</a></li>
                         }
                     </ul>
                 </div>
 
-                <!-- Cột 5: Đăng ký + MXH -->
                 <div class="col-6 col-lg-2 col-md-12">
                     <h6 class="footer-title">Kết nối với chúng tôi</h6>
                     <div class="footer-socials">
-                        <a href="https://zalo.me/0966669001" target="_blank" rel="noopener" title="Zalo" aria-label="Zalo">
+                        <a [href]="socialZaloUrl()" target="_blank" rel="noopener" title="Zalo" aria-label="Zalo">
                             <img src="assets/image/social/icons8-zalo-32.png" alt="Zalo">
                         </a>
-                        <a href="https://www.facebook.com/NguyenVietHaiLong" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook">
+                        <a [href]="socialFacebookUrl()" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook">
                             <img src="assets/image/social/icons8-facebook-32.png" alt="Facebook">
                         </a>
-                        <a href="https://m.me/NguyenVietHaiLong" target="_blank" rel="noopener" title="Messenger" aria-label="Messenger">
+                        <a [href]="socialMessengerUrl()" target="_blank" rel="noopener" title="Messenger" aria-label="Messenger">
                             <img src="assets/image/social/icons8-messenger-32.png" alt="Messenger">
                         </a>
-                        <a href="tel:0384657756" title="Gọi điện" aria-label="Phone">
+                        <a [href]="socialPhone()" title="Gọi điện" aria-label="Phone">
                             <img src="assets/image/social/icons8-phone-32.png" alt="Phone">
                         </a>
                     </div>
@@ -268,13 +260,10 @@
     <div class="footer-bottom">
         <div class="container">
             <div class="footer-bottom-row">
-                <p class="copyright">
-                    © 2026 <strong>SamFoods</strong>. Đã đăng ký bản quyền. Phát triển bởi
-                    <a href="https://www.facebook.com/NguyenVietHaiLong" target="_blank" rel="noopener">SamFoods Team</a>.
-                </p>
-                <p class="cert">
+                <p class="copyright" [innerHTML]="footerCopyright()"></p>
+                <p class="cert" *ngIf="businessLicense()">
                     <i class="fa-solid fa-shield-halved"></i>
-                    Đã thông báo Bộ Công Thương · Số GP-1234/GPCĐ-XXX
+                    {{ businessLicense() }}
                 </p>
             </div>
         </div>

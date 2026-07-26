@@ -14,7 +14,7 @@
 }
 
 .header-container {
-    background: var(--primary-color) !important;
+    background: var(--header-bg, #80001c) !important;
     /* position: fix;
      top: 0; */
 }
@@ -86,9 +86,7 @@
 }
 
 
-.footer-container {
-    background-color: whitesmoke;
-}
+/* Legacy footer rules removed - themed footer below */
 
 ::ng-deep .footer-menu .list-group .list-group-item {
     background-color: whitesmoke !important;
@@ -247,6 +245,14 @@
     width: 100% !important;
 }
 
+::ng-deep .ant-float-btn-body .ant-float-btn-content img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
 /* ===== Mobile responsive ===== */
 
 /* Mobile header bar (hidden on desktop) */
@@ -355,8 +361,8 @@
    FOOTER - SamFoods
    ============================================ */
 .footer-container {
-    background: linear-gradient(135deg, #2c1810 0%, #3d2418 100%);
-    color: #d4c5b0;
+    background-color: var(--footer-bg, #2c1810) !important;
+    color: var(--footer-text, #d4c5b0);
     margin-top: 48px;
     font-size: 14px;
     line-height: 1.6;
@@ -380,9 +386,10 @@
 .footer-logo {
     height: 56px;
     width: auto;
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 6px 12px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    display: block;
 }
 
 .footer-tagline {

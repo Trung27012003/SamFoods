@@ -42,7 +42,7 @@ export const routes: Routes = [
 	{
 		path: 'admin',
 		component: AdminLayout,
-		canActivate: [],
+		canActivate: [adminGuard],
 		children: [
 			{
 				path: 'welcome',
@@ -77,6 +77,11 @@ export const routes: Routes = [
 			{
 				path: 'invoice',
 				loadChildren: () => import('./pages/invoice/invoice.routes').then((m) => m.INVOICE_ROUTES),
+			},
+
+			{
+				path: 'site-setting',
+				loadChildren: () => import('./pages/site-settings/site-settings.routes').then((m) => m.SITE_SETTINGS_ROUTES),
 			},
 		]
 	}

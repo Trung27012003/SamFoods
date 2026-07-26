@@ -19,10 +19,13 @@ import { NzDividerModule } from "ng-zorro-antd/divider";
 import { ShoppingCart } from "../../pages/shopping/shopping-cart/shopping-cart";
 import { CategoryService } from "../../services/category-service";
 import { NzNotificationService } from "ng-zorro-antd/notification";
-import { CART_PRODUCT_KEY, LOGO_URL, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS, SOCIALS } from "../../shared/common.config";
+import { CART_PRODUCT_KEY, LOGO_URL, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS } from "../../shared/common.config";
+import { SiteSettingsStore } from "../../shared/site-settings";
 import { ProductService } from "../../services/product-service";
 import { HistorySearchService } from "../../services/history-search-service";
 import { AuthService } from "../auth-layout/auth-service";
+
+interface NavLink { id: number; label: string; link: string; }
 
 @Component({
 	selector: 'app-shopping-layout',
@@ -63,6 +66,7 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 	private notification = inject(NzNotificationService);
 	private router = inject(Router);
 	private authService = inject(AuthService);
+	private siteSettings = inject(SiteSettingsStore);
 
 	get isLoggedIn(): boolean {
 		return this.authService.isLoggedIn();
@@ -117,32 +121,56 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 		return this.router.url.includes('/cart');
 	}
 
-	logoURL = LOGO_URL;
-	socials = SOCIALS;
+	logoURL = computed(() => this.siteSettings.imageUrl('logo_header', LOGO_URL));
+	footerLogoURL = computed(() => this.siteSettings.imageUrl('logo_footer', LOGO_URL));
+	footerTagline = computed(() => this.siteSettings.get('footer_tagline', 'SamFoods - Đặt đồ ăn nhanh, giao tận nơi.'));
+	footerCopyright = computed(() => this.siteSettings.get('footer_copyright', '© 2026 SamFoods. Đã đăng ký bản quyền.'));
+	businessLicense = computed(() => this.siteSettings.get('business_license', ''));
+	contactAddress = computed(() => this.siteSettings.get('contact_address', ''));
+	contactEmail = computed(() => this.siteSettings.get('contact_email', ''));
+	contactHours = computed(() => this.siteSettings.get('contact_hours', ''));
+	contactPhone1 = computed(() => this.siteSettings.get('contact_phone_1', ''));
+	contactPhone2 = computed(() => this.siteSettings.get('contact_phone_2', ''));
 
-	aboutLinks = [
+	aboutLinks = computed<NavLink[]>(() => this.parseNavLinks('nav_about', [
 		{ id: 1, label: 'Giới thiệu', link: '/home' },
 		{ id: 2, label: 'Tầm nhìn & Sứ mệnh', link: '/home' },
 		{ id: 3, label: 'Đội ngũ của chúng tôi', link: '/home' },
 		{ id: 4, label: 'Tuyển dụng', link: '/home' },
 		{ id: 5, label: 'Tin tức & Sự kiện', link: '/home' }
-	];
+	]));
 
-	supportLinks = [
+	supportLinks = computed<NavLink[]>(() => this.parseNavLinks('nav_support', [
 		{ id: 1, label: 'Hướng dẫn đặt hàng', link: '/home' },
 		{ id: 2, label: 'Câu hỏi thường gặp', link: '/home' },
 		{ id: 3, label: 'Liên hệ hỗ trợ', link: '/home' },
 		{ id: 4, label: 'Đăng ký đối tác', link: '/home' },
 		{ id: 5, label: 'Đánh giá dịch vụ', link: '/home' }
-	];
+	]));
 
-	policyLinks = [
+	policyLinks = computed<NavLink[]>(() => this.parseNavLinks('nav_policy', [
 		{ id: 1, label: 'Chính sách đổi trả', link: '/home' },
 		{ id: 2, label: 'Chính sách hoàn tiền', link: '/home' },
 		{ id: 3, label: 'Chính sách vận chuyển', link: '/home' },
 		{ id: 4, label: 'Chính sách bảo mật', link: '/home' },
 		{ id: 5, label: 'Điều khoản sử dụng', link: '/home' }
-	];
+	]));
+
+	socialZaloUrl = computed(() => this.siteSettings.get('social_zalo_url', 'https://zalo.me/0966669001'));
+	socialFacebookUrl = computed(() => this.siteSettings.get('social_facebook_url', 'https://www.facebook.com/NguyenVietHaiLong'));
+	socialMessengerUrl = computed(() => this.siteSettings.get('social_messenger_url', 'https://m.me/NguyenVietHaiLong'));
+	socialPhone = computed(() => this.siteSettings.get('social_phone', 'tel:0384657756'));
+
+	parseNavLinks(key: string, fallback: NavLink[]): NavLink[] {
+		const raw = this.siteSettings.get(key, '');
+		if (!raw) return fallback;
+		try {
+			const parsed = JSON.parse(raw);
+			if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+		} catch {
+		}
+		return fallback;
+	}
 
 	constructor() {
 		this.loadHistorySearch();

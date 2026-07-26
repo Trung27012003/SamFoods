@@ -3,8 +3,8 @@
             [nzTrigger]="null">
             <div class="sidebar-logo">
                   <a (click)="goToHome()" style="cursor: pointer;">
-                        <img [src]="logoURL" alt="logo" />
-                        <h1>SamFoods</h1>
+                        <img [src]="logoURL()" alt="logo" />
+                        <h1>{{ brandName() }}</h1>
                   </a>
             </div>
             <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
@@ -30,6 +30,9 @@
                               </li>
                               <li nz-menu-item nzMatchRouter>
                                     <a routerLink="/admin/invoice"><nz-icon nzType="file-text"></nz-icon> Đơn hàng</a>
+                              </li>
+                              <li nz-menu-item nzMatchRouter>
+                                    <a routerLink="/admin/site-setting"><nz-icon nzType="setting"></nz-icon> Cấu hình site</a>
                               </li>
                         </ul>
                   </li>

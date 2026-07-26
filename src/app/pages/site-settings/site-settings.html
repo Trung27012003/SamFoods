@@ -1,0 +1,126 @@
+<app-admin-page-header
+	title="Cấu hình website"
+	subtitle="Quản lý logo, thông tin liên hệ, mạng xã hội và các tuỳ chỉnh khác"
+	[breadcrumbs]="['Quản lý', 'Cấu hình site']">
+	<div actions class="d-flex gap-2">
+		<button nz-button nzType="default" (click)="reload()">
+			<i class="fa-solid fa-rotate me-1"></i>
+			Tải lại
+		</button>
+		<button nz-button nzType="primary" (click)="save()" [disabled]="isSaving()">
+			<i class="fa-solid fa-save me-1"></i>
+			{{ isSaving() ? 'Đang lưu...' : 'Lưu thay đổi' }}
+		</button>
+	</div>
+</app-admin-page-header>
+
+<nz-spin [nzSpinning]="isLoading()">
+	@if (groups().length > 0) {
+		<nz-tabs nzType="card">
+			@for (g of groups(); track g.group) {
+				<nz-tab [nzTitle]="g.group">
+					<div class="admin-card">
+						<div class="row g-3">
+							@for (item of g.items; track item.ID) {
+								<div class="col-12 col-md-6">
+									<div class="setting-field">
+										<label class="setting-label">
+											{{ item.DisplayName }}
+											@if (item.Description) {
+												<small class="text-muted d-block">{{ item.Description }}</small>
+											}
+										</label>
+
+										@if (item.ValueType === 'image') {
+											<div class="setting-image">
+												@if (item.SettingValue) {
+													<img [src]="imagePreviewUrl(item.SettingValue)" alt="{{ item.DisplayName }}" />
+												} @else {
+													<div class="image-placeholder">
+														<i class="fa-regular fa-image"></i>
+														<span>Chưa có ảnh</span>
+													</div>
+												}
+												<div class="d-flex gap-2 mt-2 align-items-center">
+													<label class="upload-btn">
+														<i class="fa-solid fa-upload me-1"></i>
+														{{ uploadingKey() === item.SettingKey ? 'Đang upload...' : 'Chọn ảnh' }}
+														<input type="file" accept="image/*" hidden
+															(change)="onFileSelected($event, item.SettingKey!)"
+															[disabled]="uploadingKey() === item.SettingKey" />
+													</label>
+													@if (item.SettingValue) {
+														<button nz-button nzType="text" nzDanger (click)="updateLocalValue(item.SettingKey!, '')">
+															<i class="fa-solid fa-trash"></i> Xoá
+														</button>
+													}
+													<small class="text-muted text-truncate" style="max-width: 250px;" [title]="item.SettingValue">
+														{{ item.SettingValue }}
+													</small>
+												</div>
+											</div>
+										} @else if (isColorPreset(item.SettingKey)) {
+											<div class="color-presets">
+												@for (c of presetColors(item.SettingKey); track c) {
+													<button type="button"
+														class="color-swatch"
+														[class.active]="isPresetActive(item.SettingValue, c)"
+														[style.background]="c"
+														[attr.aria-label]="'Màu ' + c"
+														[title]="c"
+														(click)="onValueChange(item.SettingKey!, c)">
+													</button>
+												}
+												<label class="color-custom" [class.active]="isCustomValue(item.SettingValue, item.SettingKey)" [title]="'Tuỳ chỉnh: ' + (item.SettingValue || '')">
+													<input type="color"
+														class="color-custom-input"
+														[value]="customPickerValue(item.SettingValue)"
+														(change)="onCustomColorChange(item.SettingKey!, $event)"
+														(input)="onCustomColorChange(item.SettingKey!, $event)" />
+													<i class="fa-solid fa-paintbrush"></i>
+												</label>
+											</div>
+											<div class="d-flex align-items-center gap-2 mt-1">
+												<small class="text-muted">Giá trị hiện tại: <code>{{ item.SettingValue || '(mặc định)' }}</code></small>
+												@if (isCustomValue(item.SettingValue, item.SettingKey)) {
+													<small class="text-warning">
+																		<i class="fa-solid fa-circle-info"></i>
+																		Tự chọn — runtime sẽ fallback màu mặc định.
+																		</small>
+																}
+												@if ((item.SettingValue || '').trim()) {
+													<button nz-button nzSize="small" nzType="text" (click)="onValueChange(item.SettingKey!, '')">
+														<i class="fa-solid fa-rotate-left"></i> Reset
+													</button>
+												}
+											</div>
+										} @else if (item.ValueType === 'text') {
+											<textarea nz-input rows="3"
+												[ngModel]="item.SettingValue"
+												(ngModelChange)="onValueChange(item.SettingKey!, $event)"></textarea>
+										} @else if (item.ValueType === 'json') {
+											<textarea nz-input rows="8" class="json-input"
+												[ngModel]="parseJsonValue(item.SettingValue)"
+												(ngModelChange)="onValueChange(item.SettingKey!, $event)"></textarea>
+											<button nz-button nzType="text" nzSize="small" (click)="reformatJson(item.SettingKey!)" class="mt-1">
+												<i class="fa-solid fa-indent me-1"></i> Format JSON
+											</button>
+										} @else {
+											<input nz-input
+												[ngModel]="item.SettingValue"
+												(ngModelChange)="onValueChange(item.SettingKey!, $event)" />
+										}
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				</nz-tab>
+			}
+		</nz-tabs>
+	} @else {
+		<div class="admin-card text-center text-muted p-5">
+			<nz-empty nzNotFoundContent="Chưa có cấu hình nào"></nz-empty>
+		</div>
+	}
+</nz-spin>

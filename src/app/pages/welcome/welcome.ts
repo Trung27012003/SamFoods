@@ -9,7 +9,8 @@ import { CategoryService } from '../../services/category-service';
 import { BannerService } from '../../services/banner-service';
 import { InvoiceService } from '../../services/invoice-service';
 import { PromtionService } from '../../services/promtion-service';
-import { AdminPageHeader } from '../../shared';
+import { AdminPageHeader, CurrencyVndPipe } from '../../shared';
+import { InvoiceStatsModel } from '../../models/invoice-stats-model';
 
 interface KpiCard {
 	label: string;
@@ -22,7 +23,7 @@ interface KpiCard {
 
 @Component({
 	selector: 'app-welcome',
-	imports: [CommonModule, RouterLink, NzIconModule, NzButtonModule, AdminPageHeader],
+	imports: [CommonModule, RouterLink, NzIconModule, NzButtonModule, AdminPageHeader, CurrencyVndPipe],
 	templateUrl: './welcome.html',
 	styleUrl: './welcome.css'
 })
@@ -41,12 +42,15 @@ export class Welcome implements OnInit {
 		{ label: 'Banner hoạt động', value: 0, icon: 'picture', color: '#722ed1', route: '/admin/banner', loading: true }
 	]);
 
+	stats = signal<InvoiceStatsModel | null>(null);
+
 	ngOnInit(): void {
 		this.loadProductCount();
 		this.loadCategoryCount();
 		this.loadInvoiceCount();
 		this.loadPromotionCount();
 		this.loadBannerCount();
+		this.loadInvoiceStats();
 	}
 
 	updateKpi(label: string, value: number): void {
@@ -92,6 +96,15 @@ export class Welcome implements OnInit {
 				this.updateKpi('Banner hoạt động', active);
 			},
 			error: () => this.updateKpi('Banner hoạt động', 0)
+		});
+	}
+
+	loadInvoiceStats(): void {
+		this.invoiceService.getStats().subscribe({
+			next: (res) => {
+				if (res?.data) this.stats.set(res.data);
+			},
+			error: () => this.stats.set(null)
 		});
 	}
 }

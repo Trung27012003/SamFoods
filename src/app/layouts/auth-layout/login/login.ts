@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { AuthService } from '../auth-service';
+import { SiteSettingsStore } from '../../../shared/site-settings';
 
 @Component({
 	selector: 'app-login',
@@ -29,6 +30,10 @@ export class Login implements OnInit {
 	validateForm!: FormGroup;
 	isLoading = false;
 	showPassword = false;
+
+	private siteSettings = inject(SiteSettingsStore);
+	logoURL = computed(() => this.siteSettings.imageUrl('logo_auth', 'assets/image/logo.jpg'));
+	brandName = computed(() => this.siteSettings.get('brand_name', 'SamFoods'));
 
 	constructor(
 		private fb: FormBuilder,

@@ -153,7 +153,7 @@ export class AuthService {
 	isAdmin(): boolean {
 		const decoded = this.decodeToken();
 		if (!decoded) return false;
-		const roleCodes = decoded.RoleCodes || decoded.role || '';
+		const roleCodes = decoded.rolecodes || decoded.role || '';
 		return roleCodes.toUpperCase().includes('ADMIN');
 	}
 }
