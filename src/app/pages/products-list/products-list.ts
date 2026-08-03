@@ -97,13 +97,22 @@ export class ProductsList implements OnInit {
 		this.loadUnitCounts();
 		this.loadProducts();
 
-		// Đọc keyword từ query param (?keyword=...) do header search truyền sang
+		// Đọc query param (?keyword=... và ?categoryID=...) do home/header truyền sang
 		this.route.queryParamMap.subscribe(params => {
 			const keyword = (params.get('keyword') || '').trim();
 			if (keyword) {
 				this.searchKeyword.set(keyword);
-				this.applyFilters();
 			}
+
+			const categoryParam = params.get('categoryID');
+			if (categoryParam) {
+				const catId = Number(categoryParam);
+				if (!Number.isNaN(catId)) {
+					this.selectedCategoryID.set(catId);
+				}
+			}
+
+			this.applyFilters();
 		});
 	}
 

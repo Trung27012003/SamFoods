@@ -45,7 +45,7 @@ export const routes: Routes = [
 		canActivate: [adminGuard],
 		children: [
 			{
-				path: 'welcome',
+				path: 'dashboard',
 				loadChildren: () => import('./pages/welcome/welcome.routes').then((m) => m.WELCOME_ROUTES),
 			},
 

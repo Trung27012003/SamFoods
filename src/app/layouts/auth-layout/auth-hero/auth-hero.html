@@ -1,0 +1,28 @@
+<aside class="auth-hero">
+	<a routerLink="/home" class="auth-hero__back">
+		<i class="fa-solid fa-arrow-left"></i>
+		<span>Quay lại trang chủ</span>
+	</a>
+
+	<div class="auth-hero__content">
+		<h1>{{ title }}</h1>
+		<p class="auth-hero__subtitle">{{ subtitle }}</p>
+
+		@if (bullets.length) {
+		<ul class="auth-hero__bullets">
+			@for (item of bullets; track item) {
+			<li>
+				<span class="auth-hero__check">
+					<i class="fa-solid fa-check"></i>
+				</span>
+				<span>{{ item }}</span>
+			</li>
+			}
+		</ul>
+		}
+	</div>
+
+	<div class="auth-hero__decor auth-hero__decor--1"></div>
+	<div class="auth-hero__decor auth-hero__decor--2"></div>
+	<div class="auth-hero__decor auth-hero__decor--3"></div>
+</aside>

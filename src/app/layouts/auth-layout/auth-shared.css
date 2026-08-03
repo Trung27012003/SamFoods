@@ -1,0 +1,325 @@
+/* ============================================================
+   Auth – Shared styles (Login & Register)
+   ============================================================ */
+
+.auth-page {
+	min-height: 100vh;
+	background: var(--surface-bg);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-6);
+}
+
+.auth-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	max-width: 1120px;
+	width: 100%;
+	background: var(--surface-card);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-lg);
+	overflow: hidden;
+	min-height: 600px;
+}
+
+.auth-card {
+	padding: var(--space-8) var(--space-6);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.auth-card__header {
+	text-align: center;
+	margin-bottom: var(--space-6);
+}
+
+.auth-card__header img {
+	width: 64px;
+	height: 64px;
+	border-radius: 12px;
+	object-fit: cover;
+}
+
+.auth-card__header h2 {
+	font-size: 24px;
+	font-weight: 700;
+	margin: var(--space-3) 0 var(--space-1);
+	color: var(--text-primary);
+}
+
+.auth-card__header p {
+	color: var(--text-tertiary);
+	margin: 0;
+	font-size: 14px;
+}
+
+/* Form fields */
+.auth-field {
+	position: relative;
+	display: flex;
+	align-items: center;
+	margin-bottom: var(--space-4);
+	border: 1px solid var(--surface-border);
+	border-radius: var(--radius-md);
+	padding: 0 var(--space-3);
+	height: 48px;
+	background: var(--surface-bg);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.auth-field input {
+	flex: 1;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	height: 100%;
+	font-size: 14px;
+	color: var(--text-primary);
+	font-family: inherit;
+}
+
+.auth-field input::placeholder {
+	color: var(--text-tertiary);
+}
+
+.auth-field:focus-within {
+	border-color: var(--brand-primary);
+	box-shadow: 0 0 0 3px var(--brand-primary-soft);
+	background: var(--surface-card);
+}
+
+.auth-field__icon {
+	color: var(--text-tertiary);
+	margin-right: var(--space-2);
+	width: 16px;
+	text-align: center;
+	font-size: 14px;
+}
+
+.auth-field__suffix {
+	color: var(--text-tertiary);
+	cursor: pointer;
+	padding: var(--space-2);
+	font-size: 14px;
+	transition: color 0.15s ease;
+}
+
+.auth-field__suffix:hover {
+	color: var(--brand-primary);
+}
+
+.auth-field.is-error {
+	border-color: var(--color-error);
+}
+
+.auth-field.is-error:focus-within {
+	box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.12);
+}
+
+.auth-field-error {
+	font-size: 12px;
+	color: var(--color-error);
+	margin: -8px 0 var(--space-3);
+	padding-left: var(--space-2);
+}
+
+/* Auth row (checkbox + link) */
+.auth-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: var(--space-3) 0 var(--space-5);
+	font-size: 13px;
+	color: var(--text-secondary);
+}
+
+.auth-row a {
+	color: var(--brand-primary);
+	font-weight: 500;
+	text-decoration: none;
+}
+
+.auth-row a:hover {
+	color: var(--brand-primary-hover);
+	text-decoration: underline;
+}
+
+.auth-check {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	cursor: pointer;
+	user-select: none;
+}
+
+.auth-check input[type="checkbox"] {
+	width: 16px;
+	height: 16px;
+	accent-color: var(--brand-primary);
+	cursor: pointer;
+}
+
+/* 2-column row inside register */
+.auth-field-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--space-3);
+}
+
+.auth-field-row .auth-field {
+	margin-bottom: var(--space-4);
+}
+
+/* Submit button */
+.auth-submit {
+	height: 48px !important;
+	font-weight: 600 !important;
+	font-size: 15px !important;
+	border-radius: var(--radius-md) !important;
+	box-shadow: 0 4px 12px var(--brand-primary-soft);
+	transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.auth-submit:hover:not(:disabled) {
+	transform: translateY(-1px);
+	box-shadow: 0 6px 16px var(--brand-primary-soft);
+}
+
+.auth-submit:active:not(:disabled) {
+	transform: translateY(0);
+}
+
+/* Switch link (login <-> register) */
+.auth-switch {
+	text-align: center;
+	margin-top: var(--space-5);
+	color: var(--text-secondary);
+	font-size: 14px;
+}
+
+.auth-switch a {
+	color: var(--brand-primary);
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.auth-switch a:hover {
+	color: var(--brand-primary-hover);
+	text-decoration: underline;
+}
+
+/* Password strength bar */
+.pwd-strength {
+	display: flex;
+	gap: 4px;
+	margin: var(--space-1) 0 var(--space-3);
+}
+
+.pwd-strength__bar {
+	flex: 1;
+	height: 4px;
+	background: var(--surface-border);
+	border-radius: 2px;
+	transition: background-color 0.2s ease;
+}
+
+.pwd-strength__bar.active-1 {
+	background: #ff4d4f;
+}
+
+.pwd-strength__bar.active-2 {
+	background: #faad14;
+}
+
+.pwd-strength__bar.active-3 {
+	background: #1677ff;
+}
+
+.pwd-strength__bar.active-4 {
+	background: var(--color-success);
+}
+
+.pwd-strength__label {
+	font-size: 12px;
+	color: var(--text-tertiary);
+	margin-top: var(--space-1);
+}
+
+/* Terms checkbox (register) */
+.auth-terms {
+	margin: var(--space-3) 0 var(--space-5);
+	font-size: 13px;
+	color: var(--text-secondary);
+}
+
+.auth-terms a {
+	color: var(--brand-primary);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.auth-terms a:hover {
+	text-decoration: underline;
+}
+
+/* Override ng-zorro input wrapper inside .auth-field (no border styling) */
+.auth-field .ant-input,
+.auth-field input.ant-input {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	height: 100% !important;
+}
+
+.auth-field .ant-input:focus,
+.auth-field input.ant-input:focus {
+	box-shadow: none !important;
+}
+
+.auth-field .ant-input-group {
+	display: flex;
+	align-items: center;
+	flex: 1;
+}
+
+.auth-field .ant-input-prefix,
+.auth-field .ant-input-suffix {
+	margin: 0 var(--space-2);
+}
+
+/* Error tooltip from nz-form-control */
+.auth-field-error .ant-form-item-explain,
+.auth-field-error .ant-form-item-explain-error {
+	color: var(--color-error);
+	font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+	.auth-grid {
+		grid-template-columns: 1fr;
+		max-width: 480px;
+	}
+
+	.auth-card {
+		padding: var(--space-6) var(--space-5);
+	}
+
+	.auth-field-row {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 575.98px) {
+	.auth-page {
+		padding: var(--space-3);
+	}
+
+	.auth-card {
+		padding: var(--space-5) var(--space-4);
+	}
+}

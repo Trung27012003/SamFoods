@@ -1,67 +1,63 @@
-<section class="gradient-form">
-    <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-xl-10">
-                <div class="card rounded-3 text-black">
-                    <div class="row g-0">
-                        <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
-                            <div class="text-white px-3 py-4 p-md-5 mx-md-4">
-                                <a routerLink="/home" class="back-home-link">
-                                    <i class="fa-solid fa-arrow-left me-2"></i>Quay lại trang chủ
-                                </a>
-                                <h4 class="mb-4 mt-3">Chào mừng đến với SamFoods</h4>
-                                <p class="small mb-0">Hệ thống quản lý bán hàng thông minh, hiện đại và dễ sử dụng.</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="card-body p-md-5 mx-md-4">
-                                <div class="text-center">
-                                    <img [src]="logoURL()" style="width: 100px;" alt="logo">
-                                    <h4 class="mt-3 mb-4 pb-1">Đăng nhập</h4>
-                                </div>
+<section class="auth-page">
+	<div class="auth-grid">
+		<app-auth-hero
+			title="Chào mừng đến với SamFoods"
+			subtitle="Hệ thống quản lý bán hàng thông minh, hiện đại và dễ sử dụng."
+			[bullets]="[
+				'Theo dõi đơn hàng theo thời gian thực',
+				'Quản lý sản phẩm & danh mục tập trung',
+				'Khuyến mãi và voucher hấp dẫn'
+			]">
+		</app-auth-hero>
 
-                                <form [formGroup]="validateForm" (ngSubmit)="handleOk()">
-                                    <nz-spin [nzSpinning]="isLoading">
-                                        <div class="form-row">
-                                            <div class="form-label">
-                                                <nz-form-label nzRequired>Tên đăng nhập</nz-form-label>
-                                            </div>
-                                            <nz-form-control nzErrorTip="Vui lòng nhập tên đăng nhập (ít nhất 3 ký tự)!">
-                                                <input nz-input formControlName="userName" placeholder="Nhập tên đăng nhập" autocomplete="username" />
-                                            </nz-form-control>
-                                        </div>
+		<div class="auth-card">
+			<div class="auth-card__header">
+				<img [src]="logoURL()" alt="logo" />
+				<h2>Đăng nhập</h2>
+				<p>Chào mừng bạn quay lại</p>
+			</div>
 
-                                        <div class="form-row">
-                                            <div class="form-label">
-                                                <nz-form-label nzRequired>Mật khẩu</nz-form-label>
-                                            </div>
-                                            <nz-form-control nzErrorTip="Vui lòng nhập mật khẩu (ít nhất 6 ký tự)!">
-                                                <nz-input-group [nzSuffix]="suffixTemplate">
-                                                    <input [type]="showPassword ? 'text' : 'password'" nz-input formControlName="password" placeholder="Nhập mật khẩu" autocomplete="current-password" />
-                                                </nz-input-group>
-                                                <ng-template #suffixTemplate>
-                                                    <nz-icon nzType="eye" nzTheme="outline" style="cursor: pointer;" (click)="togglePassword()"></nz-icon>
-                                                </ng-template>
-                                            </nz-form-control>
-                                        </div>
+			<form [formGroup]="validateForm" (ngSubmit)="handleOk()" class="auth-form">
+				<nz-spin [nzSpinning]="isLoading">
+					<label class="auth-field" [class.is-error]="isFieldInvalid('userName')">
+						<i class="fa-solid fa-user auth-field__icon"></i>
+						<input nz-input formControlName="userName" placeholder="Tên đăng nhập" autocomplete="username" />
+					</label>
+					@if (isFieldInvalid('userName')) {
+					<div class="auth-field-error">Vui lòng nhập tên đăng nhập (ít nhất 3 ký tự)!</div>
+					}
 
-                                        <div class="text-center pt-1 mb-5 pb-1">
-                                            <button nz-button nzType="primary" nzBlock class="login-btn">
-                                                Đăng nhập
-                                            </button>
-                                        </div>
+					<label class="auth-field" [class.is-error]="isFieldInvalid('password')">
+						<i class="fa-solid fa-lock auth-field__icon"></i>
+						<input [type]="showPassword ? 'text' : 'password'" nz-input formControlName="password"
+							placeholder="Mật khẩu" autocomplete="current-password" />
+						<i class="fa-solid auth-field__suffix"
+							[class.fa-eye]="!showPassword"
+							[class.fa-eye-slash]="showPassword"
+							(click)="togglePassword()"></i>
+					</label>
+					@if (isFieldInvalid('password')) {
+					<div class="auth-field-error">Vui lòng nhập mật khẩu (ít nhất 6 ký tự)!</div>
+					}
 
-                                        <div class="d-flex align-items-center justify-content-center pb-4">
-                                            <p class="mb-0 me-2">Bạn chưa có tài khoản?</p>
-                                            <button nz-button nzType="link" (click)="goToRegister()">Đăng ký ngay</button>
-                                        </div>
-                                    </nz-spin>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+					<div class="auth-row">
+						<label class="auth-check">
+							<input type="checkbox" />
+							<span>Ghi nhớ đăng nhập</span>
+						</label>
+						<a routerLink="/change-password">Quên mật khẩu?</a>
+					</div>
+
+					<button nz-button nzType="primary" nzBlock class="auth-submit" [disabled]="isLoading">
+						Đăng nhập
+					</button>
+
+					<div class="auth-switch">
+						Chưa có tài khoản?
+						<a (click)="goToRegister()">Đăng ký ngay</a>
+					</div>
+				</nz-spin>
+			</form>
+		</div>
+	</div>
 </section>

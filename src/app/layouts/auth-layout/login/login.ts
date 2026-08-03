@@ -1,12 +1,13 @@
 import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { AuthHero } from '../auth-hero/auth-hero';
 import { AuthService } from '../auth-service';
 import { SiteSettingsStore } from '../../../shared/site-settings';
 
@@ -16,14 +17,16 @@ import { SiteSettingsStore } from '../../../shared/site-settings';
 		CommonModule,
 		FormsModule,
 		ReactiveFormsModule,
+		RouterLink,
 		NzFormModule,
 		NzInputModule,
 		NzButtonModule,
 		NzIconModule,
-		NzSpinModule
+		NzSpinModule,
+		AuthHero
 	],
 	templateUrl: './login.html',
-	styleUrl: './login.css',
+	styleUrls: ['./login.css', '../auth-shared.css'],
 	standalone: true
 })
 export class Login implements OnInit {
@@ -46,6 +49,11 @@ export class Login implements OnInit {
 			userName: ['', [Validators.required, Validators.minLength(3)]],
 			password: ['', [Validators.required, Validators.minLength(6)]]
 		});
+	}
+
+	isFieldInvalid(name: string): boolean {
+		const c = this.validateForm?.get(name);
+		return !!(c && c.invalid && (c.dirty || c.touched));
 	}
 
 	handleOk(): void {

@@ -124,31 +124,19 @@
     </div>
 
     <div>
-        @for (item of products; track item.ID) {
+        @for (item of products; track item.categoryID) {
         <div class="featured-product my-2 mt-3">
-            <h5 class="fw-bold text-uppercase">{{item.categoryName}}</h5>
-            <div class="card category-slider border-0">
-                <p-carousel [value]="item.data" [numVisible]="6" [numScroll]="3" [circular]="false" [responsiveOptions]="responsiveOptions">
-                    <ng-template let-product #item>
-                        <div class="product-card">
-                            <div class="product-img">
-                                <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">
-                                    <img [src]="product.ImageURL" alt="" />
-                                </a>
-                            </div>
-                            <div class="product-name px-2">
-                                <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{product.ProductName}}</a>
-                            </div>
-
-                        </div>
-                    </ng-template>
-                </p-carousel>
-            </div>
             <div class="card products-slider border-0">
-                <h6 class="fw-bold">Sản phẩm nổi bật</h6>
-                <div class="row">
-                    @for (product of item.data; track product.ID) {
-                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2 d-flex justify-content-center">
+                <div class="section-header d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold text-uppercase m-0">{{ item.categoryName }}</h5>
+                    <a [routerLink]="['/products']" [queryParams]="{ categoryID: item.categoryID }" class="see-all-link">
+                        Xem thêm
+                        <i nz-icon nzType="right"></i>
+                    </a>
+                </div>
+                <p-carousel *ngIf="item.data.length" [value]="item.data" [numVisible]="6" [numScroll]="6" [circular]="true" [autoplayInterval]="categoryCarouselAutoplay" [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+                    <!-- <ng-template let-product #catProductTpl> -->
+                    <ng-template pTemplate="item" let-product>
                         <div class="product-card">
                             <div class="badge">MỚI</div>
                             <div class="product-img">
@@ -157,11 +145,11 @@
                                 </a>
                             </div>
                             <div class="product-name px-2">
-                                <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{product.ProductName}}</a>
+                                <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{ product.ProductName }}</a>
                             </div>
                             <div class="product-bottom px-2">
                                 <div class="price">
-                                    {{ product.UnitPrice| number }} <small>VND</small>
+                                    {{ product.UnitPrice | number }} <small>VND</small>
                                 </div>
                                 <div class="favorite" [ngClass]="{ active: isFavourite(product) }">
                                     <a (click)="onAddFavourite(product)">
@@ -173,42 +161,10 @@
                                 <button class="btn-buy" (click)="onAddToCart(product)">Mua Hàng</button>
                             </div>
                         </div>
-                    </div>
-                    }
-                </div>
-                <!-- <p-carousel [value]="item.data" [numVisible]="6" [numScroll]="3" [circular]="false"
-                         [responsiveOptions]="responsiveOptions">
-                         <ng-template let-product #item>
-                              <div class="product-card">
-                                   <div class="badge">MỚI</div>
-                                   <div class="product-img">
-                                        <a routerLink="/detail">
-                                             <img [src]="product.ImageURL" alt="" />
-                                        </a>
-                                   </div>
-                                   <div class="product-name px-2">
-                                        <a routerLink="/detail">{{product.ProductName}}</a>
-                                   </div>
-                                   <div class="product-bottom px-2">
-                                        <div class="price">
-                                             {{ 100000000 | number }} <small>VND</small>
-                                        </div>
-                                        <div class="favorite" [ngClass]="{ active: isFavourite(product) }">
-                                             <a (click)="onAddFavourite(product)">
-                                                  <i nz-icon nzType="heart"></i>
-                                             </a>
-                                        </div>
-                                   </div>
-                                   <div class="p-2">
-                                        <button class="btn-buy" (click)="onAddToCart(product)">Mua Hàng</button>
-                                   </div>
-                              </div>
-                         </ng-template>
-                    </p-carousel> -->
-
+                    </ng-template>
+                </p-carousel>
             </div>
         </div>
-
         }
     </div>
 </div>

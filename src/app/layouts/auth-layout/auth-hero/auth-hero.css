@@ -1,0 +1,121 @@
+.auth-hero {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: var(--space-8) var(--space-6);
+	background:
+		linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-active) 100%);
+	color: var(--text-on-brand);
+	overflow: hidden;
+	min-height: 600px;
+}
+
+.auth-hero__back {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	color: rgba(255, 255, 255, 0.85);
+	text-decoration: none;
+	font-size: 13px;
+	font-weight: 500;
+	width: fit-content;
+	padding: var(--space-2) var(--space-3);
+	border-radius: var(--radius-md);
+	background: rgba(255, 255, 255, 0.08);
+	transition: background-color 0.15s ease, color 0.15s ease;
+	z-index: 2;
+}
+
+.auth-hero__back:hover {
+	background: rgba(255, 255, 255, 0.16);
+	color: #ffffff;
+}
+
+.auth-hero__content {
+	position: relative;
+	z-index: 2;
+	max-width: 380px;
+}
+
+.auth-hero__content h1 {
+	margin: 0 0 var(--space-3);
+	font-size: 32px;
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.3px;
+}
+
+.auth-hero__subtitle {
+	margin: 0 0 var(--space-6);
+	font-size: 15px;
+	line-height: 1.6;
+	color: rgba(255, 255, 255, 0.85);
+}
+
+.auth-hero__bullets {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+.auth-hero__bullets li {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	font-size: 14px;
+	color: rgba(255, 255, 255, 0.92);
+}
+
+.auth-hero__check {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.18);
+	color: #ffffff;
+	font-size: 11px;
+	flex-shrink: 0;
+}
+
+.auth-hero__decor {
+	position: absolute;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.08);
+	pointer-events: none;
+	z-index: 1;
+}
+
+.auth-hero__decor--1 {
+	top: -80px;
+	right: -80px;
+	width: 280px;
+	height: 280px;
+}
+
+.auth-hero__decor--2 {
+	bottom: -120px;
+	left: -80px;
+	width: 320px;
+	height: 320px;
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.auth-hero__decor--3 {
+	top: 40%;
+	right: 30%;
+	width: 160px;
+	height: 160px;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+@media (max-width: 991.98px) {
+	.auth-hero {
+		display: none;
+	}
+}

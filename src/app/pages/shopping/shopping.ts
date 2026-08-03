@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ProductService } from '../../services/product-service';
 import { CategoryService } from '../../services/category-service';
@@ -30,34 +31,34 @@ import { CART_PRODUCT_KEY, FAVOURITE_KEY, IMAGE_URL, NOTIFICATION_TITLE_MAP, NOT
 import { BannerService } from '../../services/banner-service';
 
 @Component({
-	selector: 'app-shopping',
-	imports: [
-		CommonModule,
-		FormsModule,
-		AvatarModule,
-		ButtonModule,
-		MegaMenuModule,
-		RippleModule,
-		CarouselModule,
-		TagModule,
-		DataViewModule,
-		SelectButtonModule,
-		NzDropdownModule,
-		NzIconModule,
-		NzInputModule,
-		NzAutocompleteModule,
-		NzCarouselModule,
-		NzBadgeModule,
-		NzCardModule,
-		NzListModule,
-		NzFloatButtonModule,
-		PanelModule,
-		NzGridModule,
-		RouterLink
-	],
-	templateUrl: './shopping.html',
-	styleUrl: '../../layouts/shopping-layout/shopping-layout.css',
-	styles: [`
+  selector: 'app-shopping',
+  imports: [
+    CommonModule,
+    FormsModule,
+    AvatarModule,
+    ButtonModule,
+    MegaMenuModule,
+    RippleModule,
+    CarouselModule,
+    TagModule,
+    DataViewModule,
+    SelectButtonModule,
+    NzDropdownModule,
+    NzIconModule,
+    NzInputModule,
+    NzAutocompleteModule,
+    NzCarouselModule,
+    NzBadgeModule,
+    NzCardModule,
+    NzListModule,
+    NzFloatButtonModule,
+    PanelModule,
+    NzGridModule,
+    RouterLink
+  ],
+  templateUrl: './shopping.html',
+  styleUrl: '../../layouts/shopping-layout/shopping-layout.css',
+  styles: [`
 		.section-header {
 			margin-bottom: 1rem;
 		}
@@ -72,6 +73,11 @@ import { BannerService } from '../../services/banner-service';
 		}
 		.see-all-link:hover {
 			text-decoration: underline;
+		}
+		.new-arrivals-slider > .card.products-slider > h5.fw-bold.text-uppercase,
+		.featured-product > h5.fw-bold.text-uppercase,
+		.featured-product > .card.products-slider > h6.fw-bold {
+			margin-bottom: 1rem;
 		}
 		@media (max-width: 768px) {
 			.section-header h5 {
@@ -98,427 +104,433 @@ import { BannerService } from '../../services/banner-service';
 			}
 		}
 	`],
-	standalone: true,
-	providers: [
-		ProductService,
-		CategoryService,
-		BannerService
-	]
+  standalone: true,
+  providers: [
+    ProductService,
+    CategoryService,
+    BannerService
+  ]
 })
 export class Shopping {
-	private productService = inject(ProductService);
-	private categoryService = inject(CategoryService);
-	private bannerService = inject(BannerService);
-	private notification = inject(NzNotificationService);
-	megaMenuItems: MegaMenuItem[] | undefined;
-	responsiveOptions: any[] | undefined;
-	bestSellerResponsiveOptions: any[] | undefined;
-	products: any[] = [];
-	productNews: any[] = [];
-	productBestSellers: any[] = [];
+  private productService = inject(ProductService);
+  private categoryService = inject(CategoryService);
+  private bannerService = inject(BannerService);
+  private notification = inject(NzNotificationService);
+  megaMenuItems: MegaMenuItem[] | undefined;
+  responsiveOptions: any[] | undefined;
+  bestSellerResponsiveOptions: any[] | undefined;
+  products: any[] = [];
+  productNews: any[] = [];
+  productBestSellers: any[] = [];
 
-	bannerSlides = signal<{ ImageURL: string; LinkURL?: string; SortOrder: number }[]>([]);
-	slideshowInterval = 3000;
+  bannerSlides = signal<{ ImageURL: string; LinkURL?: string; SortOrder: number }[]>([]);
+  slideshowInterval = 3000;
+  categoryCarouselAutoplay = 5000;
 
-	options: any[] = ['list', 'grid'];
-	layout = this.options[0];
-	keyword = '';
+  options: any[] = ['list', 'grid'];
+  layout = this.options[0];
+  keyword = '';
 
-	autoCompleteKeywords = [
-		{ label: 'Lucy', value: 'lucy' },
-		{ label: 'Jack', value: 'jack' }
-	];
+  autoCompleteKeywords = [
+    { label: 'Lucy', value: 'lucy' },
+    { label: 'Jack', value: 'jack' }
+  ];
 
 
-	// shoppingNumber = 5;
-	isVisibleShopingCard = false;
-	shopingCarts: any[] = [];
+  // shoppingNumber = 5;
+  isVisibleShopingCard = false;
+  shopingCarts: any[] = [];
 
-	ngOnInit(): void {
-		this.initMenuItems();
-		this.loadActiveBanner();
-		this.loadProducts();
-		this.loadShoppingCards();
-	}
+  ngOnInit(): void {
+    this.initMenuItems();
+    this.loadActiveBanner();
+    this.loadProducts();
+    this.loadShoppingCards();
+  }
 
-	initMenuItems() {
-		this.megaMenuItems = [
-			{
-				label: 'Hàng mới',
-			},
-			{
-				label: 'Bán chạy',
-			},
-			// {
-			// 	label: 'Sports',
-			// 	// icon: 'pi pi-clock',
-			// 	items: [
-			// 		[
-			// 			{
-			// 				label: 'Football',
-			// 				items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Running',
-			// 				items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Swimming',
-			// 				items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Tennis',
-			// 				items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
-			// 			}
-			// 		]
-			// 	]
-			// },
-			// {
-			// 	label: 'Sports',
-			// 	// icon: 'pi pi-clock',
-			// 	items: [
-			// 		[
-			// 			{
-			// 				label: 'Football',
-			// 				items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Running',
-			// 				items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Swimming',
-			// 				items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Tennis',
-			// 				items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
-			// 			}
-			// 		]
-			// 	]
-			// },
-			// {
-			// 	label: 'Sports',
-			// 	icon: 'pi pi-clock',
-			// 	items: [
-			// 		[
-			// 			{
-			// 				label: 'Football',
-			// 				items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Running',
-			// 				items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Swimming',
-			// 				items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Tennis',
-			// 				items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
-			// 			}
-			// 		]
-			// 	]
-			// },
-			// {
-			// 	label: 'Sports',
-			// 	icon: 'pi pi-clock',
-			// 	items: [
-			// 		[
-			// 			{
-			// 				label: 'Football',
-			// 				items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Running',
-			// 				items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Swimming',
-			// 				items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
-			// 			}
-			// 		],
-			// 		[
-			// 			{
-			// 				label: 'Tennis',
-			// 				items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
-			// 			}
-			// 		]
-			// 	]
-			// }
-		];
+  initMenuItems() {
+    this.megaMenuItems = [
+      {
+        label: 'Hàng mới',
+      },
+      {
+        label: 'Bán chạy',
+      },
+      // {
+      // 	label: 'Sports',
+      // 	// icon: 'pi pi-clock',
+      // 	items: [
+      // 		[
+      // 			{
+      // 				label: 'Football',
+      // 				items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Running',
+      // 				items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Swimming',
+      // 				items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Tennis',
+      // 				items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
+      // 			}
+      // 		]
+      // 	]
+      // },
+      // {
+      // 	label: 'Sports',
+      // 	// icon: 'pi pi-clock',
+      // 	items: [
+      // 		[
+      // 			{
+      // 				label: 'Football',
+      // 				items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Running',
+      // 				items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Swimming',
+      // 				items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Tennis',
+      // 				items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
+      // 			}
+      // 		]
+      // 	]
+      // },
+      // {
+      // 	label: 'Sports',
+      // 	icon: 'pi pi-clock',
+      // 	items: [
+      // 		[
+      // 			{
+      // 				label: 'Football',
+      // 				items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Running',
+      // 				items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Swimming',
+      // 				items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Tennis',
+      // 				items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
+      // 			}
+      // 		]
+      // 	]
+      // },
+      // {
+      // 	label: 'Sports',
+      // 	icon: 'pi pi-clock',
+      // 	items: [
+      // 		[
+      // 			{
+      // 				label: 'Football',
+      // 				items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Running',
+      // 				items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Swimming',
+      // 				items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
+      // 			}
+      // 		],
+      // 		[
+      // 			{
+      // 				label: 'Tennis',
+      // 				items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
+      // 			}
+      // 		]
+      // 	]
+      // }
+    ];
 
-		this.categoryService.getData().subscribe({
-			next: (res) => {
-				Promise.resolve().then(() => {
-					const categoryRoot = res.data.filter((x: any) => x.ParentID === 0 && x.IsDeleted === 0);
-					this.megaMenuItems?.push(
-						{
-							label: 'Sports',
-							// icon: 'pi pi-clock',
-							items: [
-								[
-									{
-										label: 'Football',
-										items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
-									}
-								],
-								[
-									{
-										label: 'Running',
-										items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
-									}
-								],
-								[
-									{
-										label: 'Swimming',
-										items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
-									}
-								],
-								[
-									{
-										label: 'Tennis',
-										items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
-									}
-								]
-							]
-						},
-					);
-				});
-			},
-			error: (err) => {
-				this.notification.create(
-					NOTIFICATION_TYPE_MAP[err.status] || 'error',
-					NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
-					err?.error?.message || `${err.error}\n${err.message}`,
-					{
-						nzStyle: { whiteSpace: 'pre-line' }
-					}
-				);
-			}
-		})
-	}
+    this.categoryService.getData().subscribe({
+      next: (res) => {
+        Promise.resolve().then(() => {
+          const categoryRoot = res.data.filter((x: any) => x.ParentID === 0 && x.IsDeleted === 0);
+          this.megaMenuItems?.push(
+            {
+              label: 'Sports',
+              // icon: 'pi pi-clock',
+              items: [
+                [
+                  {
+                    label: 'Football',
+                    items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
+                  }
+                ],
+                [
+                  {
+                    label: 'Running',
+                    items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
+                  }
+                ],
+                [
+                  {
+                    label: 'Swimming',
+                    items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
+                  }
+                ],
+                [
+                  {
+                    label: 'Tennis',
+                    items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
+                  }
+                ]
+              ]
+            },
+          );
+        });
+      },
+      error: (err) => {
+        this.notification.create(
+          NOTIFICATION_TYPE_MAP[err.status] || 'error',
+          NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
+          err?.error?.message || `${err.error}\n${err.message}`,
+          {
+            nzStyle: { whiteSpace: 'pre-line' }
+          }
+        );
+      }
+    })
+  }
 
-	loadProducts() {
-		this.productService.getData().subscribe({
-			next: (res) => {
-				// console.log('loadData:', res.data);
-				Promise.resolve().then(() => {
-					const data = res.data.map((item: any) => ({
-						...item,
-						ImageURL: getProductImageUrl(item.ImageURL),
-					}))
+  loadProducts() {
+    forkJoin({
+      products: this.productService.getData(),
+      categories: this.categoryService.getData()
+    }).subscribe({
+      next: (res) => {
+        Promise.resolve().then(() => {
+          const data = (res.products.data || []).map((item: any) => ({
+            ...item,
+            ImageURL: getProductImageUrl(item.ImageURL),
+          }));
 
-					this.productNews = data;
-					this.productBestSellers = data;
+          this.productNews = data;
+          this.productBestSellers = data;
 
-					const grouped = Object.values(
-						data.reduce((a: any, b: any) => {
-							(a[b.CategoryID] ??= {
-								categoryID: b.CategoryID,
-								categoryName: b.CategoryName,
-								data: []
-							}).data.push(b);
+          const rootCats = (res.categories.data || []).filter(
+            (x: any) => x.ParentID === 0 && x.IsDeleted == false
+          );
 
-							return a;
+          const grouped = Object.values(
+            data.reduce((a: any, b: any) => {
+              const cat = rootCats.find((c: any) => c.ID === b.CategoryID);
+              if (!cat) return a;
+              (a[b.CategoryID] ??= {
+                categoryID: b.CategoryID,
+                categoryName: cat.CategoryName,
+                data: []
+              }).data.push(b);
 
-						}, {})
-					);
+              return a;
 
-					this.products = grouped;
+            }, {})
+          ).filter((g: any) => g.data.length > 0);
 
-					// console.log('products:', this.products);
-					// console.log('grouped:', grouped);
-				});
-			},
-			error: (err) => {
-				this.notification.create(
-					NOTIFICATION_TYPE_MAP[err.status] || 'error',
-					NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
-					err?.error?.message || `${err.error}\n${err.message}`,
-					{
-						nzStyle: { whiteSpace: 'pre-line' }
-					}
-				);
-			}
-		});
+          this.products = grouped;
+        });
+      },
+      error: (err) => {
+        this.notification.create(
+          NOTIFICATION_TYPE_MAP[err.status] || 'error',
+          NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
+          err?.error?.message || `${err.error}\n${err.message}`,
+          {
+            nzStyle: { whiteSpace: 'pre-line' }
+          }
+        );
+      }
+    });
 
-		this.responsiveOptions = [
-			{
-				breakpoint: '1400px',
-				numVisible: 6,
-				numScroll: 1
-			},
-			{
-				breakpoint: '1199px',
-				numVisible: 5,
-				numScroll: 1
-			},
-			{
-				breakpoint: '991px',
-				numVisible: 4,
-				numScroll: 1
-			},
-			{
-				breakpoint: '767px',
-				numVisible: 3,
-				numScroll: 1
-			},
-			{
-				breakpoint: '575px',
-				numVisible: 2,
-				numScroll: 1
-			}
-		];
+    this.responsiveOptions = [
+      {
+        breakpoint: '1400px',
+        numVisible: 6,
+        numScroll: 1
+      },
+      {
+        breakpoint: '1199px',
+        numVisible: 5,
+        numScroll: 1
+      },
+      {
+        breakpoint: '991px',
+        numVisible: 4,
+        numScroll: 1
+      },
+      {
+        breakpoint: '767px',
+        numVisible: 3,
+        numScroll: 1
+      },
+      {
+        breakpoint: '575px',
+        numVisible: 2,
+        numScroll: 1
+      }
+    ];
 
-		this.bestSellerResponsiveOptions = [
-			{
-				breakpoint: '1400px',
-				numVisible: 6,
-				numScroll: 6
-			},
-			{
-				breakpoint: '1199px',
-				numVisible: 4,
-				numScroll: 4
-			},
-			{
-				breakpoint: '991px',
-				numVisible: 3,
-				numScroll: 3
-			},
-			{
-				breakpoint: '767px',
-				numVisible: 2,
-				numScroll: 2
-			},
-			{
-				breakpoint: '575px',
-				numVisible: 1,
-				numScroll: 1
-			}
-		];
-	}
+    this.bestSellerResponsiveOptions = [
+      {
+        breakpoint: '1400px',
+        numVisible: 6,
+        numScroll: 6
+      },
+      {
+        breakpoint: '1199px',
+        numVisible: 4,
+        numScroll: 4
+      },
+      {
+        breakpoint: '991px',
+        numVisible: 3,
+        numScroll: 3
+      },
+      {
+        breakpoint: '767px',
+        numVisible: 2,
+        numScroll: 2
+      },
+      {
+        breakpoint: '575px',
+        numVisible: 1,
+        numScroll: 1
+      }
+    ];
+  }
 
-	loadShoppingCards() {
-		// for (let i = 0; i < 10; i++) {
-		// 	const item = {
-		// 		href: 'https://ant.design',
-		// 		title: `ant design part)`,
-		// 		avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-		// 		description: 'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-		// 		content:
-		// 			'We supply a series of design principles, practical patterns and high quality design resources ' +
-		// 			'(Sketch and Axure), to help people create their product prototypes beautifully and efficiently.'
-		// 	}
-		// 	this.dataShopingCards.push(item);
-		// }
+  loadShoppingCards() {
+    // for (let i = 0; i < 10; i++) {
+    // 	const item = {
+    // 		href: 'https://ant.design',
+    // 		title: `ant design part)`,
+    // 		avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+    // 		description: 'Ant Design, a design language for background applications, is refined by Ant UED Team.',
+    // 		content:
+    // 			'We supply a series of design principles, practical patterns and high quality design resources ' +
+    // 			'(Sketch and Axure), to help people create their product prototypes beautifully and efficiently.'
+    // 	}
+    // 	this.dataShopingCards.push(item);
+    // }
 
-		let cartValue = localStorage.getItem(CART_PRODUCT_KEY);
-		this.shopingCarts = cartValue ? JSON.parse(cartValue) : [];
-	}
+    let cartValue = localStorage.getItem(CART_PRODUCT_KEY);
+    this.shopingCarts = cartValue ? JSON.parse(cartValue) : [];
+  }
 
-	loadActiveBanner() {
-		const imageURL = IMAGE_URL + '/banner';
-		this.bannerService.getActiveBanner().subscribe({
-			next: (res) => {
-				Promise.resolve().then(() => {
-					const active = (res.data || []).find((b: any) => b.IsActive && !b.IsDeleted);
-					if (!active) {
-						this.bannerSlides.set([]);
-						return;
-					}
+  loadActiveBanner() {
+    const imageURL = IMAGE_URL + '/banner';
+    this.bannerService.getActiveBanner().subscribe({
+      next: (res) => {
+        Promise.resolve().then(() => {
+          const active = (res.data || []).find((b: any) => b.IsActive && !b.IsDeleted);
+          if (!active) {
+            this.bannerSlides.set([]);
+            return;
+          }
 
-					this.slideshowInterval = (active.SlideshowInterval || 3) * 1000;
-					this.bannerSlides.set((active.Details || [])
-						.filter((d: any) => !d.IsDeleted && d.ImageName)
-						.sort((a: any, b: any) => (a.SortOrder ?? 0) - (b.SortOrder ?? 0))
-						.map((d: any) => ({
-							ImageURL: `${imageURL}/${active.BannerCode}/${d.ImageName}`,
-							LinkURL: d.LinkURL,
-							SortOrder: d.SortOrder,
-						})));
-				});
-			},
-			error: (err) => {
-				this.notification.create(
-					NOTIFICATION_TYPE_MAP[err.status] || 'error',
-					NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
-					err?.error?.message || `${err.error}\n${err.message}`,
-					{
-						nzStyle: { whiteSpace: 'pre-line' }
-					}
-				);
-			}
-		});
-	}
+          this.slideshowInterval = (active.SlideshowInterval || 3) * 1000;
+          this.bannerSlides.set((active.Details || [])
+            .filter((d: any) => !d.IsDeleted && d.ImageName)
+            .sort((a: any, b: any) => (a.SortOrder ?? 0) - (b.SortOrder ?? 0))
+            .map((d: any) => ({
+              ImageURL: `${imageURL}/${active.BannerCode}/${d.ImageName}`,
+              LinkURL: d.LinkURL,
+              SortOrder: d.SortOrder,
+            })));
+        });
+      },
+      error: (err) => {
+        this.notification.create(
+          NOTIFICATION_TYPE_MAP[err.status] || 'error',
+          NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
+          err?.error?.message || `${err.error}\n${err.message}`,
+          {
+            nzStyle: { whiteSpace: 'pre-line' }
+          }
+        );
+      }
+    });
+  }
 
-	getSeverity(status: string) {
-		switch (status) {
-			case '1':
-				return 'success';
-			case '2':
-				return 'warn';
-			case '3':
-				return 'danger';
-			default:
-				return 'info';
-		}
-	}
+  getSeverity(status: string) {
+    switch (status) {
+      case '1':
+        return 'success';
+      case '2':
+        return 'warn';
+      case '3':
+        return 'danger';
+      default:
+        return 'info';
+    }
+  }
 
-	onCloseShoppingCard() {
-		this.isVisibleShopingCard = false;
-	}
+  onCloseShoppingCard() {
+    this.isVisibleShopingCard = false;
+  }
 
-	onAddFavourite(item: any) {
-		let favourites = localStorage.getItem(FAVOURITE_KEY);
-		let list = favourites ? JSON.parse(favourites) : [];
+  onAddFavourite(item: any) {
+    let favourites = localStorage.getItem(FAVOURITE_KEY);
+    let list = favourites ? JSON.parse(favourites) : [];
 
-		const index = list.findIndex((x: any) => x.id === item.id);
+    const index = list.findIndex((x: any) => x.id === item.id);
 
-		if (index > -1) {
-			list.splice(index, 1);
-		} else list.push(item);
+    if (index > -1) {
+      list.splice(index, 1);
+    } else list.push(item);
 
-		localStorage.setItem(FAVOURITE_KEY, JSON.stringify(list));
-	}
+    localStorage.setItem(FAVOURITE_KEY, JSON.stringify(list));
+  }
 
-	isFavourite(item: any): boolean {
-		let favourites = localStorage.getItem(FAVOURITE_KEY);
-		let list = favourites ? JSON.parse(favourites) : [];
+  isFavourite(item: any): boolean {
+    let favourites = localStorage.getItem(FAVOURITE_KEY);
+    let list = favourites ? JSON.parse(favourites) : [];
 
-		return list.some((x: any) => x.id === item.id);
-	}
+    return list.some((x: any) => x.id === item.id);
+  }
 
-	onAddToCart(item: any) {
-		this.productService.onAddToCart({
-			ID: item.ID,
-			ProductName: item.ProductName,
-			UnitPrice: item.UnitPrice,
-			Quantity: 1,
-		});
-	}
+  onAddToCart(item: any) {
+    this.productService.onAddToCart({
+      ID: item.ID,
+      ProductName: item.ProductName,
+      UnitPrice: item.UnitPrice,
+      Quantity: 1,
+    });
+  }
 }
