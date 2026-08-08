@@ -222,7 +222,8 @@ export class BannerDetail implements OnInit {
 		}
 
 		const bannerCode = this.validateForm.get('BannerCode')?.value || '';
-		return `${IMAGE_URL}/banner/${bannerCode}/${imageName}`;
+		// return `${IMAGE_URL}/banner/${bannerCode}/${imageName}`;
+		return `${imageName}`;
 	}
 
 	handleOk(): void {

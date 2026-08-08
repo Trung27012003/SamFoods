@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, Injector, inject, signal } from '@angular/core';
 import { SiteSettingService } from '../services/site-setting-service';
 import { SiteSettingModel } from '../models/site-setting-model';
 import { environment } from '../environments/environment';
@@ -39,7 +39,7 @@ interface CacheShape {
 
 @Injectable({ providedIn: 'root' })
 export class SiteSettingsStore {
-	private service = inject(SiteSettingService);
+	private injector = inject(Injector);
 
 	private readonly _map = signal<Record<string, string>>({});
 	private readonly _loading = signal<boolean>(false);
@@ -58,16 +58,19 @@ export class SiteSettingsStore {
 		return (v === undefined || v === null) ? fallback : v;
 	}
 
-	getSignal(key: string, fallback: string = '') {
-		return computed(() => {
-			const v = this._map()[key];
-			return (v === undefined || v === null) ? fallback : v;
-		});
-	}
+	// [Settings reactive 2024]: getSignal không còn dùng — component chuyển sang computed(() => siteSettings.map()) / computed(() => siteSettings.imageUrl()). Có thể xoá khi đã ổn định.
+	//public getSignal(key: string, fallback: string = '')
+	//{
+	//    return computed(() => {
+	//        const v = this._map()[key];
+	//        return (v === undefined || v === null) ? fallback : v;
+	//    });
+	//}
 
 	imageUrl(key: string, fallback: string = ''): string {
 		const raw = this.get(key, fallback);
 		if (!raw) return fallback;
+		// [Settings image 2024-fix]: khôi phục chuẩn hoá URL — cloudinary (https) giữ nguyên, assets/ giữ nguyên, còn lại prefix với environment.host.
 		if (/^https?:\/\//i.test(raw)) return raw;
 		if (raw.startsWith('assets/')) return raw;
 		let clean = raw.replace(/^\/+/, '');
@@ -78,9 +81,11 @@ export class SiteSettingsStore {
 		return `${environment.host}api/shared/images/${clean}`;
 	}
 
-	imageUrlSignal(key: string, fallback: string = '') {
-		return computed(() => this.imageUrl(key, fallback));
-	}
+	// [Settings reactive 2024]: imageUrlSignal không còn dùng — computed imageUrl đã reactive qua _map trực tiếp. Có thể xoá khi đã ổn định.
+	//public imageUrlSignal(key: string, fallback: string = '')
+	//{
+	//    return computed(() => this.imageUrl(key, fallback));
+	//}
 
 	loadFromCache(): void {
 		try {
@@ -89,6 +94,8 @@ export class SiteSettingsStore {
 			const parsed = JSON.parse(raw) as CacheShape;
 			if (!parsed || !parsed.map || !parsed.ts) return;
 			if (Date.now() - parsed.ts > CACHE_TTL_MS) return;
+			// [SiteSettingsStore 2024-fix]: chỉ coi cache là "loaded" khi có ít nhất 1 key — tránh đóng băng store rỗng 30 phút khi BE lỗi lần đầu.
+			if (Object.keys(parsed.map).length === 0) return;
 			this._map.set(parsed.map);
 			this._loaded.set(true);
 			this.applyThemeVars();
@@ -110,10 +117,17 @@ export class SiteSettingsStore {
 		if (this._loaded() && !force) return Promise.resolve();
 
 		this._loading.set(true);
-		return new Promise((resolve) => {
-			this.service.getPublic().subscribe({
+		// [SiteSettingsStore 2024]: Lazy resolve SiteSettingService để tránh circular DI (SiteSettingService cũng inject SiteSettingsStore để refresh).
+		const service = this.injector.get(SiteSettingService);
+
+		const fetchOnce = (): Promise<void> => new Promise((resolve) => {
+			service.getPublic().subscribe({
 				next: (res) => {
 					const items: SiteSettingModel[] = res?.data ?? [];
+					// [SiteSettingsStore 2024-fix]: cảnh báo khi BE trả rỗng — thường do setting bị IsPublic=false.
+					if (!items || items.length === 0) {
+						console.warn('[SiteSettingsStore] getPublic trả 0 items — kiểm tra IsPublic filter ở BE hoặc seed data');
+					}
 					const map: Record<string, string> = {};
 					for (const item of items) {
 						if (item?.SettingKey) {
@@ -127,11 +141,19 @@ export class SiteSettingsStore {
 					this.applyThemeVars();
 					resolve();
 				},
-				error: () => {
+				error: (err) => {
+					// [SiteSettingsStore 2024-fix]: log lỗi thay vì nuốt im lặng, để admin biết BE đang fail.
+					console.error('[SiteSettingsStore] getPublic failed', err);
 					this._loading.set(false);
 					resolve();
 				}
 			});
+		});
+
+		// [SiteSettingsStore 2024-fix]: retry 1 lần sau 2s nếu lỗi mạng — phòng Cold Start BE.
+		return fetchOnce().then(() => {
+			if (this._loaded()) return;
+			return new Promise<void>((resolve) => setTimeout(resolve, 2000)).then(fetchOnce);
 		});
 	}
 

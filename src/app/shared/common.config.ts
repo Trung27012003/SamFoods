@@ -100,19 +100,19 @@ export function truncateText(text: string | null | undefined, maxLength: number)
 // Accepts either a relative path from DB (e.g. "/Product/SP001/img.jpg") or an already-absolute URL.
 // spGetProduct returns full relative path "api/shared/images/product/..." — strip that to avoid duplication.
 export function getProductImageUrl(path: string | null | undefined): string {
-	if (!path) return '';
-	if (/^https?:\/\//i.test(path)) return path;
+	// if (!path) return '';
+	// if (/^https?:\/\//i.test(path)) return path;
 
-	// Strip leading slash
-	let clean = path.replace(/^\/+/, '');
+	// // Strip leading slash
+	// let clean = path.replace(/^\/+/, '');
 
-	// spGetProduct returns "api/shared/images/product/..." → strip to avoid /api/shared/images/api/shared/images/...
-	const doubledPrefix = 'api/shared/images/';
-	if (clean.toLowerCase().startsWith(doubledPrefix)) {
-		clean = clean.substring(doubledPrefix.length);
-	}
+	// const doubledPrefix = 'api/shared/images/';
+	// if (clean.toLowerCase().startsWith(doubledPrefix)) {
+	// 	clean = clean.substring(doubledPrefix.length);
+	// }
 
-	return `${environment.host}api/shared/images/${clean}`;
+	// return `${environment.host}api/shared/images/${clean}`;
+  return path || '';
 }
 
 export function getStatusColor(status: number, statusMap: Record<number, string>): string {

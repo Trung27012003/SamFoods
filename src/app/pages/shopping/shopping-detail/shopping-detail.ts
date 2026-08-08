@@ -101,7 +101,8 @@ export class ShoppingDetail implements OnInit {
 				//Get danh sách Image
 				const productImages = res.data?.productImages || [];
 				const mappedImages = productImages.map((item: any) => {
-					const url = getProductImageUrl(`Product/${item.ProductCode}/${item.FileName}`);
+					const url = item.FileName;
+					// const url = getProductImageUrl(`Product/${item.ProductCode}/${item.FileName}`);
 					return {
 						...item,
 						Url: url,

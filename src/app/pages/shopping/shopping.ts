@@ -469,7 +469,8 @@ export class Shopping {
             .filter((d: any) => !d.IsDeleted && d.ImageName)
             .sort((a: any, b: any) => (a.SortOrder ?? 0) - (b.SortOrder ?? 0))
             .map((d: any) => ({
-              ImageURL: `${imageURL}/${active.BannerCode}/${d.ImageName}`,
+              ImageURL: `${d.ImageName}`,
+              // ImageURL: `${imageURL}/${active.BannerCode}/${d.ImageName}`,
               LinkURL: d.LinkURL,
               SortOrder: d.SortOrder,
             })));

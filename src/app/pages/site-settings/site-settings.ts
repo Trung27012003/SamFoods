@@ -230,7 +230,12 @@ export class SiteSettings implements OnInit {
 			next: (res) => {
 				this.isSaving.set(false);
 				this.notification.success('Thành công', res?.message || 'Đã lưu cấu hình!');
-				this.store.refresh().then(() => this.store.applyFavicon());
+				// [Admin save 2024-fix]: refresh store + apply theme vars + favicon + markForCheck để mọi consumer (shopping layout) re-render ngay.
+				this.store.refresh().then(() => {
+					this.store.applyThemeVars();
+					this.store.applyFavicon();
+					this.cdr.detectChanges();
+				});
 			},
 			error: (err) => {
 				this.isSaving.set(false);

@@ -223,35 +223,6 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 					const current = this.megaMenuItems() ?? [];
 					this.megaMenuItems.set([
 						...current,
-						{
-							label: 'Sports',
-							items: [
-								[
-									{
-										label: 'Football',
-										items: [{ label: 'Kits' }, { label: 'Shoes' }, { label: 'Shorts' }, { label: 'Training' }]
-									}
-								],
-								[
-									{
-										label: 'Running',
-										items: [{ label: 'Accessories' }, { label: 'Shoes' }, { label: 'T-Shirts' }, { label: 'Shorts' }]
-									}
-								],
-								[
-									{
-										label: 'Swimming',
-										items: [{ label: 'Kickboard' }, { label: 'Nose Clip' }, { label: 'Swimsuits' }, { label: 'Paddles' }]
-									}
-								],
-								[
-									{
-										label: 'Tennis',
-										items: [{ label: 'Balls' }, { label: 'Rackets' }, { label: 'Shoes' }, { label: 'Training' }]
-									}
-								]
-							]
-						},
 					]);
 				});
 			},

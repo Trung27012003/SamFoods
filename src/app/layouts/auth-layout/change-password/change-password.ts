@@ -104,6 +104,6 @@ export class ChangePassword implements OnInit {
 	}
 
 	goBack(): void {
-		this.router.navigate(['/admin/welcome']);
+		this.router.navigate(['/admin/dashboard']);
 	}
 }

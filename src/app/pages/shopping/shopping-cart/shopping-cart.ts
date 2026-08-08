@@ -118,8 +118,11 @@ export class ShoppingCart implements OnInit {
 
 						let imageUrl = '';
 						if (primaryImage?.ProductCode && primaryImage?.FileName) {
-							imageUrl = getProductImageUrl(
-								`Product/${primaryImage.ProductCode}/${primaryImage.FileName}`
+							// imageUrl = getProductImageUrl(
+							// 	`Product/${primaryImage.ProductCode}/${primaryImage.FileName}`
+							// );
+              imageUrl = getProductImageUrl(
+								`${primaryImage.FileName}`
 							);
 						}
 

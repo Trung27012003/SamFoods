@@ -66,7 +66,7 @@ export class Login implements OnInit {
 					this.isLoading = false;
 					if (res?.access_token) {
 						if (this.authService.isAdmin()) {
-							this.router.navigate(['/admin/welcome']);
+							this.router.navigate(['/admin/dashboard']);
 						} else {
 							this.router.navigate(['/home']);
 						}
