@@ -2,20 +2,15 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, model, OnInit, signal } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { GalleriaModule } from 'primeng/galleria';
 import { ProductService } from '../../../services/product-service';
 import { environment } from '../../../environments/environment';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { ProductModel } from '../../../models/product-model';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonComponent, NzButtonModule } from "ng-zorro-antd/button";
-import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
-import { NzListModule } from 'ng-zorro-antd/list';
-import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FAVOURITE_KEY, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS, getProductImageUrl } from '../../../shared/common.config';
 
@@ -25,15 +20,10 @@ import { FAVOURITE_KEY, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_
 		CommonModule,
 		FormsModule,
 		BreadcrumbModule,
-		GalleriaModule,
 		NzIconModule,
-		// NzButtonComponent,
 		NzButtonModule,
 		InputNumberModule,
-		NzTabsModule,
-		NzBreadCrumbModule,
-		NzListModule,
-		NzCollapseModule
+		NzBreadCrumbModule
 	],
 	templateUrl: './shopping-detail.html',
 	styleUrl: './shopping-detail.css',
@@ -54,10 +44,7 @@ export class ShoppingDetail implements OnInit {
 	home: MenuItem | undefined;
 
 	product: any = {};
-	productIngres: any[] = [];
-	productProcess: any[] = [];
 	productImages: any = model([]);
-	// images: any = model([]);
 	responsiveOptions: any[] = [];
 	currentImageIndex = signal(0);
 
@@ -89,36 +76,24 @@ export class ShoppingDetail implements OnInit {
 			next: (res) => {
 				this.product = res.data?.product || {};
 
-				this.productIngres = res.data?.productIngres || [];
-				this.productProcess = res.data?.productProcess || [];
-
 				this.items = [
 					{ label: 'Trang chủ' },
 					{ label: 'Sản phẩm' },
 					{ label: this.product?.ProductName || 'Chi tiết' }
 				];
 
-				//Get danh sách Image
 				const productImages = res.data?.productImages || [];
 				const mappedImages = productImages.map((item: any) => {
 					const url = item.FileName;
-					// const url = getProductImageUrl(`Product/${item.ProductCode}/${item.FileName}`);
 					return {
 						...item,
 						Url: url,
 						ThumbUrl: url
 					};
 				});
-				// Ảnh primary hiển thị đầu tiên
 				mappedImages.sort((a: any, b: any) => (b.IsPrimary ? 1 : 0) - (a.IsPrimary ? 1 : 0));
 				this.productImages.set(mappedImages);
 				this.currentImageIndex.set(0);
-
-				// this.productImages = images;
-				// this.productImages.set(images);
-				// this.productImages.set(images);
-				// console.log(this.productImages, images)
-				console.log(this.product);
 
 				this.cdr.detectChanges();
 			},
@@ -133,6 +108,15 @@ export class ShoppingDetail implements OnInit {
 				);
 			}
 		})
+	}
+
+	getStatusName(status: number | undefined): string {
+		const statusMap: Record<number, string> = {
+			1: 'Còn hàng',
+			2: 'Hết hàng',
+			3: 'Hàng mới'
+		};
+		return status != null ? (statusMap[status] || 'Không xác định') : 'Không xác định';
 	}
 
 	isFavourite(item: any): boolean {

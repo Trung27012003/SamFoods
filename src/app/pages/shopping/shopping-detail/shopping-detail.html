@@ -1,154 +1,127 @@
 <div class="container product-detail-page">
 
-    <nz-breadcrumb class="py-3">
-         <nz-breadcrumb-item>Trang chủ</nz-breadcrumb-item>
-         <nz-breadcrumb-item>Sản phẩm</nz-breadcrumb-item>
-         <nz-breadcrumb-item>{{ product.ProductName || 'Chi tiết' }}</nz-breadcrumb-item>
-    </nz-breadcrumb>
+	<nz-breadcrumb class="py-3">
+		<nz-breadcrumb-item>Trang chủ</nz-breadcrumb-item>
+		<nz-breadcrumb-item>Sản phẩm</nz-breadcrumb-item>
+		<nz-breadcrumb-item>{{ product.ProductName || 'Chi tiết' }}</nz-breadcrumb-item>
+	</nz-breadcrumb>
 
+	<div class="product-info d-flex flex-column flex-md-row justify-content-start">
+		<div class="card border-0 product-image w-100 w-md-50">
 
-    <div class="product-info d-flex flex-column flex-md-row justify-content-start">
-         <div class="card border-0 product-image w-100 w-md-50">
+			<div class="product-image-wrapper">
+				<button class="nav-btn prev-btn" (click)="prevImage()" [disabled]="currentImageIndex() === 0">
+					<i nz-icon nzType="left"></i>
+				</button>
 
-              <div class="product-image-wrapper">
-                   <button class="nav-btn prev-btn" (click)="prevImage()" [disabled]="currentImageIndex() === 0">
-                        <i nz-icon nzType="left"></i>
-                   </button>
+				<div class="main-image-container">
+					@if (productImages().length > 0) {
+					<img [src]="productImages()[currentImageIndex()].Url" alt="product image" class="main-image" />
+					} @else {
+					<div class="no-image-placeholder">Không có ảnh</div>
+					}
+				</div>
 
-                   <div class="main-image-container">
-                        @if (productImages().length > 0) {
-                        <img [src]="productImages()[currentImageIndex()].Url" alt="product image" class="main-image" />
-                        } @else {
-                        <div class="no-image-placeholder">Không có ảnh</div>
-                        }
-                   </div>
+				<button class="nav-btn next-btn" (click)="nextImage()"
+					[disabled]="currentImageIndex() === productImages().length - 1">
+					<i nz-icon nzType="right"></i>
+				</button>
+			</div>
 
-                   <button class="nav-btn next-btn" (click)="nextImage()"
-                        [disabled]="currentImageIndex() === productImages().length - 1">
-                        <i nz-icon nzType="right"></i>
-                   </button>
-              </div>
+			@if (productImages().length > 1) {
+			<div class="image-dots">
+				@for (img of productImages(); track $index) {
+				<span class="dot" [class.active]="$index === currentImageIndex()"
+					(click)="currentImageIndex.set($index)"></span>
+				}
+			</div>
+			}
+		</div>
 
-              <!-- Dot indicators -->
-              @if (productImages().length > 1) {
-              <div class="image-dots">
-                   @for (img of productImages(); track $index) {
-                   <span class="dot" [class.active]="$index === currentImageIndex()"
-                        (click)="currentImageIndex.set($index)"></span>
-                   }
-              </div>
-              }
-         </div>
-         <div class="product-detail-info w-100 w-md-50 ms-0 ms-md-3 ps-0 ps-md-3 mt-3 mt-md-0">
+		<div class="product-detail-info w-100 w-md-50 ms-0 ms-md-3 ps-0 ps-md-3 mt-3 mt-md-0">
 
-              <h3>{{ product.ProductName }}</h3>
+			<h3>{{ product.ProductName }}</h3>
 
-              <div class="d-flex justify-content-between align-items-center">
-                   <p class="my-3"><span class="fw-bold me-2">SKU:</span>{{ product.ProductCode }}</p>
-                   <button nz-button nzType="default" nzShape="circle" [ngClass]="{ active: isFavourite(product) }"
-                        (click)="onAddFavourite(product)">
-                        <i nz-icon nzType="heart"></i>
-                   </button>
-              </div>
-              <p class="my-3">{{ product.Descriptions }}</p>
+			<div class="d-flex justify-content-between align-items-center">
+				<p class="my-3"><span class="fw-bold me-2">SKU:</span>{{ product.ProductCode }}</p>
+				<button nz-button nzType="default" nzShape="circle" [ngClass]="{ active: isFavourite(product) }"
+					(click)="onAddFavourite(product)">
+					<i nz-icon nzType="heart"></i>
+				</button>
+			</div>
 
-              <div class="product-bottom">
-                   <div class="price d-flex justify-content-center">
-                        <p>{{ product.UnitPrice | number }} <small>VND</small></p>
-                   </div>
+			<div class="product-bottom">
+				<div class="price d-flex justify-content-center">
+					<p>{{ product.UnitPrice | number }} <small>VND</small></p>
+				</div>
 
-                   <div class="number-buy d-flex justify-content-center">
-                        <div class="card flex justify-center">
-                             <p-inputnumber [(ngModel)]="quantityBuy" [showButtons]="true" buttonLayout="horizontal"
-                                  spinnerMode="horizontal" [inputStyle]="{ width: '3rem' }">
-                                  <ng-template #incrementbuttonicon>
-                                       <span class="pi pi-plus"></span>
-                                  </ng-template>
-                                  <ng-template #decrementbuttonicon>
-                                       <span class="pi pi-minus"></span>
-                                  </ng-template>
-                             </p-inputnumber>
-                        </div>
-                   </div>
+				<div class="number-buy d-flex justify-content-center">
+					<div class="card flex justify-center">
+						<p-inputnumber [(ngModel)]="quantityBuy" [showButtons]="true" buttonLayout="horizontal"
+							spinnerMode="horizontal" [inputStyle]="{ width: '3rem' }">
+							<ng-template #incrementbuttonicon>
+								<span class="pi pi-plus"></span>
+							</ng-template>
+							<ng-template #decrementbuttonicon>
+								<span class="pi pi-minus"></span>
+							</ng-template>
+						</p-inputnumber>
+					</div>
+				</div>
 
-                   <div class="product-action">
-                        <button class="btn-add-to-cart" (click)="onAddToCart(product)">Thêm vào giỏ
-                             hàng</button>
-                        <button class="btn-buy" (click)="onAddToCart(product,'/cart')">Mua nhanh</button>
-                   </div>
-              </div>
-         </div>
-    </div>
+				<div class="product-action">
+					<button class="btn-add-to-cart" (click)="onAddToCart(product)">Thêm vào giỏ hàng</button>
+					<button class="btn-buy" (click)="onAddToCart(product,'/cart')">Mua nhanh</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <div class="product-detail mt-3">
-         <nz-tabs>
-              <nz-tab nzTitle="Thông tin sản phẩm">
-                   <nz-collapse [nzBordered]="false" nzGhost>
-                        <nz-collapse-panel #p [nzHeader]="header1" [nzActive]="true" [nzExpandedIcon]="'right'">
-                             <p>{{ product.Descriptions }}</p>
-                             <ng-template #expandedIcon let-active>
-                                  {{ active }}
-                                  <nz-icon nzType="caret-right" class="ant-collapse-arrow"
-                                       [nzRotate]="p.active() ? 90 : -90" />
-                             </ng-template>
+	<div class="product-meta mt-4">
+		<h5 class="mb-3">Thông tin sản phẩm</h5>
+		<div class="row g-3 product-meta-grid">
+			<div class="col-md-4 col-sm-6">
+				<div class="meta-item">
+					<span class="meta-label">SKU:</span>
+					<span class="meta-value">{{ product.ProductCode || '—' }}</span>
+				</div>
+			</div>
+			<div class="col-md-4 col-sm-6">
+				<div class="meta-item">
+					<span class="meta-label">Xuất sứ:</span>
+					<span class="meta-value">{{ product.Origin || '—' }}</span>
+				</div>
+			</div>
+			<div class="col-md-4 col-sm-6">
+				<div class="meta-item">
+					<span class="meta-label">Trọng lượng:</span>
+					<span class="meta-value">{{ product.Weight || '—' }} {{ product.UnitName }}</span>
+				</div>
+			</div>
+			<div class="col-md-4 col-sm-6">
+				<div class="meta-item">
+					<span class="meta-label">Tình trạng:</span>
+					<span class="meta-value status-{{ product.Status }}">{{ getStatusName(product.Status) }}</span>
+				</div>
+			</div>
+		</div>
 
-                             <ng-template #header1>
-                                  <h6>Mô tả</h6>
-                             </ng-template>
-                        </nz-collapse-panel>
+		<h6 class="mt-4 mb-2">Mô tả</h6>
+		<p class="product-description">{{ product.Descriptions || 'Đang cập nhật...' }}</p>
+	</div>
 
-                        <nz-collapse-panel #p [nzHeader]="header2" [nzActive]="true" [nzExpandedIcon]="'right'">
-                             <p>{{ product.StorageInstructions }}</p>
-                             <ng-template #expandedIcon let-active>
-                                  {{ active }}
-                                  <nz-icon nzType="caret-right" class="ant-collapse-arrow"
-                                       [nzRotate]="p.active() ? 90 : -90" />
-                             </ng-template>
-                             <ng-template #header2>
-                                  <h6>Cách bảo quản</h6>
-                             </ng-template>
-                        </nz-collapse-panel>
-                   </nz-collapse>
-              </nz-tab>
-              <nz-tab nzTitle="Nguyên liệu">
-                   <nz-list nzSize="small">
-                        @for (item of productIngres; track item) {
-                        <nz-list-item>
-                             <p class="">
-                                  <span class="fw-bold">{{ item.IngredientName }}:</span>
-                                  <span>{{item.Quantity}} ({{item.UnitCountID}})</span>
-                             </p>
-                        </nz-list-item>
-                        }
-                   </nz-list>
-              </nz-tab>
-              <nz-tab nzTitle="Quy trình chế biến">
-                   <nz-list nzSize="small">
-                        @for (item of productProcess; track item) {
-                        <nz-list-item>
-                             <p class="">
-                                  <span class="fw-bold">{{ item.StepName }}:</span><br>
-                                  <span>{{item.Description}}</span>
-                             </p>
-                        </nz-list-item>
-                        }
-                   </nz-list>
-              </nz-tab>
-         </nz-tabs>
-    </div>
-
-    <!-- Sticky mobile purchase bar -->
-    <div class="mobile-purchase-bar d-flex d-md-none">
-         <div class="mobile-purchase-price">
-              <small>Tổng:</small>
-              <div class="price">{{ product.UnitPrice | number }} <small>VND</small></div>
-         </div>
-         <button class="btn btn-outline-secondary mobile-purchase-add" (click)="onAddToCart(product)">
-              <i nz-icon nzType="shopping-cart"></i>
-              Thêm giỏ
-         </button>
-         <button class="btn btn-primary mobile-purchase-buy" (click)="onAddToCart(product,'/cart')">
-              Mua ngay
-         </button>
-    </div>
+	<!-- Sticky mobile purchase bar -->
+	<div class="mobile-purchase-bar d-flex d-md-none">
+		<div class="mobile-purchase-price">
+			<small>Tổng:</small>
+			<div class="price">{{ product.UnitPrice | number }} <small>VND</small></div>
+		</div>
+		<button class="btn btn-outline-secondary mobile-purchase-add" (click)="onAddToCart(product)">
+			<i nz-icon nzType="shopping-cart"></i>
+			Thêm giỏ
+		</button>
+		<button class="btn btn-primary mobile-purchase-buy" (click)="onAddToCart(product,'/cart')">
+			Mua ngay
+		</button>
+	</div>
 </div>

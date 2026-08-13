@@ -58,6 +58,14 @@ export class ProductService {
 		return this.http.get<any>(`${this.url}/${id}`);
 	}
 
+	getMaxSTT(): Observable<any> {
+		return this.http.get<any>(`${this.url}/max-stt`);
+	}
+
+	suggestProductCode(): Observable<any> {
+		return this.http.get<any>(`${this.url}/suggest-code`);
+	}
+
 	saveData(data: any): Observable<any> {
 		return this.http.post<any>(`${this.url}/save-data`, data);
 	}

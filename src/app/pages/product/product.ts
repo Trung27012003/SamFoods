@@ -135,11 +135,8 @@ export class Product implements OnInit {
 	}
 
 	formatCurrency(value: number): string {
-		if (!value) return '0 ₫';
-		return new Intl.NumberFormat('vi-VN', {
-			style: 'currency',
-			currency: 'VND'
-		}).format(value);
+		if (value == null || value === 0) return '0';
+		return new Intl.NumberFormat('en-US').format(value);
 	}
 
 	applyFilters(): void {

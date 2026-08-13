@@ -1,7 +1,7 @@
 import { Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { ProductService } from '../../../services/product-service';
-import { FormArray, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NzModalRef } from 'ng-zorro-antd/modal';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -9,19 +9,21 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { NzUploadFile, NzUploadModule, NzUploadXHRArgs } from 'ng-zorro-antd/upload';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 
 import { of, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { CategoryService } from '../../../services/category-service';
 import { UnitCountService } from '../../../services/unit-count-service';
-import { IMAGE_URL, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS } from '../../../shared/common.config';
+import { CategoryDetail } from '../../category/category-detail/category-detail';
+import { UnitCountDetail } from '../../unit-count/unit-count-detail/unit-count-detail';
+import { NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS } from '../../../shared/common.config';
 
 @Component({
 	selector: 'app-product-detail',
@@ -33,11 +35,11 @@ import { IMAGE_URL, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STAT
 		NzInputModule,
 		NzInputNumberModule,
 		NzButtonModule,
-		NzTabsModule,
 		NzSelectModule,
 		NzTreeSelectModule,
 		NzUploadModule,
-		NzSpinModule
+		NzSpinModule,
+		NzTooltipModule
 	],
 	templateUrl: './product-detail.html',
 	styleUrl: './product-detail.css',
@@ -49,16 +51,21 @@ export class ProductDetail implements OnInit, OnDestroy {
 	private unitService = inject(UnitCountService);
 	private fb = inject(NonNullableFormBuilder);
 	private modal = inject(NzModalRef<ProductDetail>);
+	private modalService = inject(NzModalService);
 	private notification = inject(NzNotificationService);
 
 	@Input() product: any = {};
 
 	isLoading = signal(false);
-	categoryNodes: NzTreeNodeOptions[] = [];
-	unitCounts: any[] = [];
+	categoryNodes = signal<NzTreeNodeOptions[]>([]);
+	unitCounts = signal<any[]>([]);
 	productFileList: NzUploadFile[] = [];
 	productFileRemoves: any[] = [];
 	primaryImageId: string | null = null;
+
+	// Flag sửa: chờ nodes load xong mới patchValue CategoryID/UnitCountID vào dropdown
+	private pendingCategoryID: number | null = null;
+	private pendingUnitCountID: number | null = null;
 
 	private destroy$ = new Subject<void>();
 	private uploadSubscription: Subscription | null = null;
@@ -75,42 +82,65 @@ export class ProductDetail implements OnInit, OnDestroy {
 		Descriptions: [''],
 		Weight: [0, [Validators.required, Validators.min(0)]],
 		UnitCountID: [null, Validators.required],
-		StorageInstructions: [''],
-		ProductIngredients: this.fb.array([]),
-		ProductProcessingRecipes: this.fb.array([])
 	});
 
-	get ingredients(): FormArray {
-		return this.validateForm.get('ProductIngredients') as FormArray;
-	}
-
-	get processRecipes(): FormArray {
-		return this.validateForm.get('ProductProcessingRecipes') as FormArray;
-	}
-
 	ngOnInit(): void {
-		this.loadCombo();
-		this.product = this.modal.getConfig().nzData?.product;
+		const modalData = this.modal.getConfig().nzData;
+		this.product = modalData?.product;
 
 		if (this.product) {
-			const productEdit = {
-				...this.product,
-				CategoryID: this.product.CategoryID
-			};
+			// Lưu CategoryID/UnitCountID để patch sau khi combos load xong
+			this.pendingCategoryID = this.product.CategoryID ?? null;
+			this.pendingUnitCountID = this.product.UnitCountID ?? null;
+
+			// Patch trước các trường còn lại (không cần combo)
+			const productEdit = { ...this.product };
+			delete (productEdit as any).CategoryID;
+			delete (productEdit as any).UnitCountID;
 			this.validateForm.patchValue(productEdit);
+			this.validateForm.get('STT')?.disable();
+
+			this.loadCombo();
 			this.loadProductDetail(this.product.ID);
 		} else {
-			this.addIngredient();
-			this.addProcessRecipe();
+			this.loadCombo();
+			this.loadAutoValues();
 		}
+	}
+
+	private loadAutoValues(): void {
+		this.productService.getMaxSTT().subscribe({
+			next: (res) => {
+				const max = res?.data ?? 0;
+				this.validateForm.patchValue({ STT: max + 1 });
+				this.validateForm.get('STT')?.disable();
+			},
+			error: () => {
+				this.validateForm.get('STT')?.disable();
+			}
+		});
+
+		this.productService.suggestProductCode().subscribe({
+			next: (res) => {
+				const code = res?.data;
+				if (code) {
+					this.validateForm.patchValue({ ProductCode: code });
+				}
+			},
+			error: () => {}
+		});
 	}
 
 	loadCombo(): void {
 		this.categoryService.getData().subscribe({
 			next: (res) => {
-				Promise.resolve().then(() => {
-					this.categoryNodes = this.buildTreeOptions(res.data);
-				});
+				const nodes = this.buildTreeOptions(res.data);
+				this.categoryNodes.set(nodes);
+				// Sau khi nodes đã vào tree-select, patch lại CategoryID nếu đang sửa
+				if (this.pendingCategoryID != null) {
+					this.validateForm.patchValue({ CategoryID: this.pendingCategoryID as any });
+					this.pendingCategoryID = null;
+				}
 			},
 			error: (err) => {
 				this.notification.create(
@@ -121,11 +151,18 @@ export class ProductDetail implements OnInit, OnDestroy {
 			}
 		});
 
+		this.loadUnitCounts();
+	}
+
+	private loadUnitCounts(): void {
 		this.unitService.getData().subscribe({
 			next: (res) => {
-				Promise.resolve().then(() => {
-					this.unitCounts = res.data;
-				});
+				this.unitCounts.set(res.data);
+				// [Sửa] Patch lại UnitCountID khi combo load xong
+				if (this.pendingUnitCountID != null) {
+					this.validateForm.patchValue({ UnitCountID: this.pendingUnitCountID as any });
+					this.pendingUnitCountID = null;
+				}
 			},
 			error: (err) => {
 				this.notification.create(
@@ -165,34 +202,38 @@ export class ProductDetail implements OnInit, OnDestroy {
 		return roots;
 	}
 
+	formatPrice = (value: number | string | undefined): string => {
+		if (value == null || value === '') return '';
+		const num = typeof value === 'string' ? Number(value.replace(/,/g, '')) : value;
+		if (Number.isNaN(num)) return '';
+		return num.toLocaleString('en-US');
+	};
+
+	parsePrice = (value: string | undefined): number => {
+		if (value == null || value === '') return 0;
+		const num = Number(String(value).replace(/,/g, ''));
+		return Number.isNaN(num) ? 0 : num;
+	};
+
 	loadProductDetail(id: number): void {
 		this.isLoading.set(true);
 		this.productService.getByID(id).subscribe({
 			next: (res) => {
-				Promise.resolve().then(() => {
-					const productIngres = res.data.productIngres || [];
-					productIngres.forEach((item: any) => this.addIngredient(item));
-
-					const productProcess = res.data.productProcess || [];
-					productProcess.forEach((item: any) => this.addProcessRecipe(item));
-
-					const urlImage = IMAGE_URL + '/product';
-					const productImages = res.data.productImages || [];
-					this.productFileList = productImages.map((item: any) => {
-						if (item.IsPrimary) {
-							this.primaryImageId = item.ID.toString();
-						}
-						return {
-							uid: item.ID,
-							name: item.FileName,
-							status: 'done',
-							url: urlImage + `/${item.ProductCode}/${item.FileName}`,
-							thumbUrl: urlImage + `/${item.ProductCode}/${item.FileName}`
-						};
-					});
-
-					this.isLoading.set(false);
+				const productImages = res.data.productImages || [];
+				this.productFileList = productImages.map((item: any) => {
+					if (item.IsPrimary) {
+						this.primaryImageId = item.ID.toString();
+					}
+					return {
+						uid: item.ID,
+						name: item.FileName,
+						status: 'done',
+						url: item.FileName,
+						thumbUrl: item.FileName
+					};
 				});
+
+				this.isLoading.set(false);
 			},
 			error: (err) => {
 				this.isLoading.set(false);
@@ -206,13 +247,73 @@ export class ProductDetail implements OnInit, OnDestroy {
 		});
 	}
 
+	openQuickAddCategory(): void {
+		const modalRef = this.modalService.create({
+			nzTitle: 'Thêm danh mục',
+			nzContent: CategoryDetail,
+			nzWidth: '60vw',
+			nzStyle: { top: '20px' },
+			nzFooter: [
+				{ label: 'Hủy', onClick: () => modalRef.close() },
+				{
+					label: 'Lưu',
+					type: 'primary',
+					onClick: (componentInstance: any) => {
+						componentInstance?.handleOk();
+					}
+				}
+			],
+			nzData: {}
+		});
+
+		modalRef.afterClose.subscribe(result => {
+			if (result) {
+				this.categoryService.getData().subscribe(res => {
+					this.categoryNodes.set(this.buildTreeOptions(res.data));
+				});
+			}
+		});
+	}
+
+	openQuickAddUnitCount(): void {
+		const modalRef = this.modalService.create({
+			nzTitle: 'Thêm đơn vị tính',
+			nzContent: UnitCountDetail,
+			nzWidth: '60vw',
+			nzStyle: { top: '20px' },
+			nzFooter: [
+				{ label: 'Hủy', onClick: () => modalRef.close() },
+				{
+					label: 'Lưu',
+					type: 'primary',
+					onClick: (componentInstance: any) => {
+						componentInstance?.handleOk();
+					}
+				}
+			],
+			nzData: {}
+		});
+
+		modalRef.afterClose.subscribe(result => {
+			if (result) {
+				this.loadUnitCounts();
+			}
+		});
+	}
+
 	setPrimaryImage(imageId: string): void {
 		this.primaryImageId = imageId;
 	}
 
 	handleOk(): void {
 		if (this.validateForm.valid) {
-			this.saveData(this.validateForm.value);
+			const rawValue = this.validateForm.getRawValue();
+			const data = {
+				...rawValue,
+				ProductIngredients: [],
+				ProductProcessingRecipes: []
+			};
+			this.saveData(data);
 		} else {
 			Object.values(this.validateForm.controls).forEach(control => {
 				if (control.invalid) {
@@ -235,17 +336,11 @@ export class ProductDetail implements OnInit, OnDestroy {
 		if (this.validateForm.get('CategoryID')?.invalid) labels.push('Danh mục');
 		if (this.validateForm.get('ProductCode')?.invalid) labels.push('Mã sản phẩm');
 		if (this.validateForm.get('ProductName')?.invalid) labels.push('Tên sản phẩm');
-		if (this.validateForm.get('Origin')?.invalid) labels.push('Nguồn gốc');
+		if (this.validateForm.get('Origin')?.invalid) labels.push('Xuất sứ');
 		if (this.validateForm.get('Status')?.invalid) labels.push('Tình trạng');
 		if (this.validateForm.get('UnitPrice')?.invalid) labels.push('Đơn giá');
 		if (this.validateForm.get('Weight')?.invalid) labels.push('Trọng lượng');
 		if (this.validateForm.get('UnitCountID')?.invalid) labels.push('Đơn vị tính');
-		this.ingredients.controls.forEach((ctrl, idx) => {
-			if (ctrl.invalid) labels.push(`Nguyên liệu #${idx + 1}`);
-		});
-		this.processRecipes.controls.forEach((ctrl, idx) => {
-			if (ctrl.invalid) labels.push(`Bước ${idx + 1}`);
-		});
 		return labels.join(', ') || 'Có trường không hợp lệ';
 	}
 
@@ -262,8 +357,8 @@ export class ProductDetail implements OnInit, OnDestroy {
 					const productID = res.data.ID;
 					this.uploadSubscription?.unsubscribe();
 					this.uploadSubscription = this.performUpload(productID).subscribe({
-					next: () => {
-						this.isLoading.set(false);
+						next: () => {
+							this.isLoading.set(false);
 							this.notification.success(
 								NOTIFICATION_TITLE_MAP[res.status as RESPONSE_STATUS],
 								res.message
@@ -359,35 +454,6 @@ export class ProductDetail implements OnInit, OnDestroy {
 		this.uploadSubscription?.unsubscribe();
 		this.destroy$.next();
 		this.destroy$.complete();
-	}
-
-	addIngredient(data: any = { ID: 0, IngredientName: '', Quantity: 0, UnitCountID: null }): void {
-		this.ingredients.push(
-			this.fb.group({
-				IngredientName: [data.IngredientName || '', [Validators.required, Validators.minLength(2)]],
-				Quantity: [data.Quantity || 0, [Validators.required, Validators.min(0)]],
-				UnitCountID: [data.UnitCountID || null, Validators.required]
-			})
-		);
-	}
-
-	removeIngredient(index: number): void {
-		this.ingredients.removeAt(index);
-	}
-
-	addProcessRecipe(data: any = { ID: 0, Step: 1, StepName: '', Description: '' }): void {
-		const step = data.ID > 0 ? data.Step : this.processRecipes.length + 1;
-		const stepName = data.ID > 0 ? data.StepName : `Bước ${step}`;
-
-		this.processRecipes.push(this.fb.group({
-			Step: [step, [Validators.required, Validators.min(1)]],
-			StepName: [stepName, [Validators.required, Validators.minLength(2)]],
-			Description: [data.Description || '', Validators.required]
-		}));
-	}
-
-	removeProcessRecipe(index: number): void {
-		this.processRecipes.removeAt(index);
 	}
 
 	handleFileUpload = (file: NzUploadFile, _fileList: NzUploadFile[]): boolean => {
