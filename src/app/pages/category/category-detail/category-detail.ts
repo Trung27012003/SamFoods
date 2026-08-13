@@ -77,7 +77,30 @@ export class CategoryDetail implements OnInit {
 			this.loadCategoryDetail(this.category.ID);
 		} else {
 			this.initForm();
+			this.loadAutoValues();
 		}
+	}
+
+	private loadAutoValues(): void {
+		this.categoryService.getMaxSTT().subscribe({
+			next: (res) => {
+				const max = res?.data ?? 0;
+				this.validateForm.patchValue({ STT: max + 1 });
+				this.validateForm.get('STT')?.disable();
+			},
+			error: () => {
+				this.validateForm.get('STT')?.disable();
+			}
+		});
+
+		this.categoryService.suggestCategoryCode().subscribe({
+			next: (res) => {
+				const code = res?.data;
+				if (code) {
+					this.validateForm.patchValue({ CategoryCode: code });
+				}
+			}
+		});
 	}
 
 	loadCategoryDetail(categoryID: number): void {

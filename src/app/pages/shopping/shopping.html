@@ -17,6 +17,13 @@
 </div>
 
 <div class="container ">
+    <div class="home-search-bar d-md-none">
+        <nz-input-search nzAllowClear (nzSearch)="onSearch()" class="search-input">
+            <input nz-input [(ngModel)]="keyword" name="keyword"
+                placeholder="Tìm kiếm sản phẩm theo tên..." />
+        </nz-input-search>
+    </div>
+
     <div class="new-arrivals-slider">
         <div class="card products-slider border-0">
             <h5 class="fw-bold text-uppercase">Sản phẩm mới</h5>

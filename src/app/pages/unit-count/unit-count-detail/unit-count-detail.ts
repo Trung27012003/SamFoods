@@ -48,6 +48,15 @@ export class UnitCountDetail implements OnInit {
 		this.unitCount = this.modal.getConfig().nzData?.unitCount;
 		if (this.unitCount) {
 			this.validateForm.patchValue(this.unitCount);
+		} else {
+			this.unitService.suggestUnitCode().subscribe({
+				next: (res) => {
+					const code = res?.data;
+					if (code) {
+						this.validateForm.patchValue({ UnitCode: code });
+					}
+				}
+			});
 		}
 	}
 

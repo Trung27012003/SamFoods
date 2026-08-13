@@ -106,7 +106,41 @@
 
 
 .new-arrivals-slider {
-    margin-top: 3rem;
+    margin-top: 2rem;
+}
+
+.home-search-bar {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 767.98px) {
+    .home-search-bar {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .new-arrivals-slider {
+        margin-top: 1rem;
+    }
+}
+
+.home-search-bar .search-input {
+    width: 100%;
+    max-width: 640px;
+}
+
+.products-slider {
+    padding: 1rem 1.25rem;
+}
+
+.products-slider > h5.fw-bold.text-uppercase,
+.products-slider > .section-header > h5.fw-bold.text-uppercase {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 ::ng-deep .p-carousel-item {

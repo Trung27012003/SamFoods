@@ -11,7 +11,7 @@ import { NzButtonComponent, NzButtonModule } from "ng-zorro-antd/button";
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FAVOURITE_KEY, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS, getProductImageUrl } from '../../../shared/common.config';
 
 @Component({
@@ -23,6 +23,8 @@ import { FAVOURITE_KEY, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_
 		NzIconModule,
 		NzButtonModule,
 		InputNumberModule,
+		NzBreadCrumbModule,
+		RouterLink,
 		NzBreadCrumbModule
 	],
 	templateUrl: './shopping-detail.html',
@@ -146,6 +148,31 @@ export class ShoppingDetail implements OnInit {
 	nextImage() {
 		const idx = this.currentImageIndex();
 		if (idx < this.productImages().length - 1) this.currentImageIndex.set(idx + 1);
+	}
+
+	private pointerStartX = 0;
+	private pointerStartY = 0;
+	private pointerActive = false;
+	private readonly SWIPE_THRESHOLD = 50;
+
+	onPointerDown(e: PointerEvent): void {
+		this.pointerActive = true;
+		this.pointerStartX = e.clientX;
+		this.pointerStartY = e.clientY;
+	}
+
+	onPointerMove(_e: PointerEvent): void {
+		// No-op: chi can luu vi tri cuoi o pointerup de don gian
+	}
+
+	onPointerUp(e: PointerEvent): void {
+		if (!this.pointerActive) return;
+		this.pointerActive = false;
+		const dx = e.clientX - this.pointerStartX;
+		const dy = e.clientY - this.pointerStartY;
+		if (Math.abs(dy) > Math.abs(dx)) return;
+		if (dx <= -this.SWIPE_THRESHOLD) this.nextImage();
+		else if (dx >= this.SWIPE_THRESHOLD) this.prevImage();
 	}
 
 	onAddToCart(item: any, router: string = '') {

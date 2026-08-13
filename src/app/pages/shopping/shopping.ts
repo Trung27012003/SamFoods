@@ -7,7 +7,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { MegaMenuItem } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -116,6 +116,7 @@ export class Shopping {
   private categoryService = inject(CategoryService);
   private bannerService = inject(BannerService);
   private notification = inject(NzNotificationService);
+  private router = inject(Router);
   megaMenuItems: MegaMenuItem[] | undefined;
   responsiveOptions: any[] | undefined;
   bestSellerResponsiveOptions: any[] | undefined;
@@ -533,5 +534,11 @@ export class Shopping {
       UnitPrice: item.UnitPrice,
       Quantity: 1,
     });
+  }
+
+  onSearch() {
+    const k = (this.keyword || '').trim();
+    if (!k) return;
+    this.router.navigate(['/products'], { queryParams: { keyword: k } });
   }
 }

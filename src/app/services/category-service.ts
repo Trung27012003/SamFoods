@@ -20,6 +20,14 @@ export class CategoryService {
 		return this.http.get<any>(`${this.url}/${id}`);
 	}
 
+	getMaxSTT(): Observable<any> {
+		return this.http.get<any>(`${this.url}/max-stt`);
+	}
+
+	suggestCategoryCode(): Observable<any> {
+		return this.http.get<any>(`${this.url}/suggest-code`);
+	}
+
 	saveData(data: any): Observable<any> {
 		return this.http.post<any>(`${this.url}/save-data`, data);
 	}

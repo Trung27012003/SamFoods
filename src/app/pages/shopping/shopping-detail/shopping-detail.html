@@ -1,15 +1,23 @@
 <div class="container product-detail-page">
 
 	<nz-breadcrumb class="py-3">
-		<nz-breadcrumb-item>Trang chủ</nz-breadcrumb-item>
-		<nz-breadcrumb-item>Sản phẩm</nz-breadcrumb-item>
+		<nz-breadcrumb-item>
+			<a routerLink="/home">Trang chủ</a>
+		</nz-breadcrumb-item>
+		<nz-breadcrumb-item>
+			<a routerLink="/products">Sản phẩm</a>
+		</nz-breadcrumb-item>
 		<nz-breadcrumb-item>{{ product.ProductName || 'Chi tiết' }}</nz-breadcrumb-item>
 	</nz-breadcrumb>
 
 	<div class="product-info d-flex flex-column flex-md-row justify-content-start">
 		<div class="card border-0 product-image w-100 w-md-50">
 
-			<div class="product-image-wrapper">
+			<div class="product-image-wrapper"
+				(pointerdown)="onPointerDown($event)"
+				(pointermove)="onPointerMove($event)"
+				(pointerup)="onPointerUp($event)"
+				(pointercancel)="onPointerUp($event)">
 				<button class="nav-btn prev-btn" (click)="prevImage()" [disabled]="currentImageIndex() === 0">
 					<i nz-icon nzType="left"></i>
 				</button>

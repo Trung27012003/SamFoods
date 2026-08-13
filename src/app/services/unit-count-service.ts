@@ -20,6 +20,10 @@ export class UnitCountService {
 		return this.http.get<any>(`${this.url}/{id}`);
 	}
 
+	suggestUnitCode(): Observable<any> {
+		return this.http.get<any>(`${this.url}/suggest-code`);
+	}
+
 	saveData(data: any): Observable<any> {
 		return this.http.post<any>(`${this.url}/save-data`, data);
 	}

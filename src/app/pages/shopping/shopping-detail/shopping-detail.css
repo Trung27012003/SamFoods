@@ -56,6 +56,14 @@
 	align-items: center;
 	justify-content: center;
 	max-width: 640px;
+	touch-action: pan-y;
+	user-select: none;
+	-webkit-user-drag: none;
+	cursor: grab;
+}
+
+.product-image-wrapper:active {
+	cursor: grabbing;
 }
 
 .main-image-container {

@@ -1,198 +1,173 @@
 <form nz-form [nzLayout]="'vertical'" [formGroup]="validateForm" (ngSubmit)="handleOk()">
-	<nz-spin [nzSpinning]="isLoading()">
-		<!-- Card 1: Phân loại -->
-		<div class="admin-form-card mb-3">
-			<h3 class="admin-form-section-title">Phân loại</h3>
+    <nz-spin [nzSpinning]="isLoading()">
+        <!-- Card 1: Phân loại -->
+        <div class="admin-form-card mb-3">
+            <h3 class="admin-form-section-title">Phân loại</h3>
 
-			<div nz-row [nzGutter]="16">
-				<div nz-col nzXs="4" nzSm="8" nzMd="8" nzLg="8">
-					<nz-form-item>
-						<nz-form-label nzRequired nzTooltipTitle="STT được tự sinh từ hệ thống">
-							STT
-						</nz-form-label>
-						<nz-form-control nzErrorTip="STT phải >= 1!">
-							<nz-input-number class="w-100" formControlName="STT" nzMin="1" [nzDisabled]="true" />
-						</nz-form-control>
-					</nz-form-item>
-				</div>
+            <div nz-row [nzGutter]="16">
+                <div nz-col nzXs="4" nzSm="8" nzMd="8" nzLg="8">
+                    <nz-form-item>
+                        <nz-form-label nzRequired nzTooltipTitle="STT được tự sinh từ hệ thống">
+                            STT
+                        </nz-form-label>
+                        <nz-form-control nzErrorTip="STT phải >= 1!">
+                            <nz-input-number class="w-100" formControlName="STT" nzMin="1" [nzDisabled]="true" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
 
-				<div nz-col nzXs="20" nzSm="16" nzMd="16" nzLg="16">
-					<nz-form-item>
-						<nz-form-label nzRequired>Danh mục</nz-form-label>
-						<nz-form-control nzErrorTip="Vui lòng chọn danh mục!">
-							<div class="d-flex gap-2 align-items-center">
-								<nz-tree-select class="flex-grow-1"
-									[nzNodes]="categoryNodes()"
-									nzShowSearch
-									nzPlaceHolder="-- Chọn danh mục --"
-									nzVirtualHeight="20vh"
-									nzHideUnMatched
-									formControlName="CategoryID">
-								</nz-tree-select>
-								<button nz-button nzType="default" nzShape="circle" type="button"
-									(click)="openQuickAddCategory()"
-									title="Thêm nhanh danh mục">
-									<i nz-icon nzType="plus"></i>
-								</button>
-							</div>
-						</nz-form-control>
-					</nz-form-item>
-				</div>
-			</div>
+                <div nz-col nzXs="20" nzSm="16" nzMd="16" nzLg="16">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Danh mục</nz-form-label>
+                        <nz-form-control nzErrorTip="Vui lòng chọn danh mục!">
+                            <div class="d-flex gap-2 align-items-center">
+                                <nz-tree-select class="flex-grow-1" [nzNodes]="categoryNodes()" nzShowSearch nzPlaceHolder="-- Chọn danh mục --" nzVirtualHeight="20vh" nzDefaultExpandAll [nzDisplayWith]="displayCategory" formControlName="CategoryID">
+                                </nz-tree-select>
+                                <button nz-button nzType="default" nzShape="circle" type="button" (click)="openQuickAddCategory()" title="Thêm nhanh danh mục">
+                                    <i nz-icon nzType="plus"></i>
+                                </button>
+                            </div>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
 
-			<div nz-row [nzGutter]="16">
-				<div nz-col nzXs="24" nzSm="8" nzMd="6" nzLg="6">
-					<nz-form-item>
-						<nz-form-label nzRequired>Mã sản phẩm</nz-form-label>
-						<nz-form-control nzErrorTip="Mã từ 2-50 ký tự!">
-							<input nz-input formControlName="ProductCode"
-								placeholder="VD: SP-20260813-0001" />
-						</nz-form-control>
-					</nz-form-item>
-				</div>
+            <div nz-row [nzGutter]="16">
+                <div nz-col nzXs="24" nzSm="8" nzMd="6" nzLg="6">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Mã sản phẩm</nz-form-label>
+                        <nz-form-control nzErrorTip="Mã từ 2-50 ký tự!">
+                            <input nz-input formControlName="ProductCode" placeholder="VD: SP-20260813-0001" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
 
-				<div nz-col nzXs="24" nzSm="8" nzMd="12" nzLg="12">
-					<nz-form-item>
-						<nz-form-label nzRequired>Tên sản phẩm</nz-form-label>
-						<nz-form-control nzErrorTip="Tên từ 2-200 ký tự!">
-							<input nz-input formControlName="ProductName" placeholder="Nhập tên sản phẩm" />
-						</nz-form-control>
-					</nz-form-item>
-				</div>
+                <div nz-col nzXs="24" nzSm="8" nzMd="12" nzLg="12">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Tên sản phẩm</nz-form-label>
+                        <nz-form-control nzErrorTip="Tên từ 2-200 ký tự!">
+                            <input nz-input formControlName="ProductName" placeholder="Nhập tên sản phẩm" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
 
-				<div nz-col nzXs="24" nzSm="8" nzMd="6" nzLg="6">
-					<nz-form-item>
-						<nz-form-label nzRequired>Xuất sứ</nz-form-label>
-						<nz-form-control nzErrorTip="Vui lòng nhập xuất sứ!">
-							<input nz-input formControlName="Origin" placeholder="VD: Việt Nam" />
-						</nz-form-control>
-					</nz-form-item>
-				</div>
-			</div>
-		</div>
+                <div nz-col nzXs="24" nzSm="8" nzMd="6" nzLg="6">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Xuất sứ</nz-form-label>
+                        <nz-form-control nzErrorTip="Vui lòng nhập xuất sứ!">
+                            <input nz-input formControlName="Origin" placeholder="VD: Việt Nam" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+        </div>
 
-		<!-- Card 2: Thông tin bán hàng -->
-		<div class="admin-form-card mb-3">
-			<h3 class="admin-form-section-title">Thông tin bán hàng</h3>
+        <!-- Card 2: Thông tin bán hàng -->
+        <div class="admin-form-card mb-3">
+            <h3 class="admin-form-section-title">Thông tin bán hàng</h3>
 
-			<div nz-row [nzGutter]="16">
-				<div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
-					<nz-form-item>
-						<nz-form-label nzRequired>Đơn giá (VNĐ)</nz-form-label>
-						<nz-form-control nzErrorTip="Đơn giá >= 0!">
-							<nz-input-number class="w-100" formControlName="UnitPrice" nzMin="0"
-								[nzFormatter]="formatPrice"
-								[nzParser]="parsePrice" />
-						</nz-form-control>
-					</nz-form-item>
-				</div>
+            <div nz-row [nzGutter]="16">
+                <div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Đơn giá (VNĐ)</nz-form-label>
+                        <nz-form-control nzErrorTip="Đơn giá >= 0!">
+                            <nz-input-number class="w-100" formControlName="UnitPrice" nzMin="0" [nzFormatter]="formatPrice" [nzParser]="parsePrice" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
 
-				<div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
-					<nz-form-item>
-						<nz-form-label nzRequired>Trọng lượng</nz-form-label>
-						<nz-form-control nzErrorTip="Trọng lượng >= 0!">
-							<nz-input-number class="w-100" formControlName="Weight" nzMin="0" />
-						</nz-form-control>
-					</nz-form-item>
-				</div>
+                <div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Trọng lượng</nz-form-label>
+                        <nz-form-control nzErrorTip="Trọng lượng >= 0!">
+                            <nz-input-number class="w-100" formControlName="Weight" nzMin="0" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
 
-				<div nz-col nzXs="20" nzSm="10" nzMd="6" nzLg="6">
-					<nz-form-item>
-						<nz-form-label nzRequired>Đơn vị tính</nz-form-label>
-						<nz-form-control nzErrorTip="Vui lòng chọn ĐVT!">
-							<div class="d-flex gap-2 align-items-center">
-								<nz-select class="flex-grow-1" nzShowSearch nzAllowClear
-									placeholder="-- Đơn vị tính --" formControlName="UnitCountID">
-									@for (item of unitCounts(); track item.ID) {
-									<nz-option [nzLabel]="item.UnitName" [nzValue]="item.ID" />
-									}
-								</nz-select>
-								<button nz-button nzType="default" nzShape="circle" type="button"
-									(click)="openQuickAddUnitCount()"
-									title="Thêm nhanh đơn vị tính">
-									<i nz-icon nzType="plus"></i>
-								</button>
-							</div>
-						</nz-form-control>
-					</nz-form-item>
-				</div>
+                <div nz-col nzXs="20" nzSm="10" nzMd="6" nzLg="6">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Đơn vị tính</nz-form-label>
+                        <nz-form-control nzErrorTip="Vui lòng chọn ĐVT!">
+                            <div class="d-flex gap-2 align-items-center">
+                                <nz-select class="flex-grow-1" nzShowSearch nzAllowClear placeholder="-- Đơn vị tính --" formControlName="UnitCountID">
+                                    @for (item of unitCounts(); track item.ID) {
+                                    <nz-option [nzLabel]="item.UnitName" [nzValue]="item.ID" />
+                                    }
+                                </nz-select>
+                                <button nz-button nzType="default" nzShape="circle" type="button" (click)="openQuickAddUnitCount()" title="Thêm nhanh đơn vị tính">
+                                    <i nz-icon nzType="plus"></i>
+                                </button>
+                            </div>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
 
-				<div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
-					<nz-form-item>
-						<nz-form-label nzRequired>Tình trạng</nz-form-label>
-						<nz-form-control nzErrorTip="Vui lòng chọn tình trạng!">
-							<nz-select class="w-100" nzShowSearch nzAllowClear
-								placeholder="-- Tình trạng --" formControlName="Status">
-								<nz-option nzLabel="Còn hàng" [nzValue]="1" />
-								<nz-option nzLabel="Hết hàng" [nzValue]="2" />
-								<nz-option nzLabel="Hàng mới" [nzValue]="3" />
-							</nz-select>
-						</nz-form-control>
-					</nz-form-item>
-				</div>
-			</div>
-		</div>
+                <div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Tình trạng</nz-form-label>
+                        <nz-form-control nzErrorTip="Vui lòng chọn tình trạng!">
+                            <nz-select class="w-100" nzShowSearch nzAllowClear placeholder="-- Tình trạng --" formControlName="Status">
+                                <nz-option nzLabel="Còn hàng" [nzValue]="1" />
+                                <nz-option nzLabel="Hết hàng" [nzValue]="2" />
+                                <nz-option nzLabel="Hàng mới" [nzValue]="3" />
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+        </div>
 
-		<!-- Card 3: Mô tả & Hình ảnh -->
-		<div class="admin-form-card mb-3">
-			<h3 class="admin-form-section-title">Mô tả & Hình ảnh</h3>
+        <!-- Card 3: Mô tả & Hình ảnh -->
+        <div class="admin-form-card mb-3">
+            <h3 class="admin-form-section-title">Mô tả & Hình ảnh</h3>
 
-			<div nz-row [nzGutter]="16">
-				<div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
-					<nz-form-item>
-						<nz-form-label>Mô tả</nz-form-label>
-						<nz-form-control>
-							<textarea nz-input formControlName="Descriptions" rows="5"
-								placeholder="Mô tả chi tiết về sản phẩm..."></textarea>
-						</nz-form-control>
-					</nz-form-item>
-				</div>
-			</div>
+            <div nz-row [nzGutter]="16">
+                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+                    <nz-form-item>
+                        <nz-form-label>Mô tả</nz-form-label>
+                        <nz-form-control>
+                            <textarea nz-input formControlName="Descriptions" rows="5" placeholder="Mô tả chi tiết về sản phẩm..."></textarea>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
 
-			<div nz-row [nzGutter]="16">
-				<div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
-					<nz-form-item>
-						<nz-form-label>Hình ảnh</nz-form-label>
-						<nz-form-control>
-							<div class="mb-2">
-								<span class="text-muted">
-									<i nz-icon nzType="info-circle"></i>
-									Ảnh đầu tiên sẽ được đặt làm ảnh chính nếu không chọn.
-								</span>
-							</div>
-							<nz-upload
-								[nzAction]="''"
-								nzListType="picture"
-								[(nzFileList)]="productFileList"
-								[nzMultiple]="true"
-								[nzBeforeUpload]="handleFileUpload"
-								[nzCustomRequest]="handleCustomRequest"
-								[nzRemove]="onRemoveFile">
-								<button nz-button type="button">
-									<i nz-icon nzType="upload"></i> Chọn ảnh
-								</button>
-							</nz-upload>
-							<div class="mt-3">
-								<nz-form-label>Chọn ảnh chính</nz-form-label>
-								<div class="admin-image-grid mt-2">
-									@for (file of productFileList; track file.uid) {
-									<div class="admin-image-item"
-										[class.selected]="primaryImageId === file.uid"
-										(click)="setPrimaryImage(file.uid)">
-										<img [src]="file.thumbUrl || file.url" alt="preview" />
-										@if (primaryImageId === file.uid) {
-										<div class="primary-badge">
-											<i nz-icon nzType="star" nzTheme="fill"></i>
-										</div>
-										}
-									</div>
-									}
-								</div>
-							</div>
-						</nz-form-control>
-					</nz-form-item>
-				</div>
-			</div>
-		</div>
-	</nz-spin>
+            <div nz-row [nzGutter]="16">
+                <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+                    <nz-form-item>
+                        <nz-form-label>Hình ảnh</nz-form-label>
+                        <nz-form-control>
+                            <div class="mb-2">
+                                <span class="text-muted">
+                                    <i nz-icon nzType="info-circle"></i>
+                                    Ảnh đầu tiên sẽ được đặt làm ảnh chính nếu không chọn.
+                                </span>
+                            </div>
+                            <nz-upload [nzAction]="''" nzListType="picture" [(nzFileList)]="productFileList" [nzMultiple]="true" [nzBeforeUpload]="handleFileUpload" [nzCustomRequest]="handleCustomRequest" [nzRemove]="onRemoveFile">
+                                <button nz-button type="button">
+                                    <i nz-icon nzType="upload"></i> Chọn ảnh
+                                </button>
+                            </nz-upload>
+                            <div class="mt-3">
+                                <nz-form-label>Chọn ảnh chính</nz-form-label>
+                                <div class="admin-image-grid mt-2">
+                                    @for (file of productFileList; track file.uid) {
+                                    <div class="admin-image-item" [class.selected]="primaryImageId === file.uid" (click)="setPrimaryImage(file.uid)">
+                                        <img [src]="file.thumbUrl || file.url" alt="preview" />
+                                        @if (primaryImageId === file.uid) {
+                                        <div class="primary-badge">
+                                            <i nz-icon nzType="star" nzTheme="fill"></i>
+                                        </div>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+        </div>
+    </nz-spin>
 </form>

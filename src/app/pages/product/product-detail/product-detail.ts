@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { ProductService } from '../../../services/product-service';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
@@ -45,7 +45,7 @@ import { NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS } from '
 	styleUrl: './product-detail.css',
 	providers: [ProductService, CategoryService, UnitCountService]
 })
-export class ProductDetail implements OnInit, OnDestroy {
+export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 	private productService = inject(ProductService);
 	private categoryService = inject(CategoryService);
 	private unitService = inject(UnitCountService);
@@ -53,6 +53,7 @@ export class ProductDetail implements OnInit, OnDestroy {
 	private modal = inject(NzModalRef<ProductDetail>);
 	private modalService = inject(NzModalService);
 	private notification = inject(NzNotificationService);
+	private cdr = inject(ChangeDetectorRef);
 
 	@Input() product: any = {};
 
@@ -95,8 +96,8 @@ export class ProductDetail implements OnInit, OnDestroy {
 
 			// Patch trước các trường còn lại (không cần combo)
 			const productEdit = { ...this.product };
-			delete (productEdit as any).CategoryID;
-			delete (productEdit as any).UnitCountID;
+			// delete (productEdit as any).CategoryID;
+			// delete (productEdit as any).UnitCountID;
 			this.validateForm.patchValue(productEdit);
 			this.validateForm.get('STT')?.disable();
 
@@ -105,6 +106,17 @@ export class ProductDetail implements OnInit, OnDestroy {
 		} else {
 			this.loadCombo();
 			this.loadAutoValues();
+		}
+	}
+
+	ngAfterViewInit(): void {
+		// [Sửa] Tree-select cần 1 tick sau khi nodes được set mới match giá trị patch
+		if (this.pendingCategoryID != null) {
+			setTimeout(() => {
+				this.validateForm.patchValue({ CategoryID: this.pendingCategoryID as any });
+				this.pendingCategoryID = null;
+				this.cdr.markForCheck();
+			}, 0);
 		}
 	}
 
@@ -136,11 +148,6 @@ export class ProductDetail implements OnInit, OnDestroy {
 			next: (res) => {
 				const nodes = this.buildTreeOptions(res.data);
 				this.categoryNodes.set(nodes);
-				// Sau khi nodes đã vào tree-select, patch lại CategoryID nếu đang sửa
-				if (this.pendingCategoryID != null) {
-					this.validateForm.patchValue({ CategoryID: this.pendingCategoryID as any });
-					this.pendingCategoryID = null;
-				}
 			},
 			error: (err) => {
 				this.notification.create(
@@ -158,10 +165,13 @@ export class ProductDetail implements OnInit, OnDestroy {
 		this.unitService.getData().subscribe({
 			next: (res) => {
 				this.unitCounts.set(res.data);
-				// [Sửa] Patch lại UnitCountID khi combo load xong
+				// [Sửa] Patch lại UnitCountID khi combo load xong (setTimeout để @for render xong)
 				if (this.pendingUnitCountID != null) {
-					this.validateForm.patchValue({ UnitCountID: this.pendingUnitCountID as any });
-					this.pendingUnitCountID = null;
+					setTimeout(() => {
+						this.validateForm.patchValue({ UnitCountID: this.pendingUnitCountID as any });
+						this.pendingUnitCountID = null;
+						this.cdr.markForCheck();
+					}, 0);
 				}
 			},
 			error: (err) => {
@@ -201,6 +211,8 @@ export class ProductDetail implements OnInit, OnDestroy {
 
 		return roots;
 	}
+
+	displayCategory = (node: any): string => node?.title ?? '';
 
 	formatPrice = (value: number | string | undefined): string => {
 		if (value == null || value === '') return '';
@@ -263,7 +275,11 @@ export class ProductDetail implements OnInit, OnDestroy {
 					}
 				}
 			],
-			nzData: {}
+			nzData: {
+				category: null,
+				categoryNodes: this.categoryNodes(),
+				isParent: false
+			}
 		});
 
 		modalRef.afterClose.subscribe(result => {
