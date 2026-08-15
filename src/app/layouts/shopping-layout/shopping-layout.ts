@@ -180,6 +180,7 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 		// this.loadHistorySearch();
 		this.initMenuItems();
 		this.loadShoppingCards();
+		this.loadNewProducts();
 
 		window.addEventListener('storage', this.onStorageChange);
 		window.addEventListener('cartUpdated', this.onCartUpdated);
@@ -243,6 +244,21 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 		const cartValue = localStorage.getItem(CART_PRODUCT_KEY);
 		const carts = cartValue ? JSON.parse(cartValue) : [];
 		this.productService.setCarts(carts);
+	}
+
+	newProducts = signal<any[]>([]);
+
+	loadNewProducts() {
+		this.productService.getData().subscribe({
+			next: (res) => {
+				Promise.resolve().then(() => {
+					// Get 10 newest products
+					const products = (res.data || []).slice(0, 10);
+					this.newProducts.set(products);
+				});
+			},
+			error: (err) => console.error(err)
+		});
 	}
 
 	loadHistorySearch() {

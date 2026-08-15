@@ -10,7 +10,7 @@
                 </a>
                 <a routerLink="/cart" class="mobile-header-cart" aria-label="Giỏ hàng">
                     <nz-badge [nzCount]="totalQuantity()">
-                        <i class="fa-solid fa-cart-shopping fa-lg"></i>
+                        <nz-icon nzType="shopping-cart" nzTheme="outline" style="font-size: 24px; color: white;"></nz-icon>
                     </nz-badge>
                 </a>
             </div>
@@ -32,7 +32,7 @@
 
                     <a *ngIf="!isOnCartPage()" nz-dropdown [nzDropdownMenu]="menu" [nzTrigger]="'click'" [(nzVisible)]="isVisibleShopingCard" nzClickHide="true" class="ms-2">
                         <nz-badge [nzCount]="totalQuantityNumber">
-                            <i class="fa-solid fa-cart-shopping fa-xl text-light"></i>
+                            <nz-icon nzType="shopping-cart" nzTheme="outline" style="font-size: 28px; color: white;"></nz-icon>
                         </nz-badge>
                     </a>
                     <nz-dropdown-menu #menu="nzDropdownMenu">
@@ -77,13 +77,13 @@
 
                 <nz-divider></nz-divider>
 
-                <div class="mobile-drawer-section-title">Danh mục</div>
-                @if (mobileMenuCategories().length > 0) {
-                @for (item of mobileMenuCategories(); track item.label) {
-                <a class="mobile-drawer-link mobile-drawer-category" href="javascript:void(0)" (click)="item.command?.($event); closeMobileMenu()">
-                    {{ item.label }}
-                </a>
-                }
+                <div class="mobile-drawer-section-title">DANH SÁCH SẢN PHẨM</div>
+                @if (newProducts().length > 0) {
+                    @for (product of newProducts(); track product.ID) {
+                    <a class="mobile-drawer-link mobile-drawer-category text-truncate" [routerLink]="['/detail']" [queryParams]="{ id: product.ID }" (click)="closeMobileMenu()" [title]="product.ProductName">
+                        {{ product.ProductName }}
+                    </a>
+                    }
                 }
 
                 <nz-divider></nz-divider>
@@ -123,7 +123,7 @@
 
             <nz-float-button-top [nzVisibilityHeight]="600" />
         </nz-float-button-group> -->
-        <nz-float-button-group nzShape="circle">
+        <nz-float-button-group nzShape="circle" nzTrigger="click" [nzIcon]="triggerIcon">
 
             <nz-float-button [nzHref]="socialZaloUrl()" [nzIcon]="zalo">
             </nz-float-button>
@@ -140,6 +140,11 @@
             <nz-float-button-top [nzVisibilityHeight]="600"></nz-float-button-top>
 
         </nz-float-button-group>
+
+        <ng-template #triggerIcon>
+            <i nz-icon nzType="message" nzTheme="outline"></i>
+        </ng-template>
+
         <ng-template #zalo>
             <img src="assets/image/social/icons8-zalo-32.png" width="24" height="24">
         </ng-template>

@@ -13,45 +13,57 @@
 	<div class="product-info d-flex flex-column flex-md-row justify-content-start">
 		<div class="card border-0 product-image w-100 w-md-50">
 
-			<div class="product-image-wrapper"
-				(pointerdown)="onPointerDown($event)"
-				(pointermove)="onPointerMove($event)"
-				(pointerup)="onPointerUp($event)"
+			<div class="product-image-wrapper" (pointerdown)="onPointerDown($event)"
+				(pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)"
 				(pointercancel)="onPointerUp($event)">
-				<button class="nav-btn prev-btn" (click)="prevImage()" [disabled]="currentImageIndex() === 0">
-					<i nz-icon nzType="left"></i>
-				</button>
-
 				<div class="main-image-container">
 					@if (productImages().length > 0) {
-					<img [src]="productImages()[currentImageIndex()].Url" alt="product image" class="main-image" />
+					<div class="image-track" 
+						[style.transform]="'translateX(calc(' + (-realIndex * 100) + '% + ' + currentTranslate + 'px))'"
+						[style.transition]="isDragging || isWithoutTransition ? 'none' : 'transform 0.35s ease-in-out'"
+						(transitionend)="onTransitionEnd()">
+						
+						@if (productImages().length > 1) {
+						<div class="image-slide">
+							<img [src]="productImages()[productImages().length - 1].Url" alt="product image" class="main-image" />
+						</div>
+						}
+
+						@for (img of productImages(); track $index) {
+						<div class="image-slide">
+							<img [src]="img.Url" alt="product image" class="main-image" />
+						</div>
+						}
+
+						@if (productImages().length > 1) {
+						<div class="image-slide">
+							<img [src]="productImages()[0].Url" alt="product image" class="main-image" />
+						</div>
+						}
+					</div>
 					} @else {
 					<div class="no-image-placeholder">Không có ảnh</div>
 					}
 				</div>
 
-				<button class="nav-btn next-btn" (click)="nextImage()"
-					[disabled]="currentImageIndex() === productImages().length - 1">
-					<i nz-icon nzType="right"></i>
-				</button>
-			</div>
-
-			@if (productImages().length > 1) {
-			<div class="image-dots">
-				@for (img of productImages(); track $index) {
-				<span class="dot" [class.active]="$index === currentImageIndex()"
-					(click)="currentImageIndex.set($index)"></span>
+				@if (productImages().length > 1) {
+				<div class="image-indicator-bars">
+					@for (img of productImages(); track $index) {
+					<span class="indicator-bar" [class.active]="$index === currentImageIndex()"
+						(click)="goToImage($index)"></span>
+					}
+				</div>
 				}
 			</div>
-			}
+
 		</div>
 
 		<div class="product-detail-info w-100 w-md-50 ms-0 ms-md-3 ps-0 ps-md-3 mt-3 mt-md-0">
 
 			<h3>{{ product.ProductName }}</h3>
 
-			<div class="d-flex justify-content-between align-items-center">
-				<p class="my-3"><span class="fw-bold me-2">SKU:</span>{{ product.ProductCode }}</p>
+			<div class="sku-row">
+				<p><span class="fw-bold me-1">SKU:</span>{{ product.ProductCode }}</p>
 				<button nz-button nzType="default" nzShape="circle" [ngClass]="{ active: isFavourite(product) }"
 					(click)="onAddFavourite(product)">
 					<i nz-icon nzType="heart"></i>
@@ -59,26 +71,24 @@
 			</div>
 
 			<div class="product-bottom">
-				<div class="price d-flex justify-content-center">
-					<p>{{ product.UnitPrice | number }} <small>VND</small></p>
+				<!-- Row 1: Giá -->
+				<div class="price">
+					<span class="price-amount">{{ product.UnitPrice | number }}</span>
+					<span class="price-currency">VND</span>
 				</div>
 
-				<div class="number-buy d-flex justify-content-center">
-					<div class="card flex justify-center">
-						<p-inputnumber [(ngModel)]="quantityBuy" [showButtons]="true" buttonLayout="horizontal"
-							spinnerMode="horizontal" [inputStyle]="{ width: '3rem' }">
-							<ng-template #incrementbuttonicon>
-								<span class="pi pi-plus"></span>
-							</ng-template>
-							<ng-template #decrementbuttonicon>
-								<span class="pi pi-minus"></span>
-							</ng-template>
-						</p-inputnumber>
+				<!-- Row 2: Số lượng + Nút thêm giỏ hàng -->
+				<div class="buy-row">
+					<div class="qty-stepper">
+						<button class="qty-btn" (click)="quantityBuy = quantityBuy > 1 ? quantityBuy - 1 : 1">−</button>
+						<span class="qty-value">{{ quantityBuy }}</span>
+						<button class="qty-btn" (click)="quantityBuy = quantityBuy + 1">+</button>
 					</div>
+					<button class="btn-add-to-cart" (click)="onAddToCart(product)">THÊM VÀO GIỎ HÀNG</button>
 				</div>
 
-				<div class="product-action">
-					<button class="btn-add-to-cart" (click)="onAddToCart(product)">Thêm vào giỏ hàng</button>
+				<!-- Nút mua nhanh -->
+				<div class="buy-now-row">
 					<button class="btn-buy" (click)="onAddToCart(product,'/cart')">Mua nhanh</button>
 				</div>
 			</div>
@@ -96,13 +106,13 @@
 			</div>
 			<div class="col-md-4 col-sm-6">
 				<div class="meta-item">
-					<span class="meta-label">Xuất sứ:</span>
+					<span class="meta-label">XUẤT XỨ:</span>
 					<span class="meta-value">{{ product.Origin || '—' }}</span>
 				</div>
 			</div>
 			<div class="col-md-4 col-sm-6">
 				<div class="meta-item">
-					<span class="meta-label">Trọng lượng:</span>
+					<span class="meta-label">KHỐI LƯỢNG (gam):</span>
 					<span class="meta-value">{{ product.Weight || '—' }} {{ product.UnitName }}</span>
 				</div>
 			</div>

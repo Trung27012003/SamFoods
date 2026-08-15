@@ -15,52 +15,37 @@
                <nz-card nzBordered="false" [nzTitle]="title" [nzExtra]="extraTemplate">
                     <div class="list-item">
                          @for (product of shopingCarts(); track product.ProductID) {
-                         <div class="card d-flex justify-content-start align-items-center">
-                             <div class="item-img">
-                                  <img [src]="product.ImageURL || 'assets/image/no-image.png'" alt="" (error)="$any($event.target).src='assets/image/no-image.png'">
-                             </div>
+                         <div class="uniqlo-cart-item">
+                              <div class="uc-image">
+                                   <img [src]="product.ImageURL || 'assets/image/no-image.png'" alt="" (error)="$any($event.target).src='assets/image/no-image.png'">
+                              </div>
+                              
+                              <div class="uc-details d-flex justify-content-between align-items-start mt-2">
+                                   <h6 class="uc-title m-0">{{product.ProductName}}</h6>
+                                   <button nz-button nzType="default" nzShape="circle" class="uc-heart-btn"
+                                        [ngClass]="{ active: isFavourite(product) }"
+                                        (click)="onAddFavourite(product)">
+                                        <i nz-icon nzType="heart"></i>
+                                   </button>
+                              </div>
+                              
+                              <div class="uc-price mt-1">
+                                   <strong>{{ product.UnitPrice | number }}</strong> <small>VND</small>
+                              </div>
 
-                              <div class="ms-3 w-100">
-                                   <div class="d-flex justify-content-between align-items-center">
-                                        <h6 class="m-0">{{product.ProductName}}</h6>
-                                        <button nz-button nzType="default" nzShape="circle"
-                                             [ngClass]="{ active: isFavourite(product) }"
-                                             (click)="onAddFavourite(product)">
-                                             <i nz-icon nzType="heart"></i>
-                                        </button>
+                              <div class="uc-actions d-flex justify-content-between align-items-end mt-3">
+                                   <div class="uc-stepper">
+                                        <p-inputnumber [showButtons]="true" buttonLayout="horizontal"
+                                             [(ngModel)]="product.Quantity" spinnerMode="horizontal"
+                                             [inputStyle]="{ width: '3rem', textAlign: 'center', height: '36px' }" [min]="1"
+                                             (ngModelChange)="caculatorTotalPrice(product)">
+                                             <ng-template #incrementbuttonicon><span class="pi pi-plus"></span></ng-template>
+                                             <ng-template #decrementbuttonicon><span class="pi pi-minus"></span></ng-template>
+                                        </p-inputnumber>
                                    </div>
-
-                                   <div class="product-bottom">
-                                        <div class="price d-flex justify-content-start">
-                                             <p>{{ product.UnitPrice | number }} <small>VND</small></p>
-                                        </div>
-
-                                        <div class="d-flex justify-content-between align-items-center">
-                                             <div class="number-buy d-flex justify-content-center">
-                                                  <div class="card flex justify-center">
-                                                       <p-inputnumber [showButtons]="true" buttonLayout="horizontal"
-                                                            [(ngModel)]="product.Quantity" spinnerMode="horizontal"
-                                                            [inputStyle]="{ width: '3rem' }" size="large" [min]="1"
-                                                            (ngModelChange)="caculatorTotalPrice(product)">
-                                                            <ng-template #incrementbuttonicon>
-                                                                 <span class="pi pi-plus"></span>
-                                                            </ng-template>
-                                                            <ng-template #decrementbuttonicon>
-                                                                 <span class="pi pi-minus"></span>
-                                                            </ng-template>
-                                                       </p-inputnumber>
-                                                  </div>
-                                             </div>
-
-                                             <div class="total-amount">
-                                                  <p class="m-0 fw-bold">Tạm tính</p>
-                                                  <div class="price">
-                                                       <p class="m-0">{{ product.TotalPrice | number }}
-                                                            <small>VND</small>
-                                                       </p>
-                                                  </div>
-                                             </div>
-                                        </div>
+                                   <div class="uc-subtotal text-end">
+                                        <div class="uc-subtotal-label">Tạm tính</div>
+                                        <div class="uc-subtotal-price"><strong>{{ product.TotalPrice | number }}</strong> <small>VND</small></div>
                                    </div>
                               </div>
                          </div>
@@ -188,7 +173,7 @@
                <small>Tổng cộng</small>
                <div class="price">{{ totalAmount() | number }} <small>VND</small></div>
           </div>
-          <button class="btn btn-primary mobile-checkout-btn" (click)="saveData()">
+          <button class="btn btn-primary mobile-checkout-btn" style="background-color: #0066ff; border-color: #0066ff;" (click)="saveData()">
                Thanh toán ({{ shopingCarts().length }})
           </button>
      </div>
