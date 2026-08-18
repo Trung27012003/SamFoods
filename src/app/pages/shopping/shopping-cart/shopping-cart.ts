@@ -24,14 +24,10 @@ import { CART_PRODUCT_KEY, FAVOURITE_KEY, NOTIFICATION_TITLE_MAP, NOTIFICATION_T
 		CommonModule,
 		FormsModule,
 		ReactiveFormsModule,
-		NzGridModule,
-		FormsModule,
 		NzIconModule,
-		NzButtonComponent,
+		NzButtonModule,
 		ButtonModule,
 		InputNumberModule,
-		NzListModule,
-		NzCardModule,
 		NzFormModule,
 		NzInputModule,
 		RouterLink
@@ -131,6 +127,7 @@ export class ShoppingCart implements OnInit {
 						return {
 							...item,
 							ProductName: product?.ProductName || item.ProductName,
+							ProductCode: product?.ProductCode || item.ProductCode || '',
 							UnitPrice: item.UnitPrice || product?.UnitPrice,
 							TotalPrice: (item.UnitPrice || product?.UnitPrice || 0) * item.Quantity,
 							ImageURL: imageUrl,
