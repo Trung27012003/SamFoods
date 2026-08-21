@@ -56,8 +56,8 @@
 
                 <div nz-col nzXs="24" nzSm="8" nzMd="6" nzLg="6">
                     <nz-form-item>
-                        <nz-form-label nzRequired>Xuất sứ</nz-form-label>
-                        <nz-form-control nzErrorTip="Vui lòng nhập xuất sứ!">
+                        <nz-form-label nzRequired>XUẤT XỨ</nz-form-label>
+                        <nz-form-control nzErrorTip="Vui lòng nhập xuất xứ!">
                             <input nz-input formControlName="Origin" placeholder="VD: Việt Nam" />
                         </nz-form-control>
                     </nz-form-item>
@@ -81,9 +81,9 @@
 
                 <div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
                     <nz-form-item>
-                        <nz-form-label nzRequired>Trọng lượng</nz-form-label>
-                        <nz-form-control nzErrorTip="Trọng lượng >= 0!">
-                            <nz-input-number class="w-100" formControlName="Weight" nzMin="0" />
+                        <nz-form-label nzRequired>KHỐI LƯỢNG (gam)</nz-form-label>
+                        <nz-form-control nzErrorTip="Khối lượng >= 0!">
+                            <nz-input-number class="w-100" formControlName="Weight" [nzMin]="0" />
                         </nz-form-control>
                     </nz-form-item>
                 </div>

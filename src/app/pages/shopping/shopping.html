@@ -27,33 +27,32 @@
     <div class="new-arrivals-slider">
         <div class="card products-slider border-0">
             <h5 class="fw-bold text-uppercase">Sản phẩm mới</h5>
-            <div class="row">
+            <div class="row g-2 px-1">
                 @for (product of productBestSellers; track product.ID) {
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2 d-flex justify-content-center">
-                    <div class="product-card">
-                        <div class="badge">MỚI</div>
-                        <div class="product-img">
-                            <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">
-                                <img [src]="product.ImageURL" alt="" />
-                            </a>
-                        </div>
-                        <div class="product-name px-2">
-                            <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{ product.ProductName }}</a>
-                        </div>
-                        <div class="product-bottom px-2">
-                            <div class="price">
-                                {{ product.UnitPrice | number }} <small>VND</small>
-                            </div>
-                            <div class="favorite" [ngClass]="{ active: isFavourite(product) }">
-                                <a (click)="onAddFavourite(product)">
-                                    <i nz-icon nzType="heart"></i>
+                        <div class="product-card">
+                            <div class="badge">MỚI</div>
+                            <div class="product-img">
+                                <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">
+                                    <img [src]="product.ImageURL" alt="" />
                                 </a>
                             </div>
+                            <div class="product-info px-1 pt-2 pb-2 text-start">
+                                <div class="product-name mt-0 mb-1" style="height: auto; min-height: 40px; font-weight: 500;">
+                                    <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{ product.ProductName }}</a>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="price" style="font-size: 16px;">
+                                        {{ product.UnitPrice | number }} <small>VND</small>
+                                    </div>
+                                    <div class="favorite" [ngClass]="{ active: isFavourite(product) }">
+                                        <a (click)="onAddFavourite(product)">
+                                            <i nz-icon nzType="heart"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-2">
-                            <button class="btn-buy" (click)="onAddToCart(product)">Mua Hàng</button>
-                        </div>
-                    </div>
                 </div>
                 }
             </div>
@@ -108,21 +107,20 @@
                                 <img [src]="product.ImageURL" alt="" />
                             </a>
                         </div>
-                        <div class="product-name px-2">
-                            <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{ product.ProductName }}</a>
-                        </div>
-                        <div class="product-bottom px-2">
-                            <div class="price">
-                                {{ product.UnitPrice | number }} <small>VND</small>
+                        <div class="product-info px-1 pt-2 pb-2 text-start">
+                            <div class="product-name mt-0 mb-1" style="height: auto; min-height: 40px; font-weight: 500;">
+                                <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{ product.ProductName }}</a>
                             </div>
-                            <div class="favorite" [ngClass]="{ active: isFavourite(product) }">
-                                <a (click)="onAddFavourite(product)">
-                                    <i nz-icon nzType="heart"></i>
-                                </a>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="price" style="font-size: 20px;">
+                                    {{ product.UnitPrice | number }} <small>VND</small>
+                                </div>
+                                <div class="favorite" [ngClass]="{ active: isFavourite(product) }">
+                                    <a (click)="onAddFavourite(product)">
+                                        <i nz-icon nzType="heart"></i>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="p-2">
-                            <button class="btn-buy" (click)="onAddToCart(product)">Mua Hàng</button>
                         </div>
                     </div>
                 </ng-template>
@@ -151,21 +149,20 @@
                                     <img [src]="product.ImageURL" alt="" />
                                 </a>
                             </div>
-                            <div class="product-name px-2">
-                                <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{ product.ProductName }}</a>
-                            </div>
-                            <div class="product-bottom px-2">
-                                <div class="price">
-                                    {{ product.UnitPrice | number }} <small>VND</small>
+                            <div class="product-info px-1 pt-2 pb-2 text-start">
+                                <div class="product-name mt-0 mb-1" style="height: auto; min-height: 40px; font-weight: 500;">
+                                    <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">{{ product.ProductName }}</a>
                                 </div>
-                                <div class="favorite" [ngClass]="{ active: isFavourite(product) }">
-                                    <a (click)="onAddFavourite(product)">
-                                        <i nz-icon nzType="heart"></i>
-                                    </a>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="price" style="font-size: 16px;">
+                                        {{ product.UnitPrice | number }} <small>VND</small>
+                                    </div>
+                                    <div class="favorite" [ngClass]="{ active: isFavourite(product) }">
+                                        <a (click)="onAddFavourite(product)">
+                                            <i nz-icon nzType="heart"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="p-2">
-                                <button class="btn-buy" (click)="onAddToCart(product)">Mua Hàng</button>
                             </div>
                         </div>
                     </ng-template>

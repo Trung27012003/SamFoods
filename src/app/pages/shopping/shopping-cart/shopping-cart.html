@@ -1,196 +1,194 @@
-<div class="container mt-3 cart-page">
-     @if (shopingCarts().length === 0) {
-          <div class="cart-empty-state text-center py-5">
-               <nz-icon nzType="shopping-cart" nzTheme="outline" style="font-size: 72px; color: #ccc;"></nz-icon>
-               <h5 class="mt-3">Giỏ hàng của bạn đang trống</h5>
-               <p class="text-muted">Hãy khám phá và thêm sản phẩm vào giỏ hàng nhé!</p>
-               <a routerLink="/home" class="btn btn-primary mt-2">
-                    <nz-icon nzType="home" nzTheme="outline"></nz-icon>
-                    Tiếp tục mua sắm
-               </a>
-          </div>
-     } @else {
-     <div nz-row [nzGutter]="16">
-          <div nz-col nzXs="24" nzSm="12" nzMd="16" nzLg="16">
-               <nz-card nzBordered="false" [nzTitle]="title" [nzExtra]="extraTemplate">
-                    <div class="list-item">
-                         @for (product of shopingCarts(); track product.ProductID) {
-                         <div class="card d-flex justify-content-start align-items-center">
-                             <div class="item-img">
-                                  <img [src]="product.ImageURL || 'assets/image/no-image.png'" alt="" (error)="$any($event.target).src='assets/image/no-image.png'">
-                             </div>
+<div class="cart-page">
 
-                              <div class="ms-3 w-100">
-                                   <div class="d-flex justify-content-between align-items-center">
-                                        <h6 class="m-0">{{product.ProductName}}</h6>
-                                        <button nz-button nzType="default" nzShape="circle"
-                                             [ngClass]="{ active: isFavourite(product) }"
-                                             (click)="onAddFavourite(product)">
-                                             <i nz-icon nzType="heart"></i>
-                                        </button>
-                                   </div>
+  <!-- ===== EMPTY STATE ===== -->
+  @if (shopingCarts().length === 0) {
+  <div class="cart-empty-state">
+    <nz-icon nzType="shopping-cart" nzTheme="outline" class="empty-icon"></nz-icon>
+    <h5>Giỏ hàng của bạn đang trống</h5>
+    <p>Hãy khám phá và thêm sản phẩm vào giỏ hàng nhé!</p>
+    <a routerLink="/home" class="btn-continue-shop">
+      <nz-icon nzType="home" nzTheme="outline"></nz-icon>
+      Tiếp tục mua sắm
+    </a>
+  </div>
 
-                                   <div class="product-bottom">
-                                        <div class="price d-flex justify-content-start">
-                                             <p>{{ product.UnitPrice | number }} <small>VND</small></p>
-                                        </div>
+  } @else {
 
-                                        <div class="d-flex justify-content-between align-items-center">
-                                             <div class="number-buy d-flex justify-content-center">
-                                                  <div class="card flex justify-center">
-                                                       <p-inputnumber [showButtons]="true" buttonLayout="horizontal"
-                                                            [(ngModel)]="product.Quantity" spinnerMode="horizontal"
-                                                            [inputStyle]="{ width: '3rem' }" size="large" [min]="1"
-                                                            (ngModelChange)="caculatorTotalPrice(product)">
-                                                            <ng-template #incrementbuttonicon>
-                                                                 <span class="pi pi-plus"></span>
-                                                            </ng-template>
-                                                            <ng-template #decrementbuttonicon>
-                                                                 <span class="pi pi-minus"></span>
-                                                            </ng-template>
-                                                       </p-inputnumber>
-                                                  </div>
-                                             </div>
+  <div class="cart-layout">
 
-                                             <div class="total-amount">
-                                                  <p class="m-0 fw-bold">Tạm tính</p>
-                                                  <div class="price">
-                                                       <p class="m-0">{{ product.TotalPrice | number }}
-                                                            <small>VND</small>
-                                                       </p>
-                                                  </div>
-                                             </div>
-                                        </div>
-                                   </div>
-                              </div>
-                         </div>
-                         }
-                    </div>
-               </nz-card>
+    <!-- ===========================
+         LEFT: DANH SÁCH SẢN PHẨM
+         =========================== -->
+    <div class="cart-left">
 
-               <ng-template #title>
-                    <h4 class=" m-0 fw-bold">Giỏ hàng</h4>
-                    <p class=" m-0 fw-bold">Mặt hàng ({{shopingCarts().length}})</p>
-               </ng-template>
-               <ng-template #extraTemplate>
-                    <p class=" m-0 fw-bold">Tạm tính</p>
-               </ng-template>
+      <!-- Tiêu đề -->
+      <div class="cart-header">
+        <h2 class="cart-title">Giỏ hàng</h2>
+      </div>
 
+      <!-- Danh sách sản phẩm -->
+      <div class="product-list">
+        @for (product of shopingCarts(); track product.ProductID) {
+        <div class="product-card">
 
+          <!-- Ảnh -->
+          <div class="product-img">
+            <img
+              [src]="product.ImageURL || 'assets/image/no-image.png'"
+              [alt]="product.ProductName"
+              (error)="$any($event.target).src='assets/image/no-image.png'">
           </div>
 
-          <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8">
-               <nz-card nzBordered="false" [nzTitle]="title2" class="bg-whitesmoke">
-                    <div class="p-3">
-                         <div class="d-flex justify-content-between align-items-center">
-                              <p class="fw-bold">Tạm tính</p>
-                              <div class="price d-flex justify-content-start">
-                                   <p>{{ totalAmount() | number }} <small>VND</small></p>
-                              </div>
-                         </div>
+          <!-- Nội dung xếp dọc -->
+          <div class="product-body">
 
-                         <div class="d-flex justify-content-between align-items-center">
-                              <p class="fw-bold">Phí vận chuyển</p>
-                              <div class="price d-flex justify-content-start">
-                                   <p>{{ 0 | number }} <small>VND</small></p>
-                              </div>
-                         </div>
+            <!-- Hàng: Tên + yêu thích -->
+            <div class="item-name-row">
+              <span class="item-name">{{ product.ProductName }}</span>
+              <button nz-button nzType="text" class="fav-btn"
+                [ngClass]="{ active: isFavourite(product) }"
+                (click)="onAddFavourite(product)">
+                <i nz-icon nzType="heart"></i>
+              </button>
+            </div>
 
-                         <div class="d-flex justify-content-between align-items-center">
-                              <p>Tổng khuyến mại</p>
-                              <div class="price d-flex justify-content-start">
-                                   <p>{{ 0 | number }} <small>VND</small></p>
-                              </div>
-                         </div>
+            <!-- SKU -->
+            <div class="item-meta">
+              <span class="meta-key">SKU:</span>
+              <span class="meta-key">{{ product.ProductCode || '—' }}</span>
+            </div>
 
-                         <form nz-form [nzLayout]="'vertical'" [formGroup]="validateForm" (ngSubmit)="saveData()"
-                              class="border-3 border-top">
-                              <div nz-row [nzGutter]="16">
-                                   <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
-                                        <nz-form-item>
-                                             <nz-form-label>Họ và tên</nz-form-label>
-                                             <nz-form-control nzErrorTip="Vui lòng nhập Tên!">
-                                                  <input nz-input formControlName="CustomerName" />
-                                             </nz-form-control>
-                                        </nz-form-item>
-                                   </div>
+            <!-- Giá đơn vị -->
+            <div class="item-price">{{ product.UnitPrice | number }} VND</div>
 
-                                   <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
-                                        <nz-form-item>
-                                             <nz-form-label>SĐT</nz-form-label>
-                                             <nz-form-control [nzErrorTip]="phoneErrorTpl">
-                                                  <input nz-input formControlName="PhoneNumber" placeholder="VD: 0987654321" />
-                                                  <ng-template #phoneErrorTpl let-control>
-                                                       <ng-container *ngIf="control.hasError('required')">Vui lòng nhập SĐT!</ng-container>
-                                                       <ng-container *ngIf="control.hasError('pattern')">SĐT không hợp lệ (10 số, đầu 03/05/07/08/09)!</ng-container>
-                                                  </ng-template>
-                                             </nz-form-control>
-                                        </nz-form-item>
-                                   </div>
-                                   <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
-                                        <nz-form-item>
-                                             <nz-form-label>Địa chỉ</nz-form-label>
-                                             <nz-form-control nzErrorTip="Vui lòng nhập Địa chỉ!">
-                                                  <input nz-input formControlName="Address" />
-                                             </nz-form-control>
-                                        </nz-form-item>
-                                   </div>
-                                   <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
-                                        <nz-form-item>
-                                             <nz-form-label>Ghi chú</nz-form-label>
-                                             <nz-form-control nzErrorTip="Vui lòng nhập Địa chỉ!">
-                                                  <textarea nz-input formControlName="Note"></textarea>
-                                             </nz-form-control>
-                                        </nz-form-item>
-                                   </div>
+            <!-- Stepper -->
+            <div class="item-stepper-row">
+              <div class="stepper-pill">
+                <p-inputnumber
+                  [showButtons]="true"
+                  buttonLayout="horizontal"
+                  [(ngModel)]="product.Quantity"
+                  spinnerMode="horizontal"
+                  [inputStyle]="{ width: '2.4rem', textAlign: 'center', height: '32px', fontSize: '0.9rem', background: 'transparent', border: 'none' }"
+                  [min]="1"
+                  (ngModelChange)="caculatorTotalPrice(product)">
+                  <ng-template #decrementbuttonicon><span class="pi pi-minus"></span></ng-template>
+                  <ng-template #incrementbuttonicon><span class="pi pi-plus"></span></ng-template>
+                </p-inputnumber>
+              </div>
+            </div>
 
-                                   <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
-                                        <nz-form-item>
-                                             <div class="product-action border-3 border-top w-100">
-                                                  <button type="button" class="btn-add-to-cart" (click)="saveData()">Thanh toán</button>
-                                                  <div d-flex justify-content-between w-100>
-                                                       <a routerLink="/home" class="fw-bold">Tiếp tục mua hàng</a>
-                                                  </div>
-                                             </div>
-                                        </nz-form-item>
-                                   </div>
-                              </div>
-                         </form>
-                    </div>
-               </nz-card>
-               <ng-template #title2>
-                    <h4 class=" m-0 fw-bold">Thông tin đơn hàng ({{shopingCarts().length}})</h4>
-               </ng-template>
+            <!-- Tổng (trái) + Xóa (phải) -->
+            <div class="item-bottom-row">
+              <div class="item-total-inline">
+                <span class="item-total-label">Tổng:</span>
+                <span class="item-total-price">{{ product.TotalPrice | number }} VND</span>
+              </div>
+              <button class="btn-remove" (click)="caculatorTotalPrice({ ...product, Quantity: 0 })">Xóa</button>
+            </div>
+
+          </div><!-- /product-body -->
+        </div><!-- /product-card -->
+        }
+      </div><!-- /product-list -->
+
+      <!-- Ghi chú -->
+      <p class="cart-note">
+        Các sản phẩm bạn chọn sẽ được đặt trước trong vòng 30 phút sau khi nhấn nút "Thanh toán".
+      </p>
+
+    </div><!-- /cart-left -->
+
+
+    <!-- ===========================
+         RIGHT: FORM THANH TOÁN
+         =========================== -->
+    <div class="cart-right">
+      <div class="order-summary">
+
+        <div class="summary-header">
+          <h3 class="summary-title">Thông tin đặt hàng</h3>
+        </div>
+
+        <!-- Tóm tắt giá -->
+        <div class="price-summary">
+          <div class="price-row">
+            <span>Tạm tính ({{ shopingCarts().length }} sản phẩm)</span>
+            <span>{{ totalAmount() | number }} VND</span>
           </div>
-     </div>
-
-     <nz-list nzBordered="false" nzSize="small">
-          <!-- @for (item of shopingCarts; track item) {
-
-          <nz-list-item>
-               <nz-list-item-meta>
-                    <nz-list-item-meta-avatar [nzSrc]="item.ImageURL" />
-                    <nz-list-item-meta-title>
-                         <a href="/detail">{{ item.ProductName }}</a>
-                    </nz-list-item-meta-title>
-                    <nz-list-item-meta-description>
-                         {{ item.Descriptions }}
-                    </nz-list-item-meta-description>
-               </nz-list-item-meta>
-          </nz-list-item>
-          } -->
-
-     </nz-list>
-
-     <!-- Sticky mobile checkout bar -->
-     <div class="mobile-checkout-bar d-flex d-md-none">
-          <div class="mobile-checkout-total">
-               <small>Tổng cộng</small>
-               <div class="price">{{ totalAmount() | number }} <small>VND</small></div>
+          <div class="price-row">
+            <span>Phí vận chuyển</span>
+            <span class="free-ship">Miễn phí</span>
           </div>
-          <button class="btn btn-primary mobile-checkout-btn" (click)="saveData()">
-               Thanh toán ({{ shopingCarts().length }})
+          <div class="price-total">
+            <span>Tổng cộng</span>
+            <span class="total-amount">{{ totalAmount() | number }} VND</span>
+          </div>
+        </div>
+
+        <!-- Form thông tin -->
+        <form nz-form [nzLayout]="'vertical'" [formGroup]="validateForm"
+          (ngSubmit)="saveData()" class="checkout-form">
+
+          <nz-form-item>
+            <nz-form-label nzRequired>Họ và tên</nz-form-label>
+            <nz-form-control nzErrorTip="Vui lòng nhập Tên!">
+              <input nz-input formControlName="CustomerName" placeholder="Nguyễn Văn A" />
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label nzRequired>Số điện thoại</nz-form-label>
+            <nz-form-control [nzErrorTip]="phoneErrorTpl">
+              <input nz-input formControlName="PhoneNumber" placeholder="0987 654 321" />
+              <ng-template #phoneErrorTpl let-control>
+                <ng-container *ngIf="control.hasError('required')">Vui lòng nhập SĐT!</ng-container>
+                <ng-container *ngIf="control.hasError('pattern')">SĐT không hợp lệ (10 số, đầu 03/05/07/08/09)!</ng-container>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label nzRequired>Địa chỉ giao hàng</nz-form-label>
+            <nz-form-control nzErrorTip="Vui lòng nhập Địa chỉ!">
+              <input nz-input formControlName="Address" placeholder="Số nhà, đường, phường/xã..." />
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label>Ghi chú</nz-form-label>
+            <nz-form-control>
+              <textarea nz-input formControlName="Note"
+                [nzAutosize]="{ minRows: 2, maxRows: 4 }"
+                placeholder="Yêu cầu đặc biệt (tuỳ chọn)..."></textarea>
+            </nz-form-control>
+          </nz-form-item>
+
+          <button type="button" class="btn-checkout" (click)="saveData()">
+            THANH TOÁN
           </button>
-     </div>
-     }
+
+          <a routerLink="/home" class="link-continue">← Tiếp tục mua hàng</a>
+        </form>
+
+      </div>
+    </div><!-- /cart-right -->
+
+  </div><!-- /cart-layout -->
+
+
+  <!-- ===========================
+       MOBILE STICKY BAR
+       =========================== -->
+  <div class="mobile-bar">
+    <div class="mobile-bar-left">
+      <span class="mobile-bar-label">Tổng cộng</span>
+      <strong class="mobile-bar-total">{{ totalAmount() | number }} VND</strong>
+    </div>
+    <button class="mobile-bar-btn" (click)="saveData()">
+      THANH TOÁN
+    </button>
+  </div>
+
+  }
 </div>

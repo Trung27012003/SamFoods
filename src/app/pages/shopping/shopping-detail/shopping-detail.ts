@@ -81,8 +81,8 @@ export class ShoppingDetail implements OnInit {
 		this.responsiveOptions = [
 			{ breakpoint: '1400px', numVisible: 5, numScroll: 1 },
 			{ breakpoint: '1199px', numVisible: 4, numScroll: 1 },
-			{ breakpoint: '767px',  numVisible: 3, numScroll: 1 },
-			{ breakpoint: '575px',  numVisible: 2, numScroll: 1 }
+			{ breakpoint: '767px', numVisible: 3, numScroll: 1 },
+			{ breakpoint: '575px', numVisible: 2, numScroll: 1 }
 		];
 
 		const id = Number(this.route.snapshot.queryParamMap.get('id')) || 3;
@@ -176,13 +176,51 @@ export class ShoppingDetail implements OnInit {
 	}
 
 	prevImage() {
-		const idx = this.currentImageIndex();
-		if (idx > 0) this.currentImageIndex.set(idx - 1);
+		const len = this.productImages().length;
+		if (len <= 1) return;
+		this.realIndex--;
+		if (this.realIndex === 0) {
+			this.currentImageIndex.set(len - 1);
+		} else {
+			this.currentImageIndex.set(this.realIndex - 1);
+		}
 	}
 
 	nextImage() {
-		const idx = this.currentImageIndex();
-		if (idx < this.productImages().length - 1) this.currentImageIndex.set(idx + 1);
+		const len = this.productImages().length;
+		if (len <= 1) return;
+		this.realIndex++;
+		if (this.realIndex === len + 1) {
+			this.currentImageIndex.set(0);
+		} else {
+			this.currentImageIndex.set(this.realIndex - 1);
+		}
+	}
+
+	goToImage(index: number) {
+		this.currentImageIndex.set(index);
+		this.realIndex = index + 1;
+	}
+
+	onTransitionEnd() {
+		const len = this.productImages().length;
+		if (len <= 1) return;
+
+		if (this.realIndex === 0) {
+			this.isWithoutTransition = true;
+			this.realIndex = len;
+			setTimeout(() => {
+				this.isWithoutTransition = false;
+				this.cdr.detectChanges();
+			}, 30);
+		} else if (this.realIndex === len + 1) {
+			this.isWithoutTransition = true;
+			this.realIndex = 1;
+			setTimeout(() => {
+				this.isWithoutTransition = false;
+				this.cdr.detectChanges();
+			}, 30);
+		}
 	}
 
 	private pointerStartX = 0;
