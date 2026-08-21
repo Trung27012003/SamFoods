@@ -20,13 +20,19 @@
 
 <app-admin-list-toolbar
 	placeholder="Tìm theo mã hoặc tên sản phẩm..."
-	[searchValue]="searchValue()"
+	[searchValue]="currentKeywordInput()"
+	[keywords]="searchKeywords()"
+	keywordPlaceholder="Tìm theo mã, tên sản phẩm... (Enter để thêm tag)"
 	[filters]="[
 		{ key: 'category', placeholder: '-- Danh mục --', options: categoryOptions, value: selectedCategory() },
 		{ key: 'status', placeholder: '-- Tình trạng --', options: statusOptions, value: selectedStatus() }
 	]"
 	(searchChange)="onSearch($event)"
 	(filterChange)="onFilterChange($event)"
+	(keywordInputChange)="onKeywordInput($event)"
+	(keywordCommit)="commitKeywordInput()"
+	(keywordRemove)="removeKeyword($event)"
+	(keywordClear)="clearKeywords()"
 	(clear)="clearFilters()">
 </app-admin-list-toolbar>
 
@@ -44,9 +50,12 @@
 		[scrollable]="true"
 		scrollHeight="calc(100vh - 360px)"
 		showGridlines
-		[paginator]="true"
-		[rows]="20"
-		[rowsPerPageOptions]="[10, 20, 50, 100]">
+		[lazy]="true"
+		[totalRecords]="totalRecords()"
+		[rows]="pageSize()"
+		[first]="(pageIndex() - 1) * pageSize()"
+		[rowsPerPageOptions]="[10, 20, 50, 100]"
+		(onPage)="onPageChange($event)">
 		<ng-template #header let-columns>
 			<tr>
 				@for (col of columns; track col) {
@@ -66,6 +75,15 @@
 						[label]="rowData[col.field]" />
 					} @else if (col.field === 'UnitPrice') {
 					<span class="fw-semibold text-danger">{{ rowData[col.field] }}</span>
+					} @else if (col.field === 'CategoryNamesDisplay') {
+						<div class="d-flex flex-wrap gap-1">
+							@for (name of rowData['CategoryNamesDisplay']; track name) {
+								<nz-tag nzColor="blue">{{ name }}</nz-tag>
+							}
+							@if (!rowData['CategoryNamesDisplay'] || rowData['CategoryNamesDisplay'].length === 0) {
+								<span class="text-muted">—</span>
+							}
+						</div>
 					} @else {
 					{{ rowData[col.field] }}
 					}

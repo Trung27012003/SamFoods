@@ -5,8 +5,9 @@ import { NzFloatButtonModule } from "ng-zorro-antd/float-button";
 import { AvatarModule } from "primeng/avatar";
 import { ButtonModule } from "primeng/button";
 import { MegaMenuModule } from "primeng/megamenu";
-import { NzInputModule, NzInputSearchEvent } from "ng-zorro-antd/input";
-import { NzAutocompleteComponent, NzAutocompleteModule } from "ng-zorro-antd/auto-complete";
+import { NzInputModule } from "ng-zorro-antd/input";
+import { NzAutocompleteModule } from "ng-zorro-antd/auto-complete";
+import { NzTagModule } from "ng-zorro-antd/tag";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { NzDropdownModule } from "ng-zorro-antd/dropdown";
 import { NzDrawerModule } from "ng-zorro-antd/drawer";
@@ -42,6 +43,7 @@ interface NavLink { id: number; label: string; link: string; }
 		NzIconModule,
 		NzInputModule,
 		NzAutocompleteModule,
+		NzTagModule,
 		NzFloatButtonModule,
 		NzCardModule,
 		NzBadgeModule,
@@ -93,7 +95,10 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 
 	options: any[] = ['list', 'grid'];
 	layout = this.options[0];
-	keyword = '';
+
+	// Multi-keyword search (tag-group)
+	currentInput = signal('');
+	keywords = signal<string[]>([]);
 
 	autoCompleteKeywords = signal<string[]>([]);
 	optionKeywordss = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
@@ -278,35 +283,61 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 		this.autoCompleteKeywords.set(filtered);
 	}
 
-	onSearch(event: NzInputSearchEvent): void {
+	onKeywordInput(value: string): void {
+		this.currentInput.set(value);
+	}
 
-		const keyword = (event.value || '').trim();
-		if (!keyword) return;
+	commitCurrentInput(): void {
+		const input = this.currentInput().trim();
+		if (!input) return;
+		if (!this.keywords().includes(input)) {
+			this.keywords.update(list => [...list, input]);
+		}
+		this.currentInput.set('');
+	}
 
-		const data = {
-			ID: 0,
-			Keyword: keyword
-		};
+	removeKeyword(kw: string): void {
+		this.keywords.update(list => list.filter(x => x !== kw));
+	}
 
+	clearKeywords(): void {
+		this.keywords.set([]);
+		this.currentInput.set('');
+	}
+
+	private navigateToProducts(keywords: string[]): void {
+		if (keywords.length === 0) {
+			this.router.navigate(['/products']);
+			return;
+		}
+		this.router.navigate(['/products'], {
+			queryParams: { keywords: keywords.join(',') }
+		});
+	}
+
+	doSearch(): void {
+		this.commitCurrentInput();
+		const allKeywords = this.keywords();
+		if (allKeywords.length === 0) return;
+
+		// Lưu lịch sử (giữ logic cũ - join space)
+		const data = { ID: 0, Keyword: allKeywords.join(' ') };
 		this.historySearchService.saveData(data).subscribe({
-			next: (res) => {
-				console.log('res.data:', res.data);
+			next: () => {
 				this.loadHistorySearch();
-				this.router.navigate(['/products'], { queryParams: { keyword } });
+				this.navigateToProducts(allKeywords);
 			},
 			error: (err) => {
 				// Vẫn navigate dù lỗi lưu lịch sử
-				this.router.navigate(['/products'], { queryParams: { keyword } });
+				this.navigateToProducts(allKeywords);
 				this.notification.create(
 					NOTIFICATION_TYPE_MAP[err.status] || 'error',
 					NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
 					err?.error?.message || `${err.error}\n${err.message}`,
-					{
-						nzStyle: { whiteSpace: 'pre-line' }
-					}
+					{ nzStyle: { whiteSpace: 'pre-line' } }
 				);
 			}
-		})
+		});
 	}
 
 	mobileMenuCategories = computed(() => {

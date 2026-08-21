@@ -1,17 +1,40 @@
 <div class="admin-list-toolbar">
-	<div class="search-box">
-		<nz-input-group [nzPrefix]="searchIcon" nzSize="default">
+	@if (keywords !== null) {
+		<div class="kw-tag-search d-flex align-items-center flex-wrap gap-1 px-2 py-1">
+			@for (kw of keywords; track kw) {
+				<nz-tag nzMode="closeable" (nzOnClose)="onKeywordRemove(kw)" class="m-0">
+					{{ kw }}
+				</nz-tag>
+			}
 			<input
 				type="text"
 				nz-input
-				[placeholder]="placeholder"
-				[ngModel]="searchValue"
-				(ngModelChange)="onSearchInput($event)" />
-		</nz-input-group>
-		<ng-template #searchIcon>
-			<nz-icon nzType="search"></nz-icon>
-		</ng-template>
-	</div>
+				class="kw-tag-input flex-grow-1"
+				[placeholder]="keywordPlaceholder"
+				[value]="searchValue"
+				(input)="onKeywordInput($any($event.target).value)"
+				(keydown.enter)="onKeywordEnter()" />
+			@if (keywords.length > 0) {
+				<button nz-button nzType="text" nzSize="small" (click)="onKeywordClear()" class="p-1" title="Xóa từ khóa">
+					<nz-icon nzType="close-circle"></nz-icon>
+				</button>
+			}
+		</div>
+	} @else {
+		<div class="search-box">
+			<nz-input-group [nzPrefix]="searchIcon" nzSize="default">
+				<input
+					type="text"
+					nz-input
+					[placeholder]="placeholder"
+					[ngModel]="searchValue"
+					(ngModelChange)="onSearchInput($event)" />
+			</nz-input-group>
+			<ng-template #searchIcon>
+				<nz-icon nzType="search"></nz-icon>
+			</ng-template>
+		</div>
+	}
 
 	@for (f of filters; track f.key) {
 		<nz-select

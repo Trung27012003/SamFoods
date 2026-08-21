@@ -337,7 +337,9 @@ export class Shopping {
     }).subscribe({
       next: (res) => {
         Promise.resolve().then(() => {
-          const data = (res.products.data || []).map((item: any) => ({
+          const payload = (res?.products?.data ?? res?.products) as any;
+          const list = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+          const data = list.map((item: any) => ({
             ...item,
             ImageURL: getProductImageUrl(item.ImageURL),
           }));
@@ -351,10 +353,11 @@ export class Shopping {
 
           const grouped = Object.values(
             data.reduce((a: any, b: any) => {
-              const cat = rootCats.find((c: any) => c.ID === b.CategoryID);
+              const ids = this.parseCategoryIDs(b.CategoryIDs);
+              const cat = rootCats.find((c: any) => ids.includes(c.ID));
               if (!cat) return a;
-              (a[b.CategoryID] ??= {
-                categoryID: b.CategoryID,
+              (a[cat.ID] ??= {
+                categoryID: cat.ID,
                 categoryName: cat.CategoryName,
                 data: []
               }).data.push(b);
@@ -540,5 +543,14 @@ export class Shopping {
     const k = (this.keyword || '').trim();
     if (!k) return;
     this.router.navigate(['/products'], { queryParams: { keyword: k } });
+  }
+
+  private parseCategoryIDs(raw: any): number[] {
+    if (Array.isArray(raw)) return raw.map((x: any) => Number(x)).filter((x: number) => !Number.isNaN(x) && x > 0);
+    if (raw == null || raw === '') return [];
+    return String(raw)
+      .split(',')
+      .map(x => Number(x.trim()))
+      .filter(x => !Number.isNaN(x) && x > 0);
   }
 }

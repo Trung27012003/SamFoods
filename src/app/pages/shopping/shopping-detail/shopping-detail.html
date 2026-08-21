@@ -22,9 +22,17 @@
 					<i nz-icon nzType="left"></i>
 				</button>
 
-				<div class="main-image-container">
+				<div class="main-image-container" [class.dragging]="isDragging()">
 					@if (productImages().length > 0) {
-					<img [src]="productImages()[currentImageIndex()].Url" alt="product image" class="main-image" />
+					<div class="slide-track"
+						[style.transform]="trackTransform()"
+						[class.no-transition]="isDragging()">
+						@for (img of productImages(); track $index) {
+						<div class="slide">
+							<img [src]="img.Url" alt="product image" class="main-image" draggable="false" />
+						</div>
+						}
+					</div>
 					} @else {
 					<div class="no-image-placeholder">Không có ảnh</div>
 					}
@@ -49,6 +57,14 @@
 		<div class="product-detail-info w-100 w-md-50 ms-0 ms-md-3 ps-0 ps-md-3 mt-3 mt-md-0">
 
 			<h3>{{ product.ProductName }}</h3>
+
+			@if (product.CategoryNames && product.CategoryNames.length > 0) {
+			<div class="d-flex flex-wrap gap-1 mb-3">
+				@for (name of product.CategoryNames; track name) {
+					<nz-tag nzColor="blue">{{ name }}</nz-tag>
+				}
+			</div>
+			}
 
 			<div class="d-flex justify-content-between align-items-center">
 				<p class="my-3"><span class="fw-bold me-2">SKU:</span>{{ product.ProductCode }}</p>

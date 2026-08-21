@@ -15,7 +15,6 @@ import { NzUploadFile, NzUploadModule, NzUploadXHRArgs } from 'ng-zorro-antd/upl
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
-
 import { of, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -39,7 +38,8 @@ import { NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS } from '
 		NzTreeSelectModule,
 		NzUploadModule,
 		NzSpinModule,
-		NzTooltipModule
+		NzTooltipModule,
+
 	],
 	templateUrl: './product-detail.html',
 	styleUrl: './product-detail.css',
@@ -59,21 +59,23 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 
 	isLoading = signal(false);
 	categoryNodes = signal<NzTreeNodeOptions[]>([]);
+	categoryList = signal<any[]>([]);
 	unitCounts = signal<any[]>([]);
 	productFileList: NzUploadFile[] = [];
 	productFileRemoves: any[] = [];
 	primaryImageId: string | null = null;
 
-	// Flag sửa: chờ nodes load xong mới patchValue CategoryID/UnitCountID vào dropdown
-	private pendingCategoryID: number | null = null;
+	// Flag sửa: chờ nodes load xong mới patchValue UnitCountID vào dropdown
 	private pendingUnitCountID: number | null = null;
+
+	tagPlaceholder = (list: any[]): string => `+${list.length} danh mục`;
 
 	private destroy$ = new Subject<void>();
 	private uploadSubscription: Subscription | null = null;
 
 	validateForm = this.fb.group({
 		ID: [0],
-		CategoryID: [null, Validators.required],
+		CategoryIDs: [[] as number[], [Validators.required, this.arrayMinLength(1)]],
 		STT: [1, [Validators.required, Validators.min(1)]],
 		ProductCode: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
 		ProductName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(200)]],
@@ -85,19 +87,25 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 		UnitCountID: [null, Validators.required],
 	});
 
+	private arrayMinLength(min: number) {
+		return (control: any) => {
+			const value = control?.value;
+			if (Array.isArray(value) && value.length >= min) return null;
+			return { required: true };
+		};
+	}
+
 	ngOnInit(): void {
 		const modalData = this.modal.getConfig().nzData;
 		this.product = modalData?.product;
 
 		if (this.product) {
-			// Lưu CategoryID/UnitCountID để patch sau khi combos load xong
-			this.pendingCategoryID = this.product.CategoryID ?? null;
+			// Lưu UnitCountID để patch sau khi combos load xong
 			this.pendingUnitCountID = this.product.UnitCountID ?? null;
 
 			// Patch trước các trường còn lại (không cần combo)
 			const productEdit = { ...this.product };
-			// delete (productEdit as any).CategoryID;
-			// delete (productEdit as any).UnitCountID;
+			delete (productEdit as any).UnitCountID;
 			this.validateForm.patchValue(productEdit);
 			this.validateForm.get('STT')?.disable();
 
@@ -110,14 +118,7 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	ngAfterViewInit(): void {
-		// [Sửa] Tree-select cần 1 tick sau khi nodes được set mới match giá trị patch
-		if (this.pendingCategoryID != null) {
-			setTimeout(() => {
-				this.validateForm.patchValue({ CategoryID: this.pendingCategoryID as any });
-				this.pendingCategoryID = null;
-				this.cdr.markForCheck();
-			}, 0);
-		}
+		// (placeholder, giữ để tương thích). Tree-select đã bỏ.
 	}
 
 	private loadAutoValues(): void {
@@ -146,8 +147,9 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 	loadCombo(): void {
 		this.categoryService.getData().subscribe({
 			next: (res) => {
-				const nodes = this.buildTreeOptions(res.data);
-				this.categoryNodes.set(nodes);
+				const flat = (res.data || []).map((x: any) => ({ ID: x.ID, CategoryName: x.CategoryName, ParentID: x.ParentID }));
+				this.categoryList.set(flat);
+				this.categoryNodes.set(this.buildTreeOptions(res.data || []));
 			},
 			error: (err) => {
 				this.notification.create(
@@ -232,6 +234,18 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 		this.productService.getByID(id).subscribe({
 			next: (res) => {
 				const productImages = res.data.productImages || [];
+				const productCategories = res.data.productCategories || [];
+				const categoryIDs = (productCategories || [])
+					.map((x: any) => Number(x.CategoryID))
+					.filter((x: number) => !Number.isNaN(x) && x > 0);
+
+				if (categoryIDs.length > 0) {
+					setTimeout(() => {
+						this.validateForm.patchValue({ CategoryIDs: categoryIDs as any });
+						this.cdr.markForCheck();
+					}, 0);
+				}
+
 				this.productFileList = productImages.map((item: any) => {
 					if (item.IsPrimary) {
 						this.primaryImageId = item.ID.toString();
@@ -285,7 +299,9 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 		modalRef.afterClose.subscribe(result => {
 			if (result) {
 				this.categoryService.getData().subscribe(res => {
-					this.categoryNodes.set(this.buildTreeOptions(res.data));
+					const flat = (res.data || []).map((x: any) => ({ ID: x.ID, CategoryName: x.CategoryName, ParentID: x.ParentID }));
+					this.categoryList.set(flat);
+					this.categoryNodes.set(this.buildTreeOptions(res.data || []));
 				});
 			}
 		});
@@ -326,8 +342,10 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 			const rawValue = this.validateForm.getRawValue();
 			const data = {
 				...rawValue,
+				CategoryIDs: Array.isArray(rawValue.CategoryIDs) ? rawValue.CategoryIDs.map((x: any) => Number(x)).filter((x: number) => x > 0) : [],
 				ProductIngredients: [],
-				ProductProcessingRecipes: []
+				ProductProcessingRecipes: [],
+				ProductCategories: []
 			};
 			this.saveData(data);
 		} else {
@@ -349,7 +367,7 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 
 	private collectInvalidFields(): string {
 		const labels: string[] = [];
-		if (this.validateForm.get('CategoryID')?.invalid) labels.push('Danh mục');
+		if (this.validateForm.get('CategoryIDs')?.invalid) labels.push('Danh mục');
 		if (this.validateForm.get('ProductCode')?.invalid) labels.push('Mã sản phẩm');
 		if (this.validateForm.get('ProductName')?.invalid) labels.push('Tên sản phẩm');
 		if (this.validateForm.get('Origin')?.invalid) labels.push('Xuất sứ');

@@ -14,6 +14,7 @@ import { ColumnTable } from '../../models/column-table';
 import { ProductDetail } from './product-detail/product-detail';
 import { NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS } from '../../shared/common.config';
 import { AdminPageHeader, AdminListToolbar, AdminStatusTag } from '../../shared';
+import { NzTagComponent } from "ng-zorro-antd/tag";
 
 interface StatusOption {
 	label: string;
@@ -23,16 +24,17 @@ interface StatusOption {
 @Component({
 	selector: 'app-product',
 	imports: [
-		CommonModule,
-		FormsModule,
-		TableModule,
-		NzIconModule,
-		NzButtonModule,
-		NzEmptyModule,
-		AdminPageHeader,
-		AdminListToolbar,
-		AdminStatusTag
-	],
+    CommonModule,
+    FormsModule,
+    TableModule,
+    NzIconModule,
+    NzButtonModule,
+    NzEmptyModule,
+    AdminPageHeader,
+    AdminListToolbar,
+    AdminStatusTag,
+    NzTagComponent
+],
 	templateUrl: './product.html',
 	styleUrl: './product.css',
 	standalone: true,
@@ -47,15 +49,19 @@ export class Product implements OnInit {
 	private cdr = inject(ChangeDetectorRef);
 
 	products: any[] = [];
-	productsRaw: any[] = [];
 	categories = signal<any[]>([]);
+
+	totalRecords = signal(0);
+	pageIndex = signal(1);
+	pageSize = signal(20);
 
 	isLoadingData = signal(false);
 	isLoadingModal = signal(false);
 
 	selectedItem: any = {};
 	selectedItemRaw: any = {};
-	searchValue = signal('');
+	searchKeywords = signal<string[]>([]);
+	currentKeywordInput = signal('');
 	selectedCategory = signal<number | null>(null);
 	selectedStatus = signal<number | null>(null);
 
@@ -72,7 +78,7 @@ export class Product implements OnInit {
 	cols: ColumnTable[] = [
 		{ field: 'ProductCode', header: 'Mã SP' },
 		{ field: 'ProductName', header: 'Tên sản phẩm' },
-		{ field: 'CategoryName', header: 'Danh mục' },
+		{ field: 'CategoryNamesDisplay', header: 'Danh mục' },
 		{ field: 'UnitPrice', header: 'Đơn giá' },
 		{ field: 'UnitName', header: 'ĐVT' },
 		{ field: 'StatusName', header: 'Tình trạng' }
@@ -101,26 +107,44 @@ export class Product implements OnInit {
 
 	loadData(): void {
 		this.isLoadingData.set(true);
-		this.productService.getData().subscribe({
+		this.productService.getProductsPaged({
+			keywords: this.searchKeywords(),
+			categoryID: this.selectedCategory(),
+			status: this.selectedStatus(),
+			sortBy: 'newest',
+			pageIndex: this.pageIndex(),
+			pageSize: this.pageSize()
+		}).subscribe({
 			next: (res) => {
-				this.productsRaw = res.data;
-				this.products = this.productsRaw.map((item: any) => ({
-					...item,
-					StatusName: this.getStatusName(item.Status),
-					UnitPrice: this.formatCurrency(item.UnitPrice)
-				}));
-				this.applyFilters();
-				this.isLoadingData.set(false);
-				this.cdr.markForCheck();
+				Promise.resolve().then(() => {
+					const payload = (res?.data ?? res) as any;
+					const list = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+					this.products = list.map((item: any) => ({
+						...item,
+						StatusName: this.getStatusName(item.Status),
+						UnitPrice: this.formatCurrency(item.UnitPrice),
+						CategoryNamesDisplay: this.parseCategoryNames(item.CategoryNames)
+					}));
+					this.totalRecords.set(payload?.total ?? list.length);
+					this.isLoadingData.set(false);
+					this.cdr.markForCheck();
+					this.cdr.detectChanges();
+				});
 			},
 			error: (err) => {
-				this.isLoadingData.set(false);
-				this.notification.create(
-					NOTIFICATION_TYPE_MAP[err.status] || 'error',
-					NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
-					err?.error?.message || err.message,
-					{ nzStyle: { whiteSpace: 'pre-line' } }
-				);
+				Promise.resolve().then(() => {
+					this.products = [];
+					this.totalRecords.set(0);
+					this.isLoadingData.set(false);
+					this.cdr.markForCheck();
+					this.cdr.detectChanges();
+					this.notification.create(
+						NOTIFICATION_TYPE_MAP[err.status] || 'error',
+						NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
+						err?.error?.message || err.message,
+						{ nzStyle: { whiteSpace: 'pre-line' } }
+					);
+				});
 			}
 		});
 	}
@@ -140,29 +164,43 @@ export class Product implements OnInit {
 	}
 
 	applyFilters(): void {
-		const search = this.searchValue().toLowerCase().trim();
-		const categoryId = this.selectedCategory();
-		const status = this.selectedStatus();
+		this.pageIndex.set(1);
+		this.loadData();
+	}
 
-		const filtered = this.productsRaw.filter(item => {
-			const matchSearch = !search ||
-				item.ProductName?.toLowerCase().includes(search) ||
-				item.ProductCode?.toLowerCase().includes(search);
-			const matchCategory = !categoryId || item.CategoryID === categoryId;
-			const matchStatus = !status || item.Status === status;
-
-			return matchSearch && matchCategory && matchStatus;
-		});
-
-		this.products = filtered.map((item: any) => ({
-			...item,
-			StatusName: this.getStatusName(item.Status),
-			UnitPrice: this.formatCurrency(item.UnitPrice)
-		}));
+	private parseCategoryNames(raw: any): string[] {
+		if (Array.isArray(raw)) return raw.filter((x: any) => x != null && x !== '');
+		if (raw == null || raw === '') return [];
+		return String(raw).split(',').map(x => x.trim()).filter(Boolean);
 	}
 
 	onSearch(value: string): void {
-		this.searchValue.set(value);
+		this.onKeywordInput(value);
+		this.commitKeywordInput();
+	}
+
+	onKeywordInput(value: string): void {
+		this.currentKeywordInput.set(value);
+	}
+
+	commitKeywordInput(): void {
+		const input = this.currentKeywordInput().trim();
+		if (!input) return;
+		if (!this.searchKeywords().includes(input)) {
+			this.searchKeywords.update(list => [...list, input]);
+		}
+		this.currentKeywordInput.set('');
+		this.applyFilters();
+	}
+
+	removeKeyword(kw: string): void {
+		this.searchKeywords.update(list => list.filter(x => x !== kw));
+		this.applyFilters();
+	}
+
+	clearKeywords(): void {
+		this.searchKeywords.set([]);
+		this.currentKeywordInput.set('');
 		this.applyFilters();
 	}
 
@@ -181,10 +219,18 @@ export class Product implements OnInit {
 		if (e.key === 'status') this.onStatusChange(e.value ?? null);
 	}
 
+	onPageChange(event: { first?: number; rows?: number; page?: number }): void {
+		const page = (event?.page ?? 0) + 1; // PrimeNG uses 0-based page
+		const rows = event?.rows ?? this.pageSize();
+		this.pageIndex.set(page);
+		this.pageSize.set(rows);
+		this.loadData();
+	}
+
 	onRowSelect(event: any): void {
 		const selectedId = event.data?.ID;
 		if (selectedId) {
-			this.selectedItemRaw = this.productsRaw.find(p => p.ID === selectedId) || event.data;
+			this.selectedItemRaw = this.products.find(p => p.ID === selectedId) || event.data;
 		}
 	}
 
@@ -193,7 +239,8 @@ export class Product implements OnInit {
 	}
 
 	clearFilters(): void {
-		this.searchValue.set('');
+		this.searchKeywords.set([]);
+		this.currentKeywordInput.set('');
 		this.selectedCategory.set(null);
 		this.selectedStatus.set(null);
 		this.applyFilters();

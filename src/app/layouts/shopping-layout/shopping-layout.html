@@ -25,10 +25,31 @@
 
                 <ng-template #end>
 
-                    <nz-input-search nzAllowClear (nzSearch)="onSearch($event)">
-                        <input nz-input [(ngModel)]="keyword" placeholder="Bạn đang muốn tìm kiếm gì?" (ngModelChange)="onChange($event)" [nzAutocomplete]="auto" />
+                    <div class="kw-tag-search d-flex align-items-center gap-1 px-2">
+                        @for (kw of keywords(); track kw) {
+                            <nz-tag nzMode="closeable" (nzOnClose)="removeKeyword(kw)" class="m-0">
+                                {{ kw }}
+                            </nz-tag>
+                        }
+                        <input nz-input
+                            type="text"
+                            class="kw-tag-input flex-grow-1"
+                            [value]="currentInput()"
+                            (input)="onKeywordInput($any($event.target).value)"
+                            (keydown.enter)="doSearch()"
+                            placeholder="Bạn đang muốn tìm kiếm gì? (Enter để thêm & tìm)"
+                            [nzAutocomplete]="auto"
+                        />
                         <nz-autocomplete [nzDataSource]="autoCompleteKeywords()" #auto></nz-autocomplete>
-                    </nz-input-search>
+                        @if (keywords().length > 0 || currentInput()) {
+                            <button nz-button nzType="text" nzSize="small" (click)="clearKeywords()" class="p-1" title="Xóa tất cả">
+                                <i nz-icon nzType="close-circle"></i>
+                            </button>
+                        }
+                        <button nz-button nzType="primary" nzSize="small" (click)="doSearch()" title="Tìm kiếm">
+                            <i nz-icon nzType="search"></i>
+                        </button>
+                    </div>
 
                     <a *ngIf="!isOnCartPage()" nz-dropdown [nzDropdownMenu]="menu" [nzTrigger]="'click'" [(nzVisible)]="isVisibleShopingCard" nzClickHide="true" class="ms-2">
                         <nz-badge [nzCount]="totalQuantityNumber">

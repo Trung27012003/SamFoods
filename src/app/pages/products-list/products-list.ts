@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -15,10 +15,10 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { ProductService } from '../../services/product-service';
 import { CategoryService } from '../../services/category-service';
-import { UnitCountService } from '../../services/unit-count-service';
 import {
 	FAVOURITE_KEY,
 	NOTIFICATION_TITLE_MAP,
@@ -44,46 +44,38 @@ type SortBy = 'newest' | 'price_asc' | 'price_desc' | 'name_asc';
 		NzDrawerModule,
 		NzPaginationModule,
 		NzEmptyModule,
-		NzSpinModule
+		NzSpinModule,
+		NzTagModule
 	],
 	templateUrl: './products-list.html',
 	styleUrl: './products-list.css',
 	standalone: true,
-	providers: [ProductService, CategoryService, UnitCountService]
+	providers: [ProductService, CategoryService]
 })
 export class ProductsList implements OnInit {
 	private productService = inject(ProductService);
 	private categoryService = inject(CategoryService);
-	private unitService = inject(UnitCountService);
 	private notification = inject(NzNotificationService);
 	private route = inject(ActivatedRoute);
+	private cdr = inject(ChangeDetectorRef);
 
-	searchKeyword = signal('');
+	searchKeywords = signal<string[]>([]);
+	currentKeywordInput = signal('');
 	selectedCategoryID = signal<number | null>(null);
-	selectedStatus = signal<number | null>(null);
 	minPrice = signal<number | null>(null);
 	maxPrice = signal<number | null>(null);
-	selectedUnitCountID = signal<number | null>(null);
 	sortBy = signal<SortBy>('newest');
 	pageIndex = signal(1);
 	pageSize = signal(12);
 
-	allProducts = signal<any[]>([]);
-	filteredProducts = signal<any[]>([]);
+	// Server-paged products (chỉ lưu trang hiện tại)
 	pagedProducts = signal<any[]>([]);
 	total = signal(0);
 	isLoading = signal(false);
 
 	categoryTree = signal<NzTreeNodeOptions[]>([]);
-	unitCounts = signal<any[]>([]);
 
 	isFilterDrawerOpen = signal(false);
-
-	statusOptions = [
-		{ label: 'Còn hàng', value: 1 },
-		{ label: 'Hết hàng', value: 2 },
-		{ label: 'Hàng mới', value: 3 }
-	];
 
 	sortOptions: { label: string; value: SortBy }[] = [
 		{ label: 'Mới nhất', value: 'newest' },
@@ -94,15 +86,18 @@ export class ProductsList implements OnInit {
 
 	ngOnInit(): void {
 		this.loadCategories();
-		this.loadUnitCounts();
-		this.loadProducts();
 
-		// Đọc query param (?keyword=... và ?categoryID=...) do home/header truyền sang
+		// Đọc query param (?keywords=... hoặc ?keyword=... và ?categoryID=...) do home/header truyền sang
 		this.route.queryParamMap.subscribe(params => {
-			const keyword = (params.get('keyword') || '').trim();
-			if (keyword) {
-				this.searchKeyword.set(keyword);
+			const keywordsParam = params.get('keywords');
+			const keywordParam = params.get('keyword');
+			let kws: string[] = [];
+			if (keywordsParam) {
+				kws = keywordsParam.split(',').map(x => x.trim()).filter(Boolean);
+			} else if (keywordParam) {
+				kws = keywordParam.split(/\s+/).filter(Boolean);
 			}
+			this.searchKeywords.set(kws);
 
 			const categoryParam = params.get('categoryID');
 			if (categoryParam) {
@@ -112,6 +107,7 @@ export class ProductsList implements OnInit {
 				}
 			}
 
+			this.pageIndex.set(1);
 			this.applyFilters();
 		});
 	}
@@ -121,17 +117,6 @@ export class ProductsList implements OnInit {
 			next: (res) => {
 				Promise.resolve().then(() => {
 					this.categoryTree.set(this.buildTreeOptions(res.data || []));
-				});
-			},
-			error: (err) => this.notifyError(err)
-		});
-	}
-
-	loadUnitCounts(): void {
-		this.unitService.getData().subscribe({
-			next: (res) => {
-				Promise.resolve().then(() => {
-					this.unitCounts.set(res.data || []);
 				});
 			},
 			error: (err) => this.notifyError(err)
@@ -165,63 +150,57 @@ export class ProductsList implements OnInit {
 		});
 
 		return roots;
-	}	loadProducts(): void {
+	}
+
+	private buildCategoryIDsForServer(): string | undefined {
+		const categoryId = this.selectedCategoryID();
+		if (categoryId == null) return undefined;
+		const ids = this.collectCategoryIds(categoryId, this.categoryTree());
+		if (ids.size === 0) return undefined;
+		return Array.from(ids).join(',');
+	}
+
+	applyFilters(): void {
 		this.isLoading.set(true);
-		this.productService.getData('').subscribe({
+		const categoryIDs = this.buildCategoryIDsForServer();
+		const pageIndex = this.pageIndex();
+		const pageSize = this.pageSize();
+
+		this.productService.getProductsPaged({
+			keywords: this.searchKeywords(),
+			categoryIDs,
+			minPrice: this.minPrice(),
+			maxPrice: this.maxPrice(),
+			sortBy: this.sortBy(),
+			pageIndex,
+			pageSize
+		}).subscribe({
 			next: (res) => {
 				Promise.resolve().then(() => {
-					const raw = res.data || [];
-					const list = Array.isArray(raw) ? raw : [];
+					const payload = (res?.data ?? res) as any;
+					const list = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
 					const mapped = list.map((p: any) => ({
 						...p,
 						ImageURL: getProductImageUrl(p.ImageURL)
 					}));
-					this.allProducts.set(mapped);
-					this.applyFilters();
+					this.pagedProducts.set(mapped);
+					this.total.set(payload?.total ?? 0);
 					this.isLoading.set(false);
+					this.cdr.markForCheck();
+					this.cdr.detectChanges();
 				});
 			},
 			error: (err) => {
-				this.isLoading.set(false);
-				this.notifyError(err);
+				Promise.resolve().then(() => {
+					this.pagedProducts.set([]);
+					this.total.set(0);
+					this.isLoading.set(false);
+					this.cdr.markForCheck();
+					this.cdr.detectChanges();
+					this.notifyError(err);
+				});
 			}
 		});
-	}
-
-	applyFilters(): void {
-		const keyword = this.searchKeyword().toLowerCase().trim();
-		const categoryId = this.selectedCategoryID();
-		const status = this.selectedStatus();
-		const minP = this.minPrice();
-		const maxP = this.maxPrice();
-		const unitId = this.selectedUnitCountID();
-		const sort = this.sortBy();
-
-		// Build set of valid category IDs if a parent is selected (include children)
-		const validCategoryIds = categoryId != null
-			? this.collectCategoryIds(categoryId, this.categoryTree())
-			: null;
-
-		let filtered = this.allProducts().filter((p: any) => {
-			if (keyword) {
-				const name = (p.ProductName || '').toLowerCase();
-				const code = (p.ProductCode || '').toLowerCase();
-				if (!name.includes(keyword) && !code.includes(keyword)) return false;
-			}
-			if (validCategoryIds && !validCategoryIds.has(p.CategoryID)) return false;
-			if (status != null && p.Status !== status) return false;
-			if (minP != null && p.UnitPrice < minP) return false;
-			if (maxP != null && p.UnitPrice > maxP) return false;
-			if (unitId != null && p.UnitCountID !== unitId) return false;
-			return true;
-		});
-
-		filtered = this.sortProducts(filtered, sort);
-
-		this.filteredProducts.set(filtered);
-		this.total.set(filtered.length);
-		this.pageIndex.set(1);
-		this.applyPagination();
 	}
 
 	private collectCategoryIds(rootId: number, nodes: NzTreeNodeOptions[]): Set<number> {
@@ -246,47 +225,67 @@ export class ProductsList implements OnInit {
 		return ids;
 	}
 
-	private sortProducts(list: any[], sort: SortBy): any[] {
-		const arr = [...list];
-		switch (sort) {
-			case 'price_asc':
-				arr.sort((a, b) => (a.UnitPrice || 0) - (b.UnitPrice || 0));
-				break;
-			case 'price_desc':
-				arr.sort((a, b) => (b.UnitPrice || 0) - (a.UnitPrice || 0));
-				break;
-			case 'name_asc':
-				arr.sort((a, b) => (a.ProductName || '').localeCompare(b.ProductName || ''));
-				break;
-			case 'newest':
-			default:
-				arr.sort((a, b) => (b.ID || 0) - (a.ID || 0));
-		}
-		return arr;
-	}
-
-	applyPagination(): void {
-		const start = (this.pageIndex() - 1) * this.pageSize();
-		const end = start + this.pageSize();
-		this.pagedProducts.set(this.filteredProducts().slice(start, end));
-	}
-
 	onPageChange(page: number): void {
 		this.pageIndex.set(page);
-		this.applyPagination();
+		this.applyFilters();
 		if (typeof window !== 'undefined') {
 			window.scrollTo({ top: 0, behavior: 'smooth' });
 		}
 	}
 
 	clearFilters(): void {
-		this.searchKeyword.set('');
+		this.searchKeywords.set([]);
+		this.currentKeywordInput.set('');
 		this.selectedCategoryID.set(null);
-		this.selectedStatus.set(null);
 		this.minPrice.set(null);
 		this.maxPrice.set(null);
-		this.selectedUnitCountID.set(null);
 		this.sortBy.set('newest');
+		this.pageIndex.set(1);
+		this.applyFilters();
+	}
+
+	onKeywordInput(value: string): void {
+		this.currentKeywordInput.set(value);
+	}
+
+	commitKeywordInput(): void {
+		const input = this.currentKeywordInput().trim();
+		if (!input) return;
+		if (!this.searchKeywords().includes(input)) {
+			this.searchKeywords.update(list => [...list, input]);
+		}
+		this.currentKeywordInput.set('');
+		this.pageIndex.set(1);
+		this.applyFilters();
+	}
+
+	removeKeyword(kw: string): void {
+		this.searchKeywords.update(list => list.filter(x => x !== kw));
+		this.pageIndex.set(1);
+		this.applyFilters();
+	}
+
+	clearKeywords(): void {
+		this.searchKeywords.set([]);
+		this.currentKeywordInput.set('');
+		this.pageIndex.set(1);
+		this.applyFilters();
+	}
+
+	onCategoryChange(value: number | null): void {
+		this.selectedCategoryID.set(value);
+		this.pageIndex.set(1);
+		this.applyFilters();
+	}
+
+	onSortChange(value: SortBy): void {
+		this.sortBy.set(value);
+		this.pageIndex.set(1);
+		this.applyFilters();
+	}
+
+	onApplyPriceFilter(): void {
+		this.pageIndex.set(1);
 		this.applyFilters();
 	}
 

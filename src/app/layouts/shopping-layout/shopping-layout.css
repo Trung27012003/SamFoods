@@ -288,6 +288,48 @@
     margin: 0 auto;
 }
 
+/* ===== Multi-keyword tag search (header) ===== */
+.kw-tag-search {
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    min-height: 32px;
+    max-width: 480px;
+    width: 100%;
+}
+
+.kw-tag-search:focus-within {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.kw-tag-search .kw-tag-input {
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    min-width: 140px;
+    padding: 4px 0;
+}
+
+.kw-tag-search .kw-tag-input:focus {
+    box-shadow: none;
+}
+
+.kw-tag-search ::ng-deep .ant-tag {
+    margin: 0;
+    padding: 2px 8px;
+    background: #e6f7ff;
+    border-color: #91d5ff;
+    color: #1890ff;
+    display: inline-flex;
+    align-items: center;
+}
+
+.kw-tag-search ::ng-deep .ant-tag-close-icon {
+    margin-left: 4px;
+}
+
 /* ===== Mobile responsive ===== */
 
 /* Mobile header bar (hidden on desktop) */

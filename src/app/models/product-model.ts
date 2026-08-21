@@ -1,6 +1,10 @@
+export interface ProductCategoryRef {
+	ID: number;
+	CategoryName: string;
+}
+
 export interface ProductModel {
 	ID: number;
-	CategoryID: number;
 	ProductCode: string;
 	ProductName: string;
 	Descriptions: string;
@@ -13,6 +17,11 @@ export interface ProductModel {
 
 	STT: number;
 	Status: number;
+
+	// N-N categories
+	CategoryIDs?: number[];
+	CategoryNames?: string[];
+	CategoryList?: ProductCategoryRef[];
 
 	productIngres: any[];
 	productProcess: any[];

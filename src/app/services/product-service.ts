@@ -7,7 +7,9 @@ import { Router } from '@angular/router';
 
 export interface ProductsFilter {
 	keyword?: string;
+	keywords?: string[];
 	categoryID?: number | null;
+	categoryIDs?: string; // CSV - danh sách ID (bao gồm children nếu user chọn parent)
 	status?: number | null;
 	minPrice?: number | null;
 	maxPrice?: number | null;
@@ -15,6 +17,14 @@ export interface ProductsFilter {
 	sortBy?: 'newest' | 'price_asc' | 'price_desc' | 'name_asc';
 	pageIndex?: number;
 	pageSize?: number;
+}
+
+// Response mới từ server: {total, pageIndex, pageSize, data}
+export interface ProductsPagedResponse {
+	total: number;
+	pageIndex: number;
+	pageSize: number;
+	data: any[];
 }
 
 @Injectable({
@@ -35,10 +45,19 @@ export class ProductService {
 
 	constructor(private http: HttpClient) { }
 
-	getData(keyword: any = '', params?: ProductsFilter): Observable<any> {
+	getData(keyword: any = '', params?: ProductsFilter): Observable<ProductsPagedResponse> {
 		let httpParams = new HttpParams().set('keyword', keyword);
 		if (params) {
-			if (params.categoryID != null) httpParams = httpParams.set('categoryID', params.categoryID.toString());
+			// Multi-keyword (array) -> join space, gửi qua 'keyword' (string) để tương thích controller
+			if (params.keywords && params.keywords.length > 0) {
+				const joined = params.keywords.join(' ').trim();
+				if (joined) httpParams = httpParams.set('keyword', joined);
+			}
+			if (params.categoryIDs && params.categoryIDs.trim() !== '') {
+				httpParams = httpParams.set('categoryIDs', params.categoryIDs);
+			} else if (params.categoryID != null) {
+				httpParams = httpParams.set('categoryIDs', params.categoryID.toString());
+			}
 			if (params.status != null) httpParams = httpParams.set('status', params.status.toString());
 			if (params.minPrice != null) httpParams = httpParams.set('minPrice', params.minPrice.toString());
 			if (params.maxPrice != null) httpParams = httpParams.set('maxPrice', params.maxPrice.toString());
@@ -50,7 +69,7 @@ export class ProductService {
 		return this.http.get<any>(this.url, { params: httpParams });
 	}
 
-	getProductsPaged(filter: ProductsFilter): Observable<any> {
+	getProductsPaged(filter: ProductsFilter): Observable<ProductsPagedResponse> {
 		return this.getData(filter.keyword ?? '', filter);
 	}
 

@@ -19,10 +19,13 @@
                 <div nz-col nzXs="20" nzSm="16" nzMd="16" nzLg="16">
                     <nz-form-item>
                         <nz-form-label nzRequired>Danh mục</nz-form-label>
-                        <nz-form-control nzErrorTip="Vui lòng chọn danh mục!">
+                        <nz-form-control nzErrorTip="Vui lòng chọn ít nhất 1 danh mục!">
                             <div class="d-flex gap-2 align-items-center">
-                                <nz-tree-select class="flex-grow-1" [nzNodes]="categoryNodes()" nzShowSearch nzPlaceHolder="-- Chọn danh mục --" nzVirtualHeight="20vh" nzDefaultExpandAll [nzDisplayWith]="displayCategory" formControlName="CategoryID">
-                                </nz-tree-select>
+                                <nz-select class="flex-grow-1" nzMode="multiple" nzShowSearch nzAllowClear nzPlaceHolder="-- Chọn danh mục (có thể chọn nhiều) --" [nzMaxTagCount]="3" formControlName="CategoryIDs">
+                                    @for (item of categoryList(); track item.ID) {
+                                    <nz-option [nzLabel]="item.CategoryName" [nzValue]="item.ID" />
+                                    }
+                                </nz-select>
                                 <button nz-button nzType="default" nzShape="circle" type="button" (click)="openQuickAddCategory()" title="Thêm nhanh danh mục">
                                     <i nz-icon nzType="plus"></i>
                                 </button>
