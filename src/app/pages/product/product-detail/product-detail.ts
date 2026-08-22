@@ -340,9 +340,25 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 	handleOk(): void {
 		if (this.validateForm.valid) {
 			const rawValue = this.validateForm.getRawValue();
+			
+			// Đảm bảo CategoryIDs luôn là mảng số
+			let parsedCategoryIDs: number[] = [];
+			if (Array.isArray(rawValue.CategoryIDs)) {
+				parsedCategoryIDs = rawValue.CategoryIDs.map((x: any) => Number(x)).filter((x: number) => x > 0);
+			} else if (typeof rawValue.CategoryIDs === 'string' && (rawValue.CategoryIDs as string).trim() !== '') {
+				parsedCategoryIDs = (rawValue.CategoryIDs as string).split(',').map(x => Number(x.trim())).filter(x => !Number.isNaN(x) && x > 0);
+			}
+
+			// Đảm bảo UnitPrice là số (nếu có dấu phẩy từ grid format)
+			let parsedUnitPrice: any = rawValue.UnitPrice;
+			if (typeof parsedUnitPrice === 'string') {
+				parsedUnitPrice = Number(parsedUnitPrice.replace(/,/g, ''));
+			}
+
 			const data = {
 				...rawValue,
-				CategoryIDs: Array.isArray(rawValue.CategoryIDs) ? rawValue.CategoryIDs.map((x: any) => Number(x)).filter((x: number) => x > 0) : [],
+				UnitPrice: parsedUnitPrice,
+				CategoryIDs: parsedCategoryIDs,
 				ProductIngredients: [],
 				ProductProcessingRecipes: [],
 				ProductCategories: []

@@ -256,11 +256,15 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 	loadNewProducts() {
 		this.productService.getData().subscribe({
 			next: (res) => {
-				Promise.resolve().then(() => {
-					// Get 10 newest products
-					const products = (res.data || []).slice(0, 10);
-					this.newProducts.set(products);
-				});
+				// getData() trả về {total, pageIndex, pageSize, data: [...]} — lấy .data
+				const payload = (res as any);
+				const list: any[] = Array.isArray(payload?.data?.data)
+					? payload.data.data
+					: Array.isArray(payload?.data)
+						? payload.data
+						: [];
+				// Lấy 10 sản phẩm mới nhất
+				this.newProducts.set(list.slice(0, 10));
 			},
 			error: (err) => console.error(err)
 		});

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -61,7 +61,7 @@ export class ProductsList implements OnInit {
 
 	searchKeywords = signal<string[]>([]);
 	currentKeywordInput = signal('');
-	selectedCategoryID = signal<number | null>(null);
+	selectedCategoryIDs = signal<number[]>([]);
 	minPrice = signal<number | null>(null);
 	maxPrice = signal<number | null>(null);
 	sortBy = signal<SortBy>('newest');
@@ -75,6 +75,10 @@ export class ProductsList implements OnInit {
 
 	categoryTree = signal<NzTreeNodeOptions[]>([]);
 
+	// Computed: chuyển selectedCategoryIDs sang string[] để bind nz-tree-select
+	// Dùng computed thay vì .map() trong template để tránh vòng lặp vô hạn
+	selectedCategoryKeys = computed(() => this.selectedCategoryIDs().map(id => id.toString()));
+
 	isFilterDrawerOpen = signal(false);
 
 	sortOptions: { label: string; value: SortBy }[] = [
@@ -83,6 +87,9 @@ export class ProductsList implements OnInit {
 		{ label: 'Giá giảm dần', value: 'price_desc' },
 		{ label: 'Tên A-Z', value: 'name_asc' }
 	];
+
+	private categoriesLoaded = false;
+	private pendingApplyFilters = false;
 
 	ngOnInit(): void {
 		this.loadCategories();
@@ -103,12 +110,16 @@ export class ProductsList implements OnInit {
 			if (categoryParam) {
 				const catId = Number(categoryParam);
 				if (!Number.isNaN(catId)) {
-					this.selectedCategoryID.set(catId);
+					this.selectedCategoryIDs.set([catId]);
 				}
 			}
 
 			this.pageIndex.set(1);
-			this.applyFilters();
+			if (this.categoriesLoaded) {
+				this.applyFilters();
+			} else {
+				this.pendingApplyFilters = true;
+			}
 		});
 	}
 
@@ -117,6 +128,11 @@ export class ProductsList implements OnInit {
 			next: (res) => {
 				Promise.resolve().then(() => {
 					this.categoryTree.set(this.buildTreeOptions(res.data || []));
+					this.categoriesLoaded = true;
+					if (this.pendingApplyFilters) {
+						this.pendingApplyFilters = false;
+						this.applyFilters();
+					}
 				});
 			},
 			error: (err) => this.notifyError(err)
@@ -153,11 +169,17 @@ export class ProductsList implements OnInit {
 	}
 
 	private buildCategoryIDsForServer(): string | undefined {
-		const categoryId = this.selectedCategoryID();
-		if (categoryId == null) return undefined;
-		const ids = this.collectCategoryIds(categoryId, this.categoryTree());
-		if (ids.size === 0) return undefined;
-		return Array.from(ids).join(',');
+		const selectedIds = this.selectedCategoryIDs();
+		if (!selectedIds || selectedIds.length === 0) return undefined;
+		// Gom tất cả IDs (bao gồm children) của từng node được chọn
+		const allIds = new Set<number>();
+		for (const id of selectedIds) {
+			allIds.add(id);
+			const ids = this.collectCategoryIds(id, this.categoryTree());
+			ids.forEach(x => allIds.add(x));
+		}
+		if (allIds.size === 0) return undefined;
+		return Array.from(allIds).join(',');
 	}
 
 	applyFilters(): void {
@@ -187,7 +209,6 @@ export class ProductsList implements OnInit {
 					this.total.set(payload?.total ?? 0);
 					this.isLoading.set(false);
 					this.cdr.markForCheck();
-					this.cdr.detectChanges();
 				});
 			},
 			error: (err) => {
@@ -196,7 +217,6 @@ export class ProductsList implements OnInit {
 					this.total.set(0);
 					this.isLoading.set(false);
 					this.cdr.markForCheck();
-					this.cdr.detectChanges();
 					this.notifyError(err);
 				});
 			}
@@ -236,7 +256,7 @@ export class ProductsList implements OnInit {
 	clearFilters(): void {
 		this.searchKeywords.set([]);
 		this.currentKeywordInput.set('');
-		this.selectedCategoryID.set(null);
+		this.selectedCategoryIDs.set([]);
 		this.minPrice.set(null);
 		this.maxPrice.set(null);
 		this.sortBy.set('newest');
@@ -272,8 +292,19 @@ export class ProductsList implements OnInit {
 		this.applyFilters();
 	}
 
-	onCategoryChange(value: number | null): void {
-		this.selectedCategoryID.set(value);
+	onCategoryChange(value: any[] | null): void {
+		// nz-tree-select [nzMultiple]=true trả về string[] (keys) hoặc NzTreeNode[]
+		const raw = value || [];
+		const ids = raw
+			.map((v: any) => {
+				// Nếu là string/number → parse trực tiếp
+				if (typeof v === 'string' || typeof v === 'number') return Number(v);
+				// Nếu là NzTreeNode object → lấy .key hoặc .value
+				if (v && (v.key || v.value)) return Number(v.key ?? v.value);
+				return NaN;
+			})
+			.filter((v: number) => !Number.isNaN(v) && v > 0);
+		this.selectedCategoryIDs.set(ids);
 		this.pageIndex.set(1);
 		this.applyFilters();
 	}

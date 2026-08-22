@@ -139,7 +139,7 @@
                         <i nz-icon nzType="right"></i>
                     </a>
                 </div>
-                <p-carousel *ngIf="item.data.length" [value]="item.data" [numVisible]="6" [numScroll]="6" [circular]="true" [autoplayInterval]="categoryCarouselAutoplay" [responsiveOptions]="responsiveOptions" [showIndicators]="false">
+                <p-carousel *ngIf="item.data.length" [value]="item.data" [numVisible]="6" [numScroll]="6" [circular]="false" [autoplayInterval]="categoryCarouselAutoplay" [responsiveOptions]="bestSellerResponsiveOptions" [showIndicators]="false">
                     <!-- <ng-template let-product #catProductTpl> -->
                     <ng-template pTemplate="item" let-product>
                         <div class="product-card">

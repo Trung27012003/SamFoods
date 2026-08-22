@@ -36,7 +36,7 @@
 
         <div class="toolbar-meta mt-2 text-muted small">
             Tìm thấy <strong>{{ total() }}</strong> sản phẩm
-            @if (searchKeywords().length > 0 || selectedCategoryID() != null
+            @if (searchKeywords().length > 0 || selectedCategoryIDs().length > 0
             || minPrice() != null || maxPrice() != null) {
             <button nz-button nzType="link" nzSize="small" (click)="clearFilters()">
                 <nz-icon nzType="close-circle"></nz-icon> Xóa bộ lọc
@@ -126,7 +126,15 @@
 <ng-template #filterPanel>
     <div class="filter-section">
         <label class="filter-label">Danh mục</label>
-        <nz-tree-select style="width: 100%" [nzNodes]="categoryTree()" nzShowSearch nzHideUnMatched nzPlaceHolder="-- Tất cả danh mục --" [ngModel]="selectedCategoryID()" (ngModelChange)="onCategoryChange($event)">
+        <nz-tree-select
+            style="width: 100%"
+            [nzNodes]="categoryTree()"
+            nzShowSearch
+            nzHideUnMatched
+            [nzMultiple]="true"
+            nzPlaceHolder="-- Tất cả danh mục --"
+            [ngModel]="selectedCategoryKeys()"
+            (ngModelChange)="onCategoryChange($event)">
         </nz-tree-select>
 
     </div>

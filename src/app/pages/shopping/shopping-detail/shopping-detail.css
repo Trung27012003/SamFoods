@@ -230,6 +230,45 @@ nz-breadcrumb a {
     cursor: grabbing;
 }
 
+/* Nav Buttons for Image Slider */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.nav-btn:hover:not(:disabled) {
+    background-color: #fff;
+    color: var(--primary-color, #80001c);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.prev-btn {
+    left: 10px;
+}
+
+.next-btn {
+    right: 10px;
+}
+
 .main-image-container {
     width: 100%;
     overflow: hidden;

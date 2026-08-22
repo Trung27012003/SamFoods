@@ -172,6 +172,7 @@
     align-items: center;
     /* background-color: aqua; */
     padding: 0.25rem;
+    flex-grow: 0 !important;
 }
 
 .product-card {
@@ -726,4 +727,73 @@
     .footer-payments {
         justify-content: flex-start;
     }
+}
+
+/* =====================================================
+   SEARCH BAR IN HEADER (kw-tag-search)
+   Nằm trong p-megamenu-end — PrimeNG reset button styles
+   → phải dùng ::ng-deep để override
+   ===================================================== */
+
+/* Container tag + input */
+.kw-tag-search {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 3px 6px;
+    min-width: 0;
+    flex: 1 1 auto;
+    max-width: 380px;
+}
+
+/* Input ẩn border mặc định */
+.kw-tag-search .kw-tag-input {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    outline: none !important;
+    min-width: 80px;
+    padding: 0 4px;
+    font-size: 13px;
+    color: #333;
+    height: 24px;
+    line-height: 24px;
+}
+
+/* ::ng-deep fix button bên trong p-megamenu — PrimeNG reset all: unset */
+::ng-deep .p-megamenu-end .kw-tag-search button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    border-radius: 50% !important;
+    padding: 4px !important;
+    line-height: 1 !important;
+    transition: all 0.2s !important;
+    font-size: 14px !important;
+}
+
+/* Button X (nzType="text") */
+::ng-deep .p-megamenu-end .kw-tag-search button[title="Xóa tất cả"] {
+    border: none !important;
+    background: transparent !important;
+    color: #999 !important;
+}
+::ng-deep .p-megamenu-end .kw-tag-search button[title="Xóa tất cả"]:hover {
+    background: rgba(0,0,0,0.06) !important;
+    color: #333 !important;
+}
+
+/* Button Search (nzType="primary") */
+::ng-deep .p-megamenu-end .kw-tag-search button[title="Tìm kiếm"] {
+    border: none !important;
+    background: var(--primary-color, #80001c) !important;
+    color: #fff !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+}
+::ng-deep .p-megamenu-end .kw-tag-search button[title="Tìm kiếm"]:hover {
+    opacity: 0.85 !important;
 }

@@ -14,9 +14,11 @@
         <div class="card border-0 product-image w-100 w-md-50">
 
             <div class="product-image-wrapper" (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)">
-                <button class="nav-btn prev-btn" (click)="prevImage()" [disabled]="currentImageIndex() === 0">
+                @if (productImages().length > 1) {
+                <button class="nav-btn prev-btn" (click)="prevImage()" [disabled]="currentImageIndex() === 0" aria-label="Ảnh trước">
 					<i nz-icon nzType="left"></i>
 				</button>
+                }
 
                 <div class="main-image-container" [class.dragging]="isDragging()">
                     @if (productImages().length > 0) {
@@ -31,6 +33,12 @@
                     <div class="no-image-placeholder">Không có ảnh</div>
                     }
                 </div>
+
+                @if (productImages().length > 1) {
+                <button class="nav-btn next-btn" (click)="nextImage()" [disabled]="currentImageIndex() === productImages().length - 1" aria-label="Ảnh sau">
+					<i nz-icon nzType="right"></i>
+				</button>
+                }
 
                 @if (productImages().length > 1) {
                 <div class="image-indicator-bars">

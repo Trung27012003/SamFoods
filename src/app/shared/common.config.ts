@@ -97,22 +97,23 @@ export function truncateText(text: string | null | undefined, maxLength: number)
 }
 
 // Helper: build full URL for product image.
-// Accepts either a relative path from DB (e.g. "/Product/SP001/img.jpg") or an already-absolute URL.
-// spGetProduct returns full relative path "api/shared/images/product/..." — strip that to avoid duplication.
+// Accepts either a relative path from DB (e.g. "Product/SP001/img.jpg") or an already-absolute URL.
+// spGetProduct (OUTER APPLY ProductImage) trả FileName dạng path tương đối → prefix với host.
 export function getProductImageUrl(path: string | null | undefined): string {
-	// if (!path) return '';
-	// if (/^https?:\/\//i.test(path)) return path;
+	if (!path) return '';
+	// Nếu đã là URL tuyệt đối (http/https) thì trả thẳng
+	if (/^https?:\/\//i.test(path)) return path;
 
-	// // Strip leading slash
-	// let clean = path.replace(/^\/+/, '');
+	// Bỏ dấu slash đầu nếu có
+	let clean = path.replace(/^\/+/, '');
 
-	// const doubledPrefix = 'api/shared/images/';
-	// if (clean.toLowerCase().startsWith(doubledPrefix)) {
-	// 	clean = clean.substring(doubledPrefix.length);
-	// }
+	// Tránh double prefix "api/shared/images/api/shared/images/"
+	const doubledPrefix = 'api/shared/images/';
+	if (clean.toLowerCase().startsWith(doubledPrefix)) {
+		clean = clean.substring(doubledPrefix.length);
+	}
 
-	// return `${environment.host}api/shared/images/${clean}`;
-  return path || '';
+	return `${environment.host}api/shared/images/${clean}`;
 }
 
 export function getStatusColor(status: number, statusMap: Record<number, string>): string {

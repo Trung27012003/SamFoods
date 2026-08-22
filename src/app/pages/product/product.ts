@@ -169,9 +169,11 @@ export class Product implements OnInit {
 	}
 
 	private parseCategoryNames(raw: any): string[] {
-		if (Array.isArray(raw)) return raw.filter((x: any) => x != null && x !== '');
-		if (raw == null || raw === '') return [];
-		return String(raw).split(',').map(x => x.trim()).filter(Boolean);
+		let names: string[] = [];
+		if (Array.isArray(raw)) names = raw.filter((x: any) => x != null && x !== '');
+		else if (raw == null || raw === '') names = [];
+		else names = String(raw).split(',').map(x => x.trim()).filter(Boolean);
+		return Array.from(new Set(names));
 	}
 
 	onSearch(value: string): void {

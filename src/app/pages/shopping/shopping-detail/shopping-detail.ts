@@ -52,6 +52,8 @@ export class ShoppingDetail implements OnInit {
 	productImages: any = model([]);
 	responsiveOptions: any[] = [];
 	currentImageIndex = signal(0);
+	realIndex = 1;
+	isWithoutTransition = false;
 	isDragging = signal(false);
 	private dragDeltaX = 0;
 	private dragWidth = 0;
