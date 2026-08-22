@@ -71,7 +71,10 @@ export class ShoppingCart implements OnInit {
 		if (e.key === CART_PRODUCT_KEY) this.loadShoppingCards();
 	};
 
-	private onCartUpdated = () => this.loadShoppingCards();
+	private onCartUpdated = (e: Event) => {
+		if ((e as CustomEvent).detail?.source === 'shopping-cart') return;
+		this.loadShoppingCards();
+	}
 
 	loadShoppingCards() {
 		let cartValue = localStorage.getItem(this.cartProductKey);
@@ -141,7 +144,7 @@ export class ShoppingCart implements OnInit {
 				if (invalidIds.length > 0) {
 					const cleaned = raw.filter(item => !invalidIds.includes(item.ProductID));
 					localStorage.setItem(this.cartProductKey, JSON.stringify(cleaned));
-					window.dispatchEvent(new CustomEvent('cartUpdated'));
+					window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { source: 'shopping-cart' } }));
 
 					this.notification.warning(
 						'Một số sản phẩm đã ngừng bán',
@@ -193,7 +196,7 @@ export class ShoppingCart implements OnInit {
 				remaining.map(({ ImageURL, ...rest }: any) => rest)
 			));
 			this.recalculateTotal();
-			window.dispatchEvent(new CustomEvent('cartUpdated'));
+			window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { source: 'shopping-cart' } }));
 			return;
 		}
 
@@ -205,7 +208,7 @@ export class ShoppingCart implements OnInit {
 			updated.map(({ ImageURL, ...rest }: any) => rest)
 		));
 		this.recalculateTotal();
-		window.dispatchEvent(new CustomEvent('cartUpdated'));
+		window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { source: 'shopping-cart' } }));
 	}
 
 	saveData() {
