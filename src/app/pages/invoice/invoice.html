@@ -1,5 +1,10 @@
-<app-admin-page-header title="Quản lý Đơn hàng" subtitle="Theo dõi và xử lý đơn hàng của khách" [breadcrumbs]="['Quản lý', 'Đơn hàng']">
+<app-admin-page-header title="Quản lý Đơn hàng" subtitle="Theo dõi và xử lý đơn hàng của khách"
+    [breadcrumbs]="['Quản lý', 'Đơn hàng']">
     <div actions class="d-flex gap-2">
+        <button nz-button nzType="default" (click)="onPrintInvoices()" [disabled]="!selectedItems.length">
+            <i class="fa-solid fa-print me-1"></i>
+            In hoá đơn{{ selectedItems.length ? ' (' + selectedItems.length + ')' : '' }}
+        </button>
         <button nz-button nzType="default" (click)="onViewDetail()" [disabled]="!selectedItemRaw?.ID">
             <i class="fa-solid fa-eye me-1"></i>
             Xem chi tiết
@@ -8,7 +13,8 @@
             <i class="fa-solid fa-pen me-1"></i>
             Sửa
         </button>
-        <button nz-button nzType="default" nz-dropdown [nzDropdownMenu]="statusMenu" nzTrigger="click" [disabled]="!hasSelection">
+        <button nz-button nzType="default" nz-dropdown [nzDropdownMenu]="statusMenu" nzTrigger="click"
+            [disabled]="!hasSelection">
             <i class="fa-solid fa-arrows-rotate me-1"></i>
             Đổi trạng thái
             <i class="fa-solid fa-caret-down ms-1"></i>
@@ -43,24 +49,38 @@
 </app-admin-list-toolbar>
 
 <div class="invoice-summary">
-    <span class="chip processing" (click)="onStatusChange(0)" role="button">Mới: <b>{{ stats()?.NewCount ?? 0 }}</b></span>
-    <span class="chip warning" (click)="onStatusChange(2)" role="button">Đang giao: <b>{{ stats()?.ShippingCount ?? 0 }}</b></span>
-    <span class="chip success" (click)="onStatusChange(3)" role="button">Hoàn thành: <b>{{ stats()?.CompletedCount ?? 0 }}</b></span>
-    <span class="chip error" (click)="onStatusChange(4)" role="button">Đã huỷ: <b>{{ stats()?.CancelledCount ?? 0 }}</b></span>
+    <span class="chip processing" (click)="onStatusChange(0)" role="button">Mới: <b>{{ stats()?.NewCount ?? 0
+            }}</b></span>
+    <span class="chip warning" (click)="onStatusChange(2)" role="button">Đang giao: <b>{{ stats()?.ShippingCount ?? 0
+            }}</b></span>
+    <span class="chip success" (click)="onStatusChange(3)" role="button">Hoàn thành: <b>{{ stats()?.CompletedCount ?? 0
+            }}</b></span>
+    <span class="chip error" (click)="onStatusChange(4)" role="button">Đã huỷ: <b>{{ stats()?.CancelledCount ?? 0
+            }}</b></span>
     <span class="chip revenue">Doanh Thu tháng: <b>{{ stats()?.MonthRevenue ?? 0 | currencyVnd }}</b></span>
 </div>
 
 <div class="admin-card p-0">
-    <p-table size="small" [columns]="cols" [value]="invoices" [tableStyle]="{ 'min-width': '80rem' }" [loading]="isLoadingData()" selectionMode="single" [(selection)]="selectedItem" (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)" [scrollable]="true" scrollHeight="calc(100vh - 360px)" showGridlines [paginator]="true" [rows]="20" [rowsPerPageOptions]="[10, 20, 50, 100]">
+    <p-table size="small" [columns]="cols" [value]="invoices" [loading]="isLoadingData()"
+        [(selection)]="selectedItems" dataKey="ID"
+        (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)"
+        showGridlines [paginator]="true" [rows]="20" [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [paginatorDropdownAppendTo]="'body'">
         <ng-template #header let-columns>
             <tr>
+                <th style="width: 45px; text-align: center;">
+                    <p-tableHeaderCheckbox />
+                </th>
                 @for (col of columns; track col) {
                 <th>{{ col.header }}</th>
                 }
             </tr>
         </ng-template>
         <ng-template #body let-rowData let-columns="columns">
-            <tr [pSelectableRow]="rowData" (dblclick)="onEdit()">
+            <tr (click)="onRowClick(rowData)" (dblclick)="onEdit()">
+                <td style="text-align: center;" (click)="$event.stopPropagation()">
+                    <p-tableCheckbox [value]="rowData" />
+                </td>
                 @for (col of columns; track col) {
                 <td>
                     @if (col.field === 'StatusName') {
@@ -78,10 +98,81 @@
         </ng-template>
         <ng-template #emptymessage>
             <tr>
-                <td [attr.colspan]="cols.length" class="text-center p-4">
+                <td [attr.colspan]="cols.length + 1" class="text-center p-4">
                     <nz-empty nzNotFoundContent="Không có đơn hàng nào"></nz-empty>
                 </td>
             </tr>
         </ng-template>
     </p-table>
+</div>
+
+<!-- Print receipt container -->
+<div id="thermal-print-section" class="print-only">
+  @for (invoice of printInvoices; track invoice.BillCode) {
+    <div class="thermal-receipt">
+      <div class="store-name">{{ storeName }}</div>
+      <div class="store-address">{{ storeAddress }}</div>
+      <div class="store-address" *ngIf="storePhone">Hotline: {{ storePhone }}</div>
+      
+      <div class="receipt-title">HÓA ĐƠN BÁN HÀNG</div>
+      
+      <div class="receipt-meta">
+        <div class="meta-row">
+          <span>Số: <strong>{{ invoice.BillCode }}</strong></span>
+          <span>Ngày: {{ formatDate(invoice.BillDate) }}</span>
+        </div>
+        <div class="meta-row">
+          <span>Khách hàng: {{ invoice.CustomerName || 'Khách lẻ' }}</span>
+        </div>
+        <div class="meta-row" *ngIf="invoice.PhoneNumber">
+          <span>SĐT: {{ invoice.PhoneNumber }}</span>
+        </div>
+        <div class="meta-row" *ngIf="invoice.Address">
+          <span>Địa chỉ: {{ invoice.Address }}</span>
+        </div>
+      </div>
+      
+      <div class="receipt-divider"></div>
+      
+      <table class="receipt-table">
+        <thead>
+          <tr>
+            <th class="col-qty">SL</th>
+            <th class="col-price">Đơn giá</th>
+            <th class="col-total">Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of invoice.InvoiceDetails; track $index) {
+            <!-- Product name occupies full width -->
+            <tr class="product-name-row">
+              <td colspan="3">{{ item.ProductName || item.ProductCode || ('SP #' + item.ProductID) }}</td>
+            </tr>
+            <!-- Product details column metrics below -->
+            <tr class="product-details-row">
+              <td class="col-qty">{{ item.Quantity }}</td>
+              <td class="col-price">{{ formatNumber(item.UnitPrice) }}</td>
+              <td class="col-total">{{ formatNumber(item.Quantity * item.UnitPrice) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      
+      <div class="receipt-divider"></div>
+      
+      <div class="receipt-summary">
+        <div class="summary-row">
+          <span class="summary-label">Cộng tiền hàng</span>
+          <span class="summary-value">{{ formatNumber(invoice.TotalAmount) }}</span>
+        </div>
+      </div>
+      
+      <div class="receipt-divider"></div>
+      
+      <div class="receipt-footer">
+        <div>CẢM ƠN QUÝ KHÁCH VÀ HẸN GẶP LẠI</div>
+        <div class="footer-hotline" *ngIf="storePhone">Hotline: {{ storePhone }}</div>
+      </div>
+    </div>
+  }
 </div>

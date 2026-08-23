@@ -106,3 +106,21 @@
 .chip.revenue b {
     color: inherit;
 }
+
+/* Table container: allow paginator dropdown to overflow */
+:host ::ng-deep .admin-card .p-datatable-table-container {
+    overflow-x: auto;
+}
+
+:host ::ng-deep .admin-card .p-paginator {
+    overflow: visible;
+}
+
+:host ::ng-deep .admin-card .p-paginator .p-select-overlay {
+    z-index: 1100;
+}
+
+/* Screen styling: hide print container */
+#thermal-print-section {
+  display: none;
+}

@@ -138,9 +138,9 @@ export class Shopping {
   ];
 
 
-  // shoppingNumber = 5;
   isVisibleShopingCard = false;
   shopingCarts: any[] = [];
+  productQuantities: { [key: number]: number } = {};
 
   ngOnInit(): void {
     this.initMenuItems();
@@ -405,7 +405,7 @@ export class Shopping {
       },
       {
         breakpoint: '575px',
-        numVisible: 1,
+        numVisible: 2,
         numScroll: 1
       }
     ];
@@ -433,8 +433,8 @@ export class Shopping {
       },
       {
         breakpoint: '575px',
-        numVisible: 1,
-        numScroll: 1
+        numVisible: 2,
+        numScroll: 2
       }
     ];
   }
@@ -537,6 +537,34 @@ export class Shopping {
       UnitPrice: item.UnitPrice,
       Quantity: 1,
     });
+  }
+
+  getProductQty(productId: number): number {
+    return this.productQuantities[productId] ?? 1;
+  }
+
+  increaseQty(product: any) {
+    const current = this.getProductQty(product.ID);
+    this.productQuantities[product.ID] = current + 1;
+  }
+
+  decreaseQty(product: any) {
+    const current = this.getProductQty(product.ID);
+    if (current > 1) {
+      this.productQuantities[product.ID] = current - 1;
+    }
+  }
+
+  onAddToCartWithQty(item: any) {
+    const qty = this.getProductQty(item.ID);
+    this.productService.onAddToCart({
+      ID: item.ID,
+      ProductName: item.ProductName,
+      UnitPrice: item.UnitPrice,
+      Quantity: qty,
+    });
+    // Reset back to 1
+    this.productQuantities[item.ID] = 1;
   }
 
   onSearch() {

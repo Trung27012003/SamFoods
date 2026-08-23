@@ -20,6 +20,7 @@
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@primeuix/themes": "^2.0.3",
     "bootstrap": "^5.3.8",
+    "jspdf": "^4.2.1",
     "ng-zorro-antd": "^21.2.1",
     "primeicons": "^7.0.0",
     "primeng": "^21.1.5",

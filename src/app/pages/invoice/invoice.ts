@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
@@ -9,6 +10,7 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { TableModule } from 'primeng/table';
 
 import { InvoiceService } from '../../services/invoice-service';
+import { SiteSettingsStore } from '../../shared/site-settings';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { ColumnTable } from '../../models/column-table';
@@ -19,7 +21,8 @@ import {
 	NOTIFICATION_TYPE_MAP,
 	RESPONSE_STATUS,
 	formatCurrency,
-	formatDateTime
+	formatDateTime,
+	formatDate
 } from '../../shared/common.config';
 import { AdminPageHeader, AdminListToolbar, AdminStatusTag, AdminStatusColor, CurrencyVndPipe } from '../../shared';
 
@@ -52,12 +55,15 @@ interface StatusOption {
 })
 export class Invoice implements OnInit {
 	private invoiceService = inject(InvoiceService);
+	private siteSettings = inject(SiteSettingsStore);
 	private modal = inject(NzModalService);
 	private notification = inject(NzNotificationService);
 	private cdr = inject(ChangeDetectorRef);
 
 	invoices: any[] = [];
 	invoicesRaw: any[] = [];
+	selectedItems: any[] = [];
+	printInvoices: any[] = [];
 
 	isLoadingData = signal(false);
 	isLoadingModal = signal(false);
@@ -229,6 +235,87 @@ export class Invoice implements OnInit {
 
 	onRowUnselect(event: any): void {
 		this.selectedItemRaw = {};
+	}
+
+	onRowClick(rowData: any): void {
+		this.selectedItem = rowData;
+		this.selectedItemRaw = this.invoicesRaw.find(i => i.ID === rowData.ID) || rowData;
+	}
+
+	onPrintInvoices(): void {
+		if (!this.selectedItems.length) {
+			this.notification.warning('Thông báo', 'Vui lòng chọn ít nhất 1 đơn hàng để in!');
+			return;
+		}
+
+		const ids = this.selectedItems.map((item: any) => item.ID).filter(Boolean);
+		if (ids.length === 0) return;
+
+		this.notification.info('Đang xử lý', `Đang tải chi tiết ${ids.length} đơn hàng...`);
+
+		const requests = ids.map((id: number) => this.invoiceService.getByID(id));
+		forkJoin(requests).subscribe({
+			next: (results: any[]) => {
+				const printDataList = results.map((res: any) => {
+					const payload = res?.data ?? {};
+					const invoice = payload.invoice ?? payload;
+					const details = payload.details ?? invoice?.InvoiceDetails ?? [];
+					return {
+						...invoice,
+						InvoiceDetails: details
+					};
+				});
+
+				this.printInvoices = printDataList;
+				this.cdr.detectChanges();
+
+				setTimeout(() => {
+					const printContent = document.getElementById('thermal-print-section');
+					if (printContent) {
+						const printClone = printContent.cloneNode(true) as HTMLElement;
+						printClone.id = 'thermal-print-section-clone';
+						document.body.appendChild(printClone);
+						
+						window.print();
+						
+						document.body.removeChild(printClone);
+					}
+					this.printInvoices = [];
+					this.cdr.detectChanges();
+				}, 300);
+
+				this.notification.success('Thành công', `Đã mở hộp thoại in cho ${printDataList.length} đơn hàng.`);
+			},
+			error: (err: any) => {
+				this.notification.create(
+					NOTIFICATION_TYPE_MAP[err.status] || 'error',
+					NOTIFICATION_TITLE_MAP[err.status as RESPONSE_STATUS] || 'Lỗi',
+					err?.error?.message || 'Không thể tải chi tiết đơn hàng để in.',
+					{ nzStyle: { whiteSpace: 'pre-line' } }
+				);
+			}
+		});
+	}
+
+	get storeName(): string {
+		return this.siteSettings.get('store_name', 'Cửa Hàng Đông Lạnh Thắng Thủy');
+	}
+
+	get storeAddress(): string {
+		return this.siteSettings.get('contact_address', 'Số 26, đường Bệnh Viện Hoài Đức, xã Đức Giang - Hoài Đức - Hà Nội');
+	}
+
+	get storePhone(): string {
+		return this.siteSettings.get('contact_phone_1', '0982545484');
+	}
+
+	formatDate(date: any): string {
+		return formatDate(date);
+	}
+
+	formatNumber(value: number | null | undefined): string {
+		if (value == null || isNaN(value)) return '0';
+		return new Intl.NumberFormat('vi-VN').format(value);
 	}
 
 	openModal(data: any, mode: 'view' | 'edit'): void {

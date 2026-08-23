@@ -103,7 +103,7 @@
     <!-- ===========================
          RIGHT: FORM THANH TOÁN
          =========================== -->
-    <div class="cart-right">
+    <ng-template #checkoutTpl>
       <div class="order-summary">
 
         <div class="summary-header">
@@ -168,10 +168,14 @@
             THANH TOÁN
           </button>
 
-          <a routerLink="/home" class="link-continue">← Tiếp tục mua hàng</a>
+          <a *ngIf="!isMobileCheckoutVisible" routerLink="/home" class="link-continue">← Tiếp tục mua hàng</a>
         </form>
 
       </div>
+    </ng-template>
+
+    <div class="cart-right">
+      <ng-container *ngTemplateOutlet="checkoutTpl"></ng-container>
     </div><!-- /cart-right -->
 
   </div><!-- /cart-layout -->
@@ -185,10 +189,23 @@
       <span class="mobile-bar-label">Tổng cộng</span>
       <strong class="mobile-bar-total">{{ totalAmount() | number }} VND</strong>
     </div>
-    <button class="mobile-bar-btn" (click)="saveData()">
+    <button class="mobile-bar-btn" (click)="openMobileCheckout()">
       THANH TOÁN
     </button>
   </div>
+
+  <!-- Mobile Checkout Drawer -->
+  <nz-drawer
+    [nzVisible]="isMobileCheckoutVisible"
+    nzPlacement="bottom"
+    [nzHeight]="'auto'"
+    [nzClosable]="true"
+    [nzBodyStyle]="{ padding: '0' }"
+    (nzOnClose)="closeMobileCheckout()">
+    <ng-container *nzDrawerContent>
+      <ng-container *ngTemplateOutlet="checkoutTpl"></ng-container>
+    </ng-container>
+  </nz-drawer>
 
   }
 </div>

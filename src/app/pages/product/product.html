@@ -50,12 +50,14 @@
 		[scrollable]="true"
 		scrollHeight="calc(100vh - 360px)"
 		showGridlines
+		[paginator]="true"
 		[lazy]="true"
 		[totalRecords]="totalRecords()"
 		[rows]="pageSize()"
 		[first]="(pageIndex() - 1) * pageSize()"
 		[rowsPerPageOptions]="[10, 20, 50, 100]"
-		(onPage)="onPageChange($event)">
+		(onPage)="onPageChange($event)"
+		[paginatorDropdownAppendTo]="'body'">
 		<ng-template #header let-columns>
 			<tr>
 				@for (col of columns; track col) {

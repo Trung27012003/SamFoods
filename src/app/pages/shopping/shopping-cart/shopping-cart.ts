@@ -11,6 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InvoiceDetailModel } from '../../../models/invoice-detail-model';
 import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { InvoiceService } from '../../../services/invoice-service';
 import { ProductService } from '../../../services/product-service';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -30,6 +31,7 @@ import { CART_PRODUCT_KEY, FAVOURITE_KEY, NOTIFICATION_TITLE_MAP, NOTIFICATION_T
 		InputNumberModule,
 		NzFormModule,
 		NzInputModule,
+		NzDrawerModule,
 		RouterLink
 	],
 	templateUrl: './shopping-cart.html',
@@ -47,6 +49,7 @@ export class ShoppingCart implements OnInit {
 	shopingCarts = signal<InvoiceDetailModel[]>([]);
 	totalAmount = signal<number>(0);
 	loading = signal<boolean>(true);
+	isMobileCheckoutVisible = false;
 
 	validateForm = this.formBuilder.group({
 		CustomerName: this.formBuilder.control('', [Validators.required, Validators.minLength(2)]),
@@ -268,5 +271,13 @@ export class ShoppingCart implements OnInit {
 				}
 			});
 		}
+	}
+
+	openMobileCheckout() {
+		this.isMobileCheckoutVisible = true;
+	}
+
+	closeMobileCheckout() {
+		this.isMobileCheckoutVisible = false;
 	}
 }

@@ -72,6 +72,7 @@ export class ProductsList implements OnInit {
 	pagedProducts = signal<any[]>([]);
 	total = signal(0);
 	isLoading = signal(false);
+	productQuantities: { [key: number]: number } = {};
 
 	categoryTree = signal<NzTreeNodeOptions[]>([]);
 
@@ -336,6 +337,35 @@ export class ProductsList implements OnInit {
 			Quantity: 1
 		});
 		this.notification.success('Thành công', `Đã thêm "${item.ProductName}" vào giỏ hàng`);
+	}
+
+	getProductQty(productId: number): number {
+		return this.productQuantities[productId] ?? 1;
+	}
+
+	increaseQty(product: any): void {
+		const current = this.getProductQty(product.ID);
+		this.productQuantities[product.ID] = current + 1;
+	}
+
+	decreaseQty(product: any): void {
+		const current = this.getProductQty(product.ID);
+		if (current > 1) {
+			this.productQuantities[product.ID] = current - 1;
+		}
+	}
+
+	onAddToCartWithQty(item: any): void {
+		const qty = this.getProductQty(item.ID);
+		this.productService.onAddToCart({
+			ID: item.ID,
+			ProductName: item.ProductName,
+			UnitPrice: item.UnitPrice,
+			Quantity: qty
+		});
+		this.notification.success('Thành công', `Đã thêm ${qty} "${item.ProductName}" vào giỏ hàng`);
+		// Reset back to 1
+		this.productQuantities[item.ID] = 1;
 	}
 
 	isFavourite(item: any): boolean {

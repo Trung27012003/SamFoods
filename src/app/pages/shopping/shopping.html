@@ -51,6 +51,19 @@
                                         </a>
                                     </div>
                                 </div>
+                                
+                                <!-- Qty & Add to Cart -->
+                                <div class="product-actions mt-3">
+                                    <div class="qty-selector d-flex align-items-center mb-2">
+                                        <button class="btn-qty-dec" (click)="decreaseQty(product)">-</button>
+                                        <input type="number" class="input-qty flex-grow-1 text-center" [value]="getProductQty(product.ID)" readonly />
+                                        <button class="btn-qty-inc" (click)="increaseQty(product)">+</button>
+                                    </div>
+                                    <button class="btn-buy-now" (click)="onAddToCartWithQty(product)">
+                                        <i nz-icon nzType="shopping-cart" class="me-1"></i>
+                                        Thêm vào giỏ
+                                    </button>
+                                </div>
                             </div>
                         </div>
                 </div>
@@ -121,6 +134,19 @@
                                     </a>
                                 </div>
                             </div>
+                            
+                            <!-- Qty & Add to Cart -->
+                            <div class="product-actions mt-3">
+                                <div class="qty-selector d-flex align-items-center mb-2">
+                                    <button class="btn-qty-dec" (click)="decreaseQty(product)">-</button>
+                                    <input type="number" class="input-qty flex-grow-1 text-center" [value]="getProductQty(product.ID)" readonly />
+                                    <button class="btn-qty-inc" (click)="increaseQty(product)">+</button>
+                                </div>
+                                <button class="btn-buy-now" (click)="onAddToCartWithQty(product)">
+                                    <i nz-icon nzType="shopping-cart" class="me-1"></i>
+                                    Thêm vào giỏ
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </ng-template>
@@ -162,6 +188,19 @@
                                             <i nz-icon nzType="heart"></i>
                                         </a>
                                     </div>
+                                </div>
+                                
+                                <!-- Qty & Add to Cart -->
+                                <div class="product-actions mt-3">
+                                    <div class="qty-selector d-flex align-items-center mb-2">
+                                        <button class="btn-qty-dec" (click)="decreaseQty(product)">-</button>
+                                        <input type="number" class="input-qty flex-grow-1 text-center" [value]="getProductQty(product.ID)" readonly />
+                                        <button class="btn-qty-inc" (click)="increaseQty(product)">+</button>
+                                    </div>
+                                    <button class="btn-buy-now" (click)="onAddToCartWithQty(product)">
+                                        <i nz-icon nzType="shopping-cart" class="me-1"></i>
+                                        Thêm vào giỏ
+                                    </button>
                                 </div>
                             </div>
                         </div>
