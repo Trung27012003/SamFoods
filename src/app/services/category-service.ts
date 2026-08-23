@@ -44,4 +44,8 @@ export class CategoryService {
 		// formData.append('ProductImageRemoves', productImageRemoves.toString());
 		return this.http.post<any>(`${this.url}/upload-file`, formData);
 	}
+
+	delete(id: number): Observable<any> {
+		return this.http.delete<any>(`${this.url}/${id}`);
+	}
 }

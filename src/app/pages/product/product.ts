@@ -284,7 +284,11 @@ export class Product implements OnInit {
 		this.openModal(null, false);
 	}
 
-	onEdit(): void {
+	onEdit(item?: any): void {
+		if (item) {
+			this.selectedItem = item;
+			this.selectedItemRaw = this.products.find(p => p.ID === item.ID) || item;
+		}
 		if (!this.selectedItem?.ID) {
 			this.notification.warning('Thông báo', 'Vui lòng chọn một sản phẩm để sửa!');
 			return;

@@ -205,20 +205,20 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 	initMenuItems() {
 		const baseItems: MegaMenuItem[] = [
 			{
-				label: 'Hàng mới',
+				label: 'Trang chủ',
 				command: () => {
 					this.router.navigate(['/home']);
 				}
 			},
 			{
-				label: 'Tất cả sản phẩm',
+				label: 'Sản phẩm',
 				command: () => {
 					this.router.navigate(['/products']);
 				}
 			},
-			{
-				label: 'Bán chạy',
-			},
+			// {
+			// 	label: 'Bán chạy',
+			// },
 		];
 		this.megaMenuItems.set(baseItems);
 

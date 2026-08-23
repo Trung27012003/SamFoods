@@ -142,7 +142,11 @@ export class Banner implements OnInit {
 		this.openModal(null, false);
 	}
 
-	onEdit(): void {
+	onEdit(item?: any): void {
+		if (item) {
+			this.selectedItem = item;
+			this.selectedItemRaw = this.bannersOriginal.find(b => b.ID === item.ID) || item;
+		}
 		if (!this.selectedItem?.ID) {
 			this.notification.warning('Thông báo', 'Vui lòng chọn một banner để sửa!');
 			return;

@@ -60,7 +60,7 @@ export class Welcome implements OnInit {
 
 	loadProductCount(): void {
 		this.productService.getData().subscribe({
-			next: (res) => this.updateKpi('Tổng sản phẩm', (res.data || []).length),
+			next: (res: any) => this.updateKpi('Tổng sản phẩm', res?.data.total ?? 0),
 			error: () => this.updateKpi('Tổng sản phẩm', 0)
 		});
 	}

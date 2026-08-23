@@ -181,7 +181,10 @@ export class Promtion implements OnInit {
 		this.openModal(null);
 	}
 
-	onEdit(): void {
+	onEdit(item?: any): void {
+		if (item) {
+			this.selectedItem = item;
+		}
 		if (!this.selectedItem?.ID) {
 			this.notification.warning('Thông báo', 'Vui lòng chọn một khuyến mại để sửa!');
 			return;

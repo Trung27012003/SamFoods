@@ -154,9 +154,9 @@ export class Shopping {
       {
         label: 'Hàng mới',
       },
-      {
-        label: 'Bán chạy',
-      },
+      // {
+      //   label: 'Bán chạy',
+      // },
       // {
       // 	label: 'Sports',
       // 	// icon: 'pi pi-clock',
@@ -537,6 +537,7 @@ export class Shopping {
       UnitPrice: item.UnitPrice,
       Quantity: 1,
     });
+    this.notification.success('Thành công', `Đã thêm "${item.ProductName}" vào giỏ hàng`);
   }
 
   getProductQty(productId: number): number {
@@ -563,6 +564,7 @@ export class Shopping {
       UnitPrice: item.UnitPrice,
       Quantity: qty,
     });
+    this.notification.success('Thành công', `Đã thêm ${qty} "${item.ProductName}" vào giỏ hàng`);
     // Reset back to 1
     this.productQuantities[item.ID] = 1;
   }

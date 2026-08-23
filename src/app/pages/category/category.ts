@@ -197,7 +197,10 @@ export class Category implements OnInit {
 		this.openModal(null, false);
 	}
 
-	onEdit(): void {
+	onEdit(node?: any): void {
+		if (node) {
+			this.selectedNode = node;
+		}
 		if (!this.selectedNode?.data) {
 			this.notification.warning('Thông báo', 'Vui lòng chọn một danh mục để sửa!');
 			return;
@@ -231,6 +234,45 @@ export class Category implements OnInit {
 						this.notification.success(
 							NOTIFICATION_TITLE_MAP[res.status as RESPONSE_STATUS],
 							res.message
+						);
+					}
+				});
+			},
+			nzCancelText: 'Hủy'
+		});
+	}
+
+	onRealDelete(): void {
+		if (!this.selectedNode?.data) {
+			this.notification.warning('Thông báo', 'Vui lòng chọn một danh mục để xóa!');
+			return;
+		}
+
+		const item = this.selectedNode.data;
+
+		// Kiểm tra danh mục con trực tiếp ở giao diện
+		if (this.selectedNode.children && this.selectedNode.children.length > 0) {
+			this.notification.error('Thông báo', 'Không thể xóa danh mục này vì đang có danh mục con bên trong!');
+			return;
+		}
+
+		this.modal.confirm({
+			nzTitle: 'Xác nhận xóa vĩnh viễn',
+			nzContent: `<b style="color: red;">
+				Bạn có chắc chắn muốn xóa vĩnh viễn danh mục
+				<span class="text-primary">${item.CategoryName}</span> không?
+				<br><small class="text-muted">Lưu ý: Hành động này không thể hoàn tác và chỉ thực hiện được nếu không có sản phẩm liên kết.</small>
+			</b>`,
+			nzOkText: 'Xóa vĩnh viễn',
+			nzOkType: 'primary',
+			nzOkDanger: true,
+			nzOnOk: () => {
+				this.categoryService.delete(item.ID).subscribe({
+					next: (res) => {
+						this.loadData();
+						this.notification.success(
+							NOTIFICATION_TITLE_MAP[res.status as RESPONSE_STATUS] || 'Thành công',
+							res.message || 'Xóa danh mục thành công!'
 						);
 					},
 					error: (err) => {

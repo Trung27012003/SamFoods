@@ -395,13 +395,17 @@ export class Invoice implements OnInit {
 		this.openModal(item, 'view');
 	}
 
-	onEdit(): void {
-		const item = this.selectedItemRaw?.ID ? this.selectedItemRaw : this.selectedItem;
-		if (!item?.ID) {
+	onEdit(item?: any): void {
+		if (item) {
+			this.selectedItem = item;
+			this.selectedItemRaw = this.invoicesRaw.find(i => i.ID === item.ID) || item;
+		}
+		const target = this.selectedItemRaw?.ID ? this.selectedItemRaw : this.selectedItem;
+		if (!target?.ID) {
 			this.notification.warning('Thông báo', 'Vui lòng chọn một đơn hàng để sửa!');
 			return;
 		}
-		this.openModal(item, 'edit');
+		this.openModal(target, 'edit');
 	}
 
 	onChangeStatus(targetStatus: number): void {

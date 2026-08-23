@@ -50,7 +50,7 @@
 			</tr>
 		</ng-template>
 		<ng-template #body let-rowData let-columns="columns">
-			<tr [pSelectableRow]="rowData" (dblclick)="onEdit()">
+			<tr [pSelectableRow]="rowData" (dblclick)="onEdit(rowData)">
 				@for (col of columns; track col) {
 				<td>
 					@if (col.field === 'StatusText') {

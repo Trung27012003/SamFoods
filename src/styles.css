@@ -198,7 +198,7 @@ body {
 	transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.admin-layout ul[nz-menu][nzTheme='light'] li[nz-menu-item] > a {
+.admin-layout ul[nz-menu][nzTheme='light'] li[nz-menu-item]>a {
 	display: inline-flex;
 	align-items: center;
 	gap: var(--space-2);
@@ -229,7 +229,7 @@ body {
 	position: relative;
 }
 
-.admin-layout ul[nz-menu][nzTheme='light'] li[nz-menu-item-selected] > a {
+.admin-layout ul[nz-menu][nzTheme='light'] li[nz-menu-item-selected]>a {
 	color: var(--brand-primary) !important;
 	font-weight: 600;
 }
@@ -263,7 +263,7 @@ body {
 	justify-content: center;
 }
 
-.admin-layout .menu-sidebar.ant-layout-sider-collapsed ul[nz-menu][nzTheme='light'] li[nz-menu-item] > a {
+.admin-layout .menu-sidebar.ant-layout-sider-collapsed ul[nz-menu][nzTheme='light'] li[nz-menu-item]>a {
 	justify-content: center;
 	max-width: none;
 	overflow: visible;
@@ -277,7 +277,7 @@ body {
 	margin: 0;
 }
 
-.admin-layout .menu-sidebar.ant-layout-sider-collapsed ul[nz-menu][nzTheme='light'] li[nz-menu-item] > a > span:not([nz-icon]):not(.anticon) {
+.admin-layout .menu-sidebar.ant-layout-sider-collapsed ul[nz-menu][nzTheme='light'] li[nz-menu-item]>a>span:not([nz-icon]):not(.anticon) {
 	display: none;
 }
 
@@ -438,7 +438,7 @@ body {
 	overflow: hidden;
 }
 
-.admin-layout .p-datatable .p-datatable-thead > tr > th {
+.admin-layout .p-datatable .p-datatable-thead>tr>th {
 	background: var(--surface-bg);
 	color: var(--text-secondary);
 	font-weight: 600;
@@ -448,15 +448,15 @@ body {
 	border-bottom: 2px solid var(--surface-border);
 }
 
-.admin-layout .p-datatable .p-datatable-tbody > tr {
+.admin-layout .p-datatable .p-datatable-tbody>tr {
 	transition: background-color 0.15s ease;
 }
 
-.admin-layout .p-datatable .p-datatable-tbody > tr:hover {
+.admin-layout .p-datatable .p-datatable-tbody>tr:hover {
 	background-color: var(--brand-primary-soft) !important;
 }
 
-.admin-layout .p-datatable .p-datatable-tbody > tr.p-datatable-row-selected {
+.admin-layout .p-datatable .p-datatable-tbody>tr.p-datatable-row-selected {
 	background-color: var(--brand-primary-soft) !important;
 	color: var(--text-primary);
 }
@@ -504,7 +504,7 @@ body {
 }
 
 /* Form labels a bit heavier for readability */
-.admin-layout .ant-form-item-label > label {
+.admin-layout .ant-form-item-label>label {
 	font-weight: 500;
 	color: var(--text-secondary);
 }
@@ -625,255 +625,280 @@ body {
    Global Print Layout for Thermal Receipt (POS 80mm)
    ============================================================ */
 @media print {
-  @page {
-    margin: 0;
-    size: auto;
-  }
-  
-  /* Hide all top-level elements of body except the printed clone */
-  body > *:not(#thermal-print-section-clone) {
-    display: none !important;
-  }
-  
-  body {
-    background: #fff;
-    margin: 0;
-    padding: 0;
-  }
-  
-  #thermal-print-section-clone {
-    display: block !important;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    width: 100%;
-    max-width: 80mm; /* Restricts width on A4/A5 pages for receipt look */
-    margin: 0 auto;  /* Centers receipt on A4/A5 pages */
-    padding: 0;
-    background: #fff;
-  }
-  
-  #thermal-print-section-clone .thermal-receipt {
-    width: 100%;
-    padding: 4mm 6mm;
-    box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
-    font-size: 11px;
-    line-height: 1.4;
-    color: #000;
-    background: #fff;
-    page-break-after: always;
-    break-after: page;
-  }
-  
-  #thermal-print-section-clone .store-name {
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    text-transform: uppercase;
-    margin-bottom: 3px;
-  }
-  
-  #thermal-print-section-clone .store-address {
-    font-size: 9px;
-    text-align: center;
-    margin-bottom: 2px;
-  }
-  
-  #thermal-print-section-clone .receipt-title {
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    letter-spacing: 0.5px;
-  }
-  
-  #thermal-print-section-clone .receipt-meta {
-    font-size: 10px;
-    margin-bottom: 6px;
-  }
-  
-  #thermal-print-section-clone .meta-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2px;
-  }
-  
-  #thermal-print-section-clone .receipt-divider {
-    border-top: 1px dashed #000;
-    margin-top: 4px;
-    margin-bottom: 4px;
-    width: 100%;
-  }
-  
-  #thermal-print-section-clone .receipt-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 4px;
-    margin-bottom: 4px;
-  }
-  
-  #thermal-print-section-clone .receipt-table th {
-    font-size: 9px;
-    font-weight: bold;
-    text-align: left;
-    padding-bottom: 4px;
-  }
-  
-  #thermal-print-section-clone .receipt-table td {
-    padding-top: 2px;
-    padding-bottom: 2px;
-  }
-  
-  #thermal-print-section-clone .product-name-row td {
-    font-size: 10px;
-    font-weight: bold;
-    padding-top: 4px;
-    word-break: break-word;
-  }
-  
-  #thermal-print-section-clone .product-details-row td {
-    font-size: 10px;
-  }
-  
-  #thermal-print-section-clone .col-qty {
-    width: 15%;
-    text-align: left;
-  }
-  
-  #thermal-print-section-clone .col-price {
-    width: 45%;
-    text-align: left;
-    padding-left: 10px;
-  }
-  
-  #thermal-print-section-clone .col-total {
-    width: 40%;
-    text-align: right;
-  }
-  
-  #thermal-print-section-clone .receipt-table th.col-total {
-    text-align: right;
-  }
-  
-  #thermal-print-section-clone .receipt-summary {
-    margin-top: 4px;
-    margin-bottom: 4px;
-  }
-  
-  #thermal-print-section-clone .summary-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    font-weight: bold;
-  }
-  
-  #thermal-print-section-clone .receipt-footer {
-    text-align: center;
-    font-size: 9px;
-    font-style: italic;
-    margin-top: 8px;
-    line-height: 1.4;
-  }
-  
-  #thermal-print-section-clone .footer-hotline {
-    font-weight: bold;
-    font-style: normal;
-    margin-top: 2px;
-  }
+	@page {
+		margin: 0;
+		size: auto;
+	}
+
+	/* Hide all top-level elements of body except the printed clone */
+	body>*:not(#thermal-print-section-clone) {
+		display: none !important;
+	}
+
+	body {
+		background: #fff;
+		margin: 0;
+		padding: 0;
+	}
+
+	#thermal-print-section-clone {
+		display: block !important;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		width: 100%;
+		max-width: 80mm;
+		/* Restricts width on A4/A5 pages for receipt look */
+		margin: 0 auto;
+		/* Centers receipt on A4/A5 pages */
+		padding: 0;
+		background: #fff;
+	}
+
+	#thermal-print-section-clone .thermal-receipt {
+		width: 100%;
+		padding: 4mm 6mm;
+		box-sizing: border-box;
+		font-family: 'Arial', sans-serif;
+		font-size: 11px;
+		line-height: 1.4;
+		color: #000;
+		background: #fff;
+		page-break-after: always;
+		break-after: page;
+	}
+
+	#thermal-print-section-clone .store-name {
+		font-size: 14px;
+		font-weight: bold;
+		text-align: center;
+		text-transform: uppercase;
+		margin-bottom: 3px;
+	}
+
+	#thermal-print-section-clone .store-address {
+		font-size: 9px;
+		text-align: center;
+		margin-bottom: 2px;
+	}
+
+	#thermal-print-section-clone .receipt-title {
+		font-size: 14px;
+		font-weight: bold;
+		text-align: center;
+		margin-top: 8px;
+		margin-bottom: 8px;
+		letter-spacing: 0.5px;
+	}
+
+	#thermal-print-section-clone .receipt-meta {
+		font-size: 10px;
+		margin-bottom: 6px;
+	}
+
+	#thermal-print-section-clone .meta-row {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 2px;
+	}
+
+	#thermal-print-section-clone .receipt-divider {
+		border-top: 1px dashed #000;
+		margin-top: 4px;
+		margin-bottom: 4px;
+		width: 100%;
+	}
+
+	#thermal-print-section-clone .receipt-table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 4px;
+		margin-bottom: 4px;
+	}
+
+	#thermal-print-section-clone .receipt-table th {
+		font-size: 9px;
+		font-weight: bold;
+		text-align: left;
+		padding-bottom: 4px;
+	}
+
+	#thermal-print-section-clone .receipt-table td {
+		padding-top: 2px;
+		padding-bottom: 2px;
+	}
+
+	#thermal-print-section-clone .product-name-row td {
+		font-size: 10px;
+		font-weight: bold;
+		padding-top: 4px;
+		word-break: break-word;
+	}
+
+	#thermal-print-section-clone .product-details-row td {
+		font-size: 10px;
+	}
+
+	#thermal-print-section-clone .col-qty {
+		width: 15%;
+		text-align: left;
+	}
+
+	#thermal-print-section-clone .col-price {
+		width: 45%;
+		text-align: left;
+		padding-left: 10px;
+	}
+
+	#thermal-print-section-clone .col-total {
+		width: 40%;
+		text-align: right;
+	}
+
+	#thermal-print-section-clone .receipt-table th.col-total {
+		text-align: right;
+	}
+
+	#thermal-print-section-clone .receipt-summary {
+		margin-top: 4px;
+		margin-bottom: 4px;
+	}
+
+	#thermal-print-section-clone .summary-row {
+		display: flex;
+		justify-content: space-between;
+		font-size: 11px;
+		font-weight: bold;
+	}
+
+	#thermal-print-section-clone .receipt-footer {
+		text-align: center;
+		font-size: 9px;
+		font-style: italic;
+		margin-top: 8px;
+		line-height: 1.4;
+	}
+
+	#thermal-print-section-clone .footer-hotline {
+		font-weight: bold;
+		font-style: normal;
+		margin-top: 2px;
+	}
+}
+
+/* ============================================================
+   Global Card Image Sizing & Layout Override (Uniform aspect ratio 1:1)
+   ============================================================ */
+.products-slider .product-card .product-img,
+.products-grid .product-card .product-img {
+	width: 100% !important;
+	aspect-ratio: 1 / 1 !important;
+	overflow: hidden !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	background: #f5f5f5 !important;
+	flex-shrink: 0 !important;
+}
+
+.products-slider .product-card .product-img img,
+.products-grid .product-card .product-img img {
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: cover !important;
+	display: block !important;
 }
 
 /* ============================================================
    Global Styles for Quantity Selector & Buy Buttons (POS Look)
    ============================================================ */
 .product-actions {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: center !important;
+	width: 100% !important;
 }
 
 .qty-selector {
-    display: flex !important;
-    align-items: center;
-    border: 1px solid #dcdcdc;
-    border-radius: 4px;
-    overflow: hidden;
-    height: 32px;
-    background: #fff;
-    width: 100%;
+	display: flex !important;
+	align-items: center;
+	border: 1px solid #dcdcdc;
+	border-radius: 4px;
+	overflow: hidden;
+	height: 34px;
+	background: #fff;
 }
 
 .qty-selector button {
-    width: 32px !important;
-    height: 100%;
-    border: none;
-    background: #f0f0f0;
-    font-size: 16px;
-    font-weight: bold;
-    color: #444;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    user-select: none;
-    outline: none;
+	width: 32px !important;
+	height: 100%;
+	border: none;
+	background: #f0f0f0;
+	font-size: 16px;
+	font-weight: bold;
+	color: #444;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	user-select: none;
+	outline: none;
 }
 
 .qty-selector button:hover {
-    background: #e4e4e4;
+	background: #e4e4e4;
 }
 
 .qty-selector button:active {
-    background: #dadada;
+	background: #dadada;
 }
 
 .qty-selector input.input-qty {
-    border: none !important;
-    height: 100%;
-    width: 100%;
-    font-weight: bold;
-    outline: none;
-    font-size: 14px;
-    text-align: center;
-    background: #fff;
-    color: #111;
-    padding: 0;
-    -moz-appearance: textfield;
+	border: none !important;
+	height: 100%;
+	width: 100%;
+	font-weight: bold;
+	outline: none;
+	font-size: 14px;
+	text-align: center;
+	background: #fff;
+	color: #111;
+	padding: 0;
+	-moz-appearance: textfield;
 }
 
 .qty-selector input.input-qty::-webkit-outer-spin-button,
 .qty-selector input.input-qty::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+	-webkit-appearance: none;
+	margin: 0;
 }
 
 .btn-buy-now {
-    width: 100%;
-    height: 34px;
-    background: var(--brand-primary, #80001c);
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 13px;
-    outline: none;
+	width: 34px !important;
+	/* Square button containing just the icon */
+	height: 34px !important;
+	background: var(--brand-primary, #80001c);
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 16px;
+	outline: none;
+	flex-shrink: 0;
 }
 
 .btn-buy-now:hover {
-    background: var(--brand-primary-hover, #a30026);
+	background: var(--brand-primary-hover, #a30026);
 }
 
 .btn-buy-now:active {
-    background: var(--brand-primary-active, #5a0014);
+	background: var(--brand-primary-active, #5a0014);
 }
-

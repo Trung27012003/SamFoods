@@ -289,11 +289,13 @@ export class ShoppingDetail implements OnInit {
 
 	onAddToCart(item: any, router: string = '') {
 		if (!item) return;
+		const qty = this.quantityBuy > 0 ? this.quantityBuy : 1;
 		this.productService.onAddToCart({
 			ID: item.ID,
 			ProductName: item.ProductName || this.product.ProductName,
 			UnitPrice: item.UnitPrice || this.product.UnitPrice,
-			Quantity: this.quantityBuy > 0 ? this.quantityBuy : 1,
+			Quantity: qty,
 		}, router);
+		this.notification.success('Thành công', `Đã thêm ${qty} "${item.ProductName || this.product.ProductName}" vào giỏ hàng`);
 	}
 }

@@ -10,7 +10,8 @@
                 </a>
                 <a routerLink="/cart" class="mobile-header-cart" aria-label="Giỏ hàng">
                     <nz-badge [nzCount]="totalQuantity()">
-                        <nz-icon nzType="shopping-cart" nzTheme="outline" style="font-size: 24px; color: white;"></nz-icon>
+                        <nz-icon nzType="shopping-cart" nzTheme="outline"
+                            style="font-size: 24px; color: white;"></nz-icon>
                     </nz-badge>
                 </a>
             </div>
@@ -27,33 +28,30 @@
 
                     <div class="kw-tag-search d-flex align-items-center gap-1 px-2">
                         @for (kw of keywords(); track kw) {
-                            <nz-tag nzMode="closeable" (nzOnClose)="removeKeyword(kw)" class="m-0">
-                                {{ kw }}
-                            </nz-tag>
+                        <nz-tag nzMode="closeable" (nzOnClose)="removeKeyword(kw)" class="m-0">
+                            {{ kw }}
+                        </nz-tag>
                         }
-                        <input nz-input
-                            type="text"
-                            class="kw-tag-input flex-grow-1"
-                            [value]="currentInput()"
-                            (input)="onKeywordInput($any($event.target).value)"
-                            (keydown.enter)="doSearch()"
-                            placeholder="Bạn đang muốn tìm kiếm gì? (Enter để thêm & tìm)"
-                            [nzAutocomplete]="auto"
-                        />
+                        <input nz-input type="text" class="kw-tag-input flex-grow-1" [value]="currentInput()"
+                            (input)="onKeywordInput($any($event.target).value)" (keydown.enter)="doSearch()"
+                            placeholder="Bạn đang muốn tìm kiếm gì? (Enter để thêm & tìm)" [nzAutocomplete]="auto" />
                         <nz-autocomplete [nzDataSource]="autoCompleteKeywords()" #auto></nz-autocomplete>
                         @if (keywords().length > 0 || currentInput()) {
-                            <button nz-button nzType="text" nzSize="small" (click)="clearKeywords()" class="p-1" title="Xóa tất cả">
-                                <i nz-icon nzType="close-circle"></i>
-                            </button>
+                        <button nz-button nzType="text" nzSize="small" (click)="clearKeywords()" class="p-1"
+                            title="Xóa tất cả">
+                            <i nz-icon nzType="close-circle"></i>
+                        </button>
                         }
                         <button nz-button nzType="primary" nzSize="small" (click)="doSearch()" title="Tìm kiếm">
                             <i nz-icon nzType="search"></i>
                         </button>
                     </div>
 
-                    <a *ngIf="!isOnCartPage()" nz-dropdown [nzDropdownMenu]="menu" [nzTrigger]="'click'" [(nzVisible)]="isVisibleShopingCard" nzClickHide="true" class="ms-2">
+                    <a *ngIf="!isOnCartPage()" nz-dropdown [nzDropdownMenu]="menu" [nzTrigger]="'click'"
+                        [(nzVisible)]="isVisibleShopingCard" nzClickHide="true" class="ms-2">
                         <nz-badge [nzCount]="totalQuantityNumber">
-                            <nz-icon nzType="shopping-cart" nzTheme="outline" style="font-size: 28px; color: white;"></nz-icon>
+                            <nz-icon nzType="shopping-cart" nzTheme="outline"
+                                style="font-size: 28px; color: white;"></nz-icon>
                         </nz-badge>
                     </a>
                     <nz-dropdown-menu #menu="nzDropdownMenu">
@@ -76,7 +74,8 @@
         </div>
     </div>
 
-    <nz-drawer [nzVisible]="isMobileMenuOpen" nzPlacement="left" nzTitle="Menu" [nzWidth]="280" (nzOnClose)="closeMobileMenu()">
+    <nz-drawer [nzVisible]="isMobileMenuOpen" nzPlacement="left" nzTitle="Menu" [nzWidth]="280"
+        (nzOnClose)="closeMobileMenu()">
         <ng-container *nzDrawerContent>
             <div class="mobile-drawer-menu">
                 <a class="mobile-drawer-link" routerLink="/home" (click)="closeMobileMenu()">
@@ -85,12 +84,12 @@
                 </a>
                 <a class="mobile-drawer-link" routerLink="/products" (click)="closeMobileMenu()">
                     <nz-icon nzType="appstore" nzTheme="outline"></nz-icon>
-                    <span>Tất cả sản phẩm</span>
+                    <span>Sản phẩm</span>
                 </a>
-                <a class="mobile-drawer-link" routerLink="/home" (click)="closeMobileMenu()">
+                <!-- <a class="mobile-drawer-link" routerLink="/home" (click)="closeMobileMenu()">
                     <nz-icon nzType="fire" nzTheme="outline"></nz-icon>
                     <span>Hàng mới</span>
-                </a>
+                </a> -->
                 <a class="mobile-drawer-link" routerLink="/cart" (click)="closeMobileMenu()">
                     <nz-icon nzType="shopping-cart" nzTheme="outline"></nz-icon>
                     <span>Giỏ hàng ({{ totalQuantity() }})</span>
@@ -100,17 +99,19 @@
 
                 <div class="mobile-drawer-section-title">DANH SÁCH SẢN PHẨM</div>
                 @if (newProducts().length > 0) {
-                    @for (product of newProducts(); track product.ID) {
-                    <a class="mobile-drawer-link mobile-drawer-category text-truncate" [routerLink]="['/detail']" [queryParams]="{ id: product.ID }" (click)="closeMobileMenu()" [title]="product.ProductName">
-                        {{ product.ProductName }}
-                    </a>
-                    }
+                @for (product of newProducts(); track product.ID) {
+                <a class="mobile-drawer-link mobile-drawer-category text-truncate" [routerLink]="['/detail']"
+                    [queryParams]="{ id: product.ID }" (click)="closeMobileMenu()" [title]="product.ProductName">
+                    {{ product.ProductName }}
+                </a>
+                }
                 }
 
                 <nz-divider></nz-divider>
 
                 <ng-template #loggedInMobile>
-                    <a *ngIf="isAdmin" class="mobile-drawer-link" routerLink="/admin/dashboard" (click)="closeMobileMenu()">
+                    <a *ngIf="isAdmin" class="mobile-drawer-link" routerLink="/admin/dashboard"
+                        (click)="closeMobileMenu()">
                         <nz-icon nzType="setting" nzTheme="outline"></nz-icon>
                         <span>Quản trị</span>
                     </a>
@@ -252,10 +253,12 @@
                         <a [href]="socialZaloUrl()" target="_blank" rel="noopener" title="Zalo" aria-label="Zalo">
                             <img src="assets/image/social/icons8-zalo-32.png" alt="Zalo">
                         </a>
-                        <a [href]="socialFacebookUrl()" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook">
+                        <a [href]="socialFacebookUrl()" target="_blank" rel="noopener" title="Facebook"
+                            aria-label="Facebook">
                             <img src="assets/image/social/icons8-facebook-32.png" alt="Facebook">
                         </a>
-                        <a [href]="socialMessengerUrl()" target="_blank" rel="noopener" title="Messenger" aria-label="Messenger">
+                        <a [href]="socialMessengerUrl()" target="_blank" rel="noopener" title="Messenger"
+                            aria-label="Messenger">
                             <img src="assets/image/social/icons8-messenger-32.png" alt="Messenger">
                         </a>
                         <a [href]="socialPhone()" title="Gọi điện" aria-label="Phone">

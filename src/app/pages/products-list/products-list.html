@@ -87,15 +87,14 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="product-actions p-2">
-                                <div class="qty-selector d-flex align-items-center mb-2">
+                            <div class="product-actions p-2 d-flex align-items-center gap-2">
+                                <div class="qty-selector d-flex align-items-center flex-grow-1">
                                     <button class="btn-qty-dec" (click)="decreaseQty(p)">-</button>
                                     <input type="number" class="input-qty flex-grow-1 text-center" [value]="getProductQty(p.ID)" readonly />
                                     <button class="btn-qty-inc" (click)="increaseQty(p)">+</button>
                                 </div>
-                                <button class="btn-buy-now" (click)="onAddToCartWithQty(p)">
-                                    <i nz-icon nzType="shopping-cart" class="me-1"></i>
-                                    Thêm vào giỏ
+                                <button class="btn-buy-now flex-shrink-0" (click)="onAddToCartWithQty(p)" title="Thêm vào giỏ">
+                                    <i nz-icon nzType="shopping-cart"></i>
                                 </button>
                             </div>
                         </div>
