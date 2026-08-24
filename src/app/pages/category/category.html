@@ -41,7 +41,7 @@
 			</tr>
 		</ng-template>
 		<ng-template #body let-rowNode let-rowData="rowData" let-columns="columns">
-			<tr [ttRow]="rowNode" [ttSelectableRow]="rowNode" (dblclick)="onEdit(rowNode)">
+			<tr [ttRow]="rowNode" [ttSelectableRow]="rowNode" (dblclick)="onEdit(rowNode.node)">
 				@for (col of columns; let first = $first; track col) {
 				<td>
 					@if (first) {

@@ -70,7 +70,7 @@
             <h3 class="admin-form-section-title">Thông tin bán hàng</h3>
 
             <div nz-row [nzGutter]="16">
-                <div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
+                <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8">
                     <nz-form-item>
                         <nz-form-label nzRequired>Đơn giá (VNĐ)</nz-form-label>
                         <nz-form-control nzErrorTip="Đơn giá >= 0!">
@@ -79,16 +79,7 @@
                     </nz-form-item>
                 </div>
 
-                <div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
-                    <nz-form-item>
-                        <nz-form-label nzRequired>KHỐI LƯỢNG (gam)</nz-form-label>
-                        <nz-form-control nzErrorTip="Khối lượng >= 0!">
-                            <nz-input-number class="w-100" formControlName="Weight" [nzMin]="0" />
-                        </nz-form-control>
-                    </nz-form-item>
-                </div>
-
-                <div nz-col nzXs="20" nzSm="10" nzMd="6" nzLg="6">
+                <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8">
                     <nz-form-item>
                         <nz-form-label nzRequired>Đơn vị tính</nz-form-label>
                         <nz-form-control nzErrorTip="Vui lòng chọn ĐVT!">
@@ -106,14 +97,13 @@
                     </nz-form-item>
                 </div>
 
-                <div nz-col nzXs="24" nzSm="12" nzMd="6" nzLg="6">
+                <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8">
                     <nz-form-item>
                         <nz-form-label nzRequired>Tình trạng</nz-form-label>
                         <nz-form-control nzErrorTip="Vui lòng chọn tình trạng!">
                             <nz-select class="w-100" nzShowSearch nzAllowClear placeholder="-- Tình trạng --" formControlName="Status">
                                 <nz-option nzLabel="Còn hàng" [nzValue]="1" />
                                 <nz-option nzLabel="Hết hàng" [nzValue]="2" />
-                                <nz-option nzLabel="Hàng mới" [nzValue]="3" />
                             </nz-select>
                         </nz-form-control>
                     </nz-form-item>

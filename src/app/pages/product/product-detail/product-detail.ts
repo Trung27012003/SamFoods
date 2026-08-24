@@ -83,7 +83,7 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 		UnitPrice: [0, [Validators.required, Validators.min(0)]],
 		Origin: ['', Validators.required],
 		Descriptions: [''],
-		Weight: [0, [Validators.required, Validators.min(0)]],
+		Weight: [0],
 		UnitCountID: [null, Validators.required],
 	});
 
@@ -389,7 +389,6 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 		if (this.validateForm.get('Origin')?.invalid) labels.push('Xuất sứ');
 		if (this.validateForm.get('Status')?.invalid) labels.push('Tình trạng');
 		if (this.validateForm.get('UnitPrice')?.invalid) labels.push('Đơn giá');
-		if (this.validateForm.get('Weight')?.invalid) labels.push('Trọng lượng');
 		if (this.validateForm.get('UnitCountID')?.invalid) labels.push('Đơn vị tính');
 		return labels.join(', ') || 'Có trường không hợp lệ';
 	}

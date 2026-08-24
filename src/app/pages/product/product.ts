@@ -67,8 +67,7 @@ export class Product implements OnInit {
 
 	statusOptions: StatusOption[] = [
 		{ label: 'Còn hàng', value: 1 },
-		{ label: 'Hết hàng', value: 2 },
-		{ label: 'Hàng mới', value: 3 }
+		{ label: 'Hết hàng', value: 2 }
 	];
 
 	get categoryOptions() {

@@ -5,9 +5,9 @@
 	<div nz-row [nzGutter]="16">
 		<div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8">
 			<nz-form-item>
-				<nz-form-label nzRequired>STT <small class="text-muted">(tự động)</small></nz-form-label>
+				<nz-form-label nzRequired>STT <small class="text-muted">(mặc định bằng 0)</small></nz-form-label>
 				<nz-form-control nzErrorTip="Vui lòng nhập STT hợp lệ!">
-					<nz-input-number class="w-100" formControlName="STT" nzMin="1" [nzDisabled]="true" />
+					<nz-input-number class="w-100" formControlName="STT" nzMin="0" />
 				</nz-form-control>
 			</nz-form-item>
 		</div>

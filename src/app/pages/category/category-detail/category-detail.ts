@@ -59,7 +59,7 @@ export class CategoryDetail implements OnInit {
 
 	validateForm = this.fb.group({
 		ID: [0],
-		STT: [1, [Validators.required]],
+		STT: [0, [Validators.required]],
 		CategoryCode: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
 		CategoryName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(200)]],
 		ParentID: ['0'],
@@ -82,16 +82,7 @@ export class CategoryDetail implements OnInit {
 	}
 
 	private loadAutoValues(): void {
-		this.categoryService.getMaxSTT().subscribe({
-			next: (res) => {
-				const max = res?.data ?? 0;
-				this.validateForm.patchValue({ STT: max + 1 });
-				this.validateForm.get('STT')?.disable();
-			},
-			error: () => {
-				this.validateForm.get('STT')?.disable();
-			}
-		});
+		this.validateForm.patchValue({ STT: 0 });
 
 		this.categoryService.suggestCategoryCode().subscribe({
 			next: (res) => {
@@ -110,7 +101,7 @@ export class CategoryDetail implements OnInit {
 				const item = res.data;
 				this.validateForm.patchValue({
 					ID: item.ID || 0,
-					STT: item.STT || 1,
+					STT: item.STT ?? 0,
 					CategoryCode: item.CategoryCode || '',
 					CategoryName: item.CategoryName || '',
 					ParentID: item.ParentID?.toString() || '0',
@@ -145,7 +136,7 @@ export class CategoryDetail implements OnInit {
 	initForm(): void {
 		this.validateForm.patchValue({
 			ID: 0,
-			STT: 1,
+			STT: 0,
 			CategoryCode: '',
 			CategoryName: '',
 			ParentID: '0',

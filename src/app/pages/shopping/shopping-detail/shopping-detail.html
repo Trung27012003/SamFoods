@@ -13,11 +13,14 @@
     <div class="product-info d-flex flex-column flex-md-row justify-content-start">
         <div class="card border-0 product-image w-100 w-md-50">
 
-            <div class="product-image-wrapper" (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)">
+            <div class="product-image-wrapper" (pointerdown)="onPointerDown($event)"
+                (pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)"
+                (pointercancel)="onPointerUp($event)">
                 @if (productImages().length > 1) {
-                <button class="nav-btn prev-btn" (click)="prevImage()" [disabled]="currentImageIndex() === 0" aria-label="Ảnh trước">
-					<i nz-icon nzType="left"></i>
-				</button>
+                <button class="nav-btn prev-btn" (click)="prevImage()" [disabled]="currentImageIndex() === 0"
+                    aria-label="Ảnh trước">
+                    <i nz-icon nzType="left"></i>
+                </button>
                 }
 
                 <div class="main-image-container" [class.dragging]="isDragging()">
@@ -35,15 +38,17 @@
                 </div>
 
                 @if (productImages().length > 1) {
-                <button class="nav-btn next-btn" (click)="nextImage()" [disabled]="currentImageIndex() === productImages().length - 1" aria-label="Ảnh sau">
-					<i nz-icon nzType="right"></i>
-				</button>
+                <button class="nav-btn next-btn" (click)="nextImage()"
+                    [disabled]="currentImageIndex() === productImages().length - 1" aria-label="Ảnh sau">
+                    <i nz-icon nzType="right"></i>
+                </button>
                 }
 
                 @if (productImages().length > 1) {
                 <div class="image-indicator-bars">
                     @for (img of productImages(); track $index) {
-                    <span class="indicator-bar" [class.active]="$index === currentImageIndex()" (click)="goToImage($index)"></span> }
+                    <span class="indicator-bar" [class.active]="$index === currentImageIndex()"
+                        (click)="goToImage($index)"></span> }
                 </div>
                 }
             </div>
@@ -70,9 +75,10 @@
 
             <div class="sku-row">
                 <p><span class="fw-bold me-1">SKU:</span>{{ product.ProductCode }}</p>
-                <button nz-button nzType="default" nzShape="circle" [ngClass]="{ active: isFavourite(product) }" (click)="onAddFavourite(product)">
-					<i nz-icon nzType="heart"></i>
-				</button>
+                <button nz-button nzType="default" nzShape="circle" [ngClass]="{ active: isFavourite(product) }"
+                    (click)="onAddFavourite(product)">
+                    <i nz-icon nzType="heart"></i>
+                </button>
             </div>
 
             <div class="product-bottom">
@@ -103,7 +109,7 @@
     <div class="product-meta mt-4">
         <h5 class="mb-3">Thông tin sản phẩm</h5>
         <div class="row g-3 product-meta-grid">
-            <div class="col-md-4 col-sm-6">
+            <!-- <div class="col-md-4 col-sm-6">
                 <div class="meta-item">
                     <span class="meta-label">SKU:</span>
                     <span class="meta-value">{{ product.ProductCode || '—' }}</span>
@@ -120,7 +126,7 @@
                     <span class="meta-label">KHỐI LƯỢNG (gam):</span>
                     <span class="meta-value">{{ product.Weight || '—' }} {{ product.UnitName }}</span>
                 </div>
-            </div>
+            </div> -->
             <div class="col-md-4 col-sm-6">
                 <div class="meta-item">
                     <span class="meta-label">Tình trạng:</span>
@@ -140,11 +146,11 @@
             <div class="price">{{ product.UnitPrice | number }} <small>VND</small></div>
         </div>
         <button class="btn btn-outline-secondary mobile-purchase-add" (click)="onAddToCart(product)">
-			<i nz-icon nzType="shopping-cart"></i>
-			Thêm giỏ
-		</button>
+            <i nz-icon nzType="shopping-cart"></i>
+            Thêm giỏ
+        </button>
         <button class="btn btn-primary mobile-purchase-buy" (click)="onAddToCart(product,'/cart')">
-			Mua ngay
-		</button>
+            Mua ngay
+        </button>
     </div>
 </div>

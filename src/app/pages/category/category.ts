@@ -199,7 +199,7 @@ export class Category implements OnInit {
 
 	onEdit(node?: any): void {
 		if (node) {
-			this.selectedNode = node;
+			this.selectedNode = node.node ? node.node : node;
 		}
 		if (!this.selectedNode?.data) {
 			this.notification.warning('Thông báo', 'Vui lòng chọn một danh mục để sửa!');
