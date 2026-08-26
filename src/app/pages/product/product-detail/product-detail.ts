@@ -106,6 +106,19 @@ export class ProductDetail implements OnInit, OnDestroy, AfterViewInit {
 			// Patch trước các trường còn lại (không cần combo)
 			const productEdit = { ...this.product };
 			delete (productEdit as any).UnitCountID;
+
+			// Đảm bảo CategoryIDs luôn là một mảng để tránh lỗi nz-select
+			if (productEdit.CategoryIDs) {
+				if (typeof productEdit.CategoryIDs === 'string') {
+					productEdit.CategoryIDs = productEdit.CategoryIDs
+						.split(',')
+						.map((x: any) => Number(x.trim()))
+						.filter((x: any) => !Number.isNaN(x) && x > 0);
+				}
+			} else {
+				productEdit.CategoryIDs = [];
+			}
+
 			this.validateForm.patchValue(productEdit);
 			this.validateForm.get('STT')?.disable();
 
