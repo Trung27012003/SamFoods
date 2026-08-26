@@ -263,8 +263,11 @@ export class ShoppingLayout implements OnInit, OnDestroy {
 					: Array.isArray(payload?.data)
 						? payload.data
 						: [];
-				// Lấy 10 sản phẩm mới nhất
-				this.newProducts.set(list.slice(0, 10));
+				// Lọc hàng mới (Status == 3) và sắp xếp A-Z theo ProductName
+				const filtered = list
+					.filter((item: any) => item.Status == 3)
+					.sort((a: any, b: any) => (a.ProductName || '').localeCompare(b.ProductName || '', 'vi'));
+				this.newProducts.set(filtered);
 			},
 			error: (err) => console.error(err)
 		});

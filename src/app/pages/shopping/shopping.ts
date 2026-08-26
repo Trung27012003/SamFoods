@@ -344,7 +344,9 @@ export class Shopping {
             ImageURL: getProductImageUrl(item.ImageURL),
           }));
 
-          this.productNews = data;
+          this.productNews = data
+            .filter((item: any) => item.Status == 3)
+            .sort((a: any, b: any) => (a.ProductName || '').localeCompare(b.ProductName || '', 'vi'));
           this.productBestSellers = data;
 
           const rootCats = (res.categories.data || []).filter(

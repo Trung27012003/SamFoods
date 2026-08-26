@@ -67,7 +67,8 @@ export class Product implements OnInit {
 
 	statusOptions: StatusOption[] = [
 		{ label: 'Còn hàng', value: 1 },
-		{ label: 'Hết hàng', value: 2 }
+		{ label: 'Hết hàng', value: 2 },
+		{ label: 'Hàng mới', value: 3 }
 	];
 
 	get categoryOptions() {
@@ -80,6 +81,7 @@ export class Product implements OnInit {
 		{ field: 'CategoryNamesDisplay', header: 'Danh mục' },
 		{ field: 'UnitPrice', header: 'Đơn giá' },
 		{ field: 'UnitName', header: 'ĐVT' },
+		{ field: 'Origin', header: 'Xuất xứ' },
 		{ field: 'StatusName', header: 'Tình trạng' }
 	];
 

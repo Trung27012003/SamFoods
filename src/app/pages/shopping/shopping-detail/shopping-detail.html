@@ -109,10 +109,10 @@
     <div class="product-meta mt-4">
         <h5 class="mb-3">Thông tin sản phẩm</h5>
         <div class="row g-3 product-meta-grid">
-            <!-- <div class="col-md-4 col-sm-6">
+            <div class="col-md-4 col-sm-6">
                 <div class="meta-item">
-                    <span class="meta-label">SKU:</span>
-                    <span class="meta-value">{{ product.ProductCode || '—' }}</span>
+                    <span class="meta-label">Tình trạng:</span>
+                    <span class="meta-value status-{{ product.Status }}">{{ getStatusName(product.Status) }}</span>
                 </div>
             </div>
             <div class="col-md-4 col-sm-6">
@@ -123,16 +123,11 @@
             </div>
             <div class="col-md-4 col-sm-6">
                 <div class="meta-item">
-                    <span class="meta-label">KHỐI LƯỢNG (gam):</span>
-                    <span class="meta-value">{{ product.Weight || '—' }} {{ product.UnitName }}</span>
-                </div>
-            </div> -->
-            <div class="col-md-4 col-sm-6">
-                <div class="meta-item">
-                    <span class="meta-label">Tình trạng:</span>
-                    <span class="meta-value status-{{ product.Status }}">{{ getStatusName(product.Status) }}</span>
+                    <span class="meta-label">ĐƠN VỊ TÍNH:</span>
+                    <span class="meta-value">{{ product.UnitName || '—' }}</span>
                 </div>
             </div>
+
         </div>
 
         <h6 class="mt-4 mb-2">Mô tả</h6>

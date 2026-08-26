@@ -28,10 +28,12 @@
         <div class="card products-slider border-0">
             <h5 class="fw-bold text-uppercase">Sản phẩm mới</h5>
             <div class="row g-2 px-1">
-                @for (product of productBestSellers; track product.ID) {
+                @for (product of productNews; track product.ID) {
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-2 d-flex justify-content-center">
                         <div class="product-card">
+                            @if (product.Status == 3) {
                             <div class="badge">MỚI</div>
+                            }
                             <div class="product-img">
                                 <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">
                                     <img [src]="product.ImageURL" alt="" />
@@ -72,7 +74,7 @@
                     [responsiveOptions]="responsiveOptions">
                     <ng-template let-product #item>
                          <div class="product-card">
-                              <div class="badge">MỚI</div>
+                              <div class="badge" *ngIf="product.Status == 3">MỚI</div>
                               <div class="product-img">
                                    <a routerLink="/detail">
                                         <img [src]="product.ImageURL" alt="" />
@@ -113,7 +115,7 @@
             <p-carousel *ngIf="productBestSellers.length" [value]="productBestSellers" [numVisible]="6" [numScroll]="6" [circular]="false" [responsiveOptions]="bestSellerResponsiveOptions" [showIndicators]="false">
                 <ng-template let-product #item>
                     <div class="product-card">
-                        <div class="badge">MỚI</div>
+                        <div class="badge" *ngIf="product.Status == 3">MỚI</div>
                         <div class="product-img">
                             <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">
                                 <img [src]="product.ImageURL" alt="" />
@@ -167,7 +169,7 @@
                     <!-- <ng-template let-product #catProductTpl> -->
                     <ng-template pTemplate="item" let-product>
                         <div class="product-card">
-                            <div class="badge">MỚI</div>
+                            <div class="badge" *ngIf="product.Status == 3">MỚI</div>
                             <div class="product-img">
                                 <a [routerLink]="['/detail']" [queryParams]="{ id: product.ID }">
                                     <img [src]="product.ImageURL" alt="" />

@@ -18,17 +18,17 @@ import { NzTagComponent } from "ng-zorro-antd/tag";
 @Component({
 	selector: 'app-shopping-detail',
 	imports: [
-    CommonModule,
-    FormsModule,
-    BreadcrumbModule,
-    NzIconModule,
-    NzButtonModule,
-    InputNumberModule,
-    NzBreadCrumbModule,
-    RouterLink,
-    NzBreadCrumbModule,
-    NzTagComponent
-],
+		CommonModule,
+		FormsModule,
+		BreadcrumbModule,
+		NzIconModule,
+		NzButtonModule,
+		InputNumberModule,
+		NzBreadCrumbModule,
+		RouterLink,
+		NzBreadCrumbModule,
+		NzTagComponent
+	],
 	templateUrl: './shopping-detail.html',
 	styleUrl: './shopping-detail.css',
 	standalone: true,
@@ -117,13 +117,13 @@ export class ShoppingDetail implements OnInit {
 				this.currentImageIndex.set(0);
 
 				// Categories (N-N): load từ productCategories
-				const productCategories = res.data?.productCategories || [];
-				const catNames = productCategories.map((pc: any) => pc.CategoryName).filter(Boolean);
-				const catIDs = productCategories.map((pc: any) => pc.CategoryID).filter((x: any) => x > 0);
-				this.product.CategoryNames = catNames;
-				this.product.CategoryIDs = catIDs;
-				// Backward-compat nếu UI còn dùng CategoryName
-				this.product.CategoryName = catNames[0] || '';
+				// const productCategories = res.data?.productCategories || [];
+				// const catNames = productCategories.map((pc: any) => pc.CategoryName).filter(Boolean);
+				// const catIDs = productCategories.map((pc: any) => pc.CategoryID).filter((x: any) => x > 0);
+				// this.product.CategoryNames = catNames;
+				// this.product.CategoryIDs = catIDs;
+				// // Backward-compat nếu UI còn dùng CategoryName
+				// this.product.CategoryName = catNames[0] || '';
 
 				this.cdr.detectChanges();
 			},

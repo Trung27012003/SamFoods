@@ -68,7 +68,9 @@
                     @for (p of pagedProducts(); track p.ID) {
                     <div class="col-6 col-sm-4 col-lg-3 mb-2 d-flex justify-content-center">
                         <div class="product-card">
+                            @if (p.Status == 3) {
                             <div class="badge">MỚI</div>
+                            }
                             <div class="product-img">
                                 <a [routerLink]="['/detail']" [queryParams]="{ id: p.ID }">
                                     <img [src]="p.ImageURL" [alt]="p.ProductName" loading="lazy" />

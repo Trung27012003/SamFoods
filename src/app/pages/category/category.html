@@ -28,13 +28,13 @@
 <div class="admin-card p-0">
 	<p-treetable class="p-treetable-sm" [value]="categorys" [columns]="cols" [scrollable]="true"
 		[tableStyle]="{ 'min-width': '60rem' }" [loading]="isLoadingData()" sortMode="multiple"
-		[resizableColumns]="true" columnResizeMode="expand" showGridlines selectionMode="single"
+		showGridlines selectionMode="single"
 		[(selection)]="selectedNode" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 20, 50]"
 		[paginatorDropdownAppendTo]="'body'">
 		<ng-template #header let-columns>
 			<tr>
 				@for (col of columns; track col) {
-				<th ttResizableColumn>
+				<th>
 					{{ col.header }}
 				</th>
 				}
