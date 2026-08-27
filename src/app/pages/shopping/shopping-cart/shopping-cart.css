@@ -483,3 +483,149 @@
   /* Ẩn panel phải trên mobile – dùng sticky bar */
   .cart-right { display: none; }
 }
+
+/* ── Shipping Toggle Buttons ───────────────────── */
+.shipping-toggle-container {
+  display: flex;
+  background: #f5f5f5;
+  border-radius: 24px;
+  padding: 4px;
+  margin: 1rem 1.25rem 0.5rem;
+  border: 1px solid #e8e8e8;
+}
+
+.shipping-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.6rem 0.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.25s ease;
+}
+
+.shipping-toggle-btn.active {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.toggle-icon {
+  font-size: 1rem;
+}
+
+/* ── Shipping Info Box ──────────────────────── */
+.shipping-info-box {
+  margin: 0 1.25rem 0.5rem;
+  padding: 0.85rem;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.shipping-info-box .info-title {
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.shipping-info-box .info-content {
+  color: #333;
+  font-weight: 500;
+}
+
+.store-address-highlight {
+  color: #d4380d !important;
+  font-weight: 600 !important;
+}
+
+.shipping-info-box .info-note {
+  color: #666;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  font-style: italic;
+}
+
+/* ── Pickup DateTime Picker ──────────────────── */
+.pickup-datetime-picker {
+  background: #fcfcfc;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+.picker-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.picker-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.picker-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.date-selector-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.date-btn {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.date-btn:hover {
+  border-color: #999;
+}
+
+.date-btn.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.time-slot-select {
+  width: 100%;
+}
+
+::ng-deep .time-slot-select .ant-select-selector {
+  border-radius: 8px !important;
+  height: 36px !important;
+  display: flex;
+  align-items: center;
+}
+
+.no-slots-warning {
+  color: #ff4d4f;
+  font-size: 0.78rem;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+  font-weight: 500;
+}

@@ -114,16 +114,41 @@
         <div class="price-summary">
           <div class="price-row">
             <span>Tạm tính ({{ shopingCarts().length }} sản phẩm)</span>
-            <span>{{ totalAmount() | number }} VND</span>
+            <span>{{ (shippingType === 1 ? totalAmount() - shippingFee : totalAmount()) | number }} VND</span>
           </div>
           <div class="price-row">
             <span>Phí vận chuyển</span>
-            <span class="free-ship">Miễn phí</span>
+            <span [class.free-ship]="shippingType === 2">{{ shippingType === 1 ? (shippingFee | number) + ' VND' : 'Miễn phí' }}</span>
           </div>
           <div class="price-total">
             <span>Tổng cộng</span>
             <span class="total-amount">{{ totalAmount() | number }} VND</span>
           </div>
+        </div>
+
+        <!-- Toggle Nhận hàng tại cửa hàng / Giao hàng -->
+        <div class="shipping-toggle-container">
+          <div class="shipping-toggle-btn" [class.active]="shippingType === 2" (click)="setShippingType(2)">
+            <i nz-icon nzType="shop" nzTheme="outline" class="toggle-icon"></i>
+            <span>Đặt đến lấy</span>
+          </div>
+          <div class="shipping-toggle-btn" [class.active]="shippingType === 1" (click)="setShippingType(1)">
+            <i nz-icon nzType="car" nzTheme="outline" class="toggle-icon"></i>
+            <span>Đặt giao hàng</span>
+          </div>
+        </div>
+
+        <!-- Nội dung chính sách tương ứng -->
+        <div class="shipping-info-box">
+          <ng-container *ngIf="shippingType === 2">
+            <div class="info-title">Nhận đơn hàng của bạn tại</div>
+            <div class="info-content store-address-highlight">{{ storePickupInfo }}</div>
+            <div class="info-note" *ngIf="businessHours">Giờ hành chính: {{ businessHours }}</div>
+          </ng-container>
+          <ng-container *ngIf="shippingType === 1">
+            <div class="info-title">Đặt giao hàng tận nhà</div>
+            <div class="info-content">{{ deliveryPolicy }}</div>
+          </ng-container>
         </div>
 
         <!-- Form thông tin -->
@@ -148,12 +173,40 @@
             </nz-form-control>
           </nz-form-item>
 
-          <nz-form-item>
+          <!-- Ô nhập địa chỉ (Chỉ hiện khi Đặt giao hàng) -->
+          <nz-form-item *ngIf="shippingType === 1">
             <nz-form-label nzRequired>Địa chỉ giao hàng</nz-form-label>
             <nz-form-control nzErrorTip="Vui lòng nhập Địa chỉ!">
               <input nz-input formControlName="Address" placeholder="Số nhà, đường, phường/xã..." />
             </nz-form-control>
           </nz-form-item>
+
+          <!-- Ô chọn ngày/giờ hẹn lấy (Chỉ hiện khi Đặt đến lấy) -->
+          <div class="pickup-datetime-picker" *ngIf="shippingType === 2">
+            <div class="picker-row">
+              <div class="picker-col">
+                <label class="picker-label">Ngày nhận hàng</label>
+                <div class="date-selector-btns">
+                  <button type="button" class="date-btn" [class.active]="pickupDate === 'today'" (click)="pickupDate = 'today'; pickupTime = ''; recalculateTotal()">
+                    Hôm nay
+                  </button>
+                  <button type="button" class="date-btn" [class.active]="pickupDate === 'tomorrow'" (click)="pickupDate = 'tomorrow'; pickupTime = ''; recalculateTotal()">
+                    Ngày mai
+                  </button>
+                </div>
+              </div>
+              
+              <div class="picker-col">
+                <label class="picker-label">Thời gian đến lấy</label>
+                <nz-select [(ngModel)]="pickupTime" [ngModelOptions]="{standalone: true}" nzPlaceHolder="Chọn khung giờ" class="time-slot-select">
+                  <nz-option *ngFor="let slot of getAvailableSlots()" [nzValue]="slot" [nzLabel]="slot"></nz-option>
+                </nz-select>
+                <div class="no-slots-warning" *ngIf="pickupDate === 'today' && getAvailableSlots().length === 0">
+                  Đã hết giờ hành chính nhận hàng hôm nay. Vui lòng chọn Ngày mai!
+                </div>
+              </div>
+            </div>
+          </div>
 
           <nz-form-item>
             <nz-form-label>Ghi chú</nz-form-label>

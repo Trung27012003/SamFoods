@@ -109,6 +109,7 @@ export class Invoice implements OnInit {
 		{ field: 'BillCode', header: 'Mã đơn' },
 		{ field: 'CustomerName', header: 'Khách hàng' },
 		{ field: 'PhoneNumber', header: 'SĐT' },
+		{ field: 'ShippingType', header: 'Hình thức nhận' },
 		{ field: 'Address', header: 'Địa chỉ' },
 		{ field: 'TotalAmountText', header: 'Tổng tiền' },
 		{ field: 'StatusName', header: 'Trạng thái' },

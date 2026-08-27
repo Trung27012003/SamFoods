@@ -11,6 +11,9 @@ export interface InvoicePrintData {
 	Address?: string;
 	Note?: string;
 	TotalAmount: number;
+	ShippingType?: number;
+	ShippingFee?: number;
+	PickupTime?: string;
 	InvoiceDetails: {
 		ProductName: string;
 		ProductCode?: string;
@@ -178,8 +181,41 @@ export class InvoicePdfService {
 
 		// ===== TOTAL =====
 		doc.setFontSize(this.FONT_SIZE_BODY);
-		doc.setFont('helvetica', 'bold');
+		
+		// Subtotal
+		doc.setFont('helvetica', 'normal');
+		const subTotal = (invoice.TotalAmount ?? 0) - (invoice.ShippingFee ?? 0);
 		doc.text('Cong tien hang', this.MARGIN_LEFT, y);
+		doc.text(this.formatNumber(subTotal), colTotal, y, { align: 'right' });
+		y += this.LINE_HEIGHT + 1.5;
+
+		// Shipping / Pickup details
+		if (invoice.ShippingType === 2) {
+			doc.text('Nhan tai cua hang', this.MARGIN_LEFT, y);
+			doc.text('0', colTotal, y, { align: 'right' });
+			y += this.LINE_HEIGHT + 1.5;
+			if (invoice.PickupTime) {
+				doc.setFontSize(this.FONT_SIZE_SMALL);
+				const pickupTimeClean = this.removeVietnameseDiacritics(invoice.PickupTime);
+				doc.text(`Hen lay: ${pickupTimeClean}`, this.MARGIN_LEFT, y);
+				y += this.LINE_HEIGHT + 1.5;
+				doc.setFontSize(this.FONT_SIZE_BODY);
+			}
+		} else {
+			if ((invoice.ShippingFee ?? 0) > 0) {
+				doc.text('Phi van chuyen', this.MARGIN_LEFT, y);
+				doc.text(this.formatNumber(invoice.ShippingFee), colTotal, y, { align: 'right' });
+				y += this.LINE_HEIGHT + 1.5;
+			}
+		}
+
+		// Divider before final total
+		this.drawDashedLine(doc, y);
+		y += 3;
+
+		// Final total
+		doc.setFont('helvetica', 'bold');
+		doc.text('Tong thanh toan', this.MARGIN_LEFT, y);
 		doc.text(this.formatNumber(invoice.TotalAmount), colTotal, y, { align: 'right' });
 		y += this.LINE_HEIGHT + 3;
 

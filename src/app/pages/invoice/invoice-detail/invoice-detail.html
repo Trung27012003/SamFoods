@@ -19,7 +19,19 @@
 			<nz-descriptions-item nzTitle="Số điện thoại">
 				{{ invoice?.PhoneNumber || '-' }}
 			</nz-descriptions-item>
-			<nz-descriptions-item nzTitle="Địa chỉ" [nzSpan]="2">
+			<nz-descriptions-item nzTitle="Hình thức nhận">
+				<span class="badge" [ngClass]="invoice?.ShippingType === 2 ? 'badge-info bg-info text-dark' : 'badge-primary bg-primary text-white'" style="padding: 2px 6px; border-radius: 4px;">
+					{{ invoice?.ShippingType === 2 ? 'Nhận tại cửa hàng' : 'Giao hàng' }}
+				</span>
+			</nz-descriptions-item>
+			<nz-descriptions-item nzTitle="Chi tiết ship / Hẹn lấy">
+				@if (invoice?.ShippingType === 2) {
+					<span class="text-danger fw-bold">{{ invoice?.PickupTime || 'Chưa hẹn giờ' }}</span>
+				} @else {
+					<span>{{ formatCurrency(invoice?.ShippingFee || 0) }}</span>
+				}
+			</nz-descriptions-item>
+			<nz-descriptions-item nzTitle="Địa chỉ / Điểm lấy" [nzSpan]="2">
 				{{ invoice?.Address || '-' }}
 			</nz-descriptions-item>
 		</nz-descriptions>
@@ -51,9 +63,21 @@
 				}
 			</tbody>
 			<tfoot>
+				<tr>
+					<td colspan="4" class="text-end text-muted">Tiền hàng:</td>
+					<td class="text-end text-muted">
+						{{ formatCurrency((invoice?.TotalAmount ?? getTotal()) - (invoice?.ShippingFee ?? 0)) }}
+					</td>
+				</tr>
+				<tr *ngIf="invoice?.ShippingType === 1 && (invoice?.ShippingFee ?? 0) > 0">
+					<td colspan="4" class="text-end text-muted">Phí vận chuyển:</td>
+					<td class="text-end text-muted">
+						+ {{ formatCurrency(invoice?.ShippingFee) }}
+					</td>
+				</tr>
 				<tr class="table-light">
 					<td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
-					<td class="text-end fw-bold text-danger">
+					<td class="text-end fw-bold text-danger" style="font-size: 1.1em;">
 						{{ formatCurrency(invoice?.TotalAmount ?? getTotal()) }}
 					</td>
 				</tr>

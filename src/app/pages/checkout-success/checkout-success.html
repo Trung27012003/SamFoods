@@ -56,10 +56,28 @@
 				<span class="summary-label"><span nz-icon nzType="phone"></span> Số điện thoại</span>
 				<span class="summary-value">{{ phoneNumber || '—' }}</span>
 			</div>
-			<div class="summary-row">
-				<span class="summary-label"><span nz-icon nzType="environment"></span> Địa chỉ</span>
-				<span class="summary-value">{{ address || '—' }}</span>
-			</div>
+			<!-- Chi tiết theo hình thức nhận hàng -->
+			<ng-container *ngIf="shippingType === 1">
+				<div class="summary-row">
+					<span class="summary-label"><span nz-icon nzType="environment"></span> Địa chỉ nhận</span>
+					<span class="summary-value">{{ address || '—' }}</span>
+				</div>
+				<div class="summary-row">
+					<span class="summary-label"><span nz-icon nzType="car"></span> Phí vận chuyển</span>
+					<span class="summary-value">{{ shippingFee | number }} VND</span>
+				</div>
+			</ng-container>
+
+			<ng-container *ngIf="shippingType === 2">
+				<div class="summary-row">
+					<span class="summary-label"><span nz-icon nzType="shop"></span> Địa điểm nhận</span>
+					<span class="summary-value">{{ address || '—' }}</span>
+				</div>
+				<div class="summary-row" *ngIf="pickupTime">
+					<span class="summary-label"><span nz-icon nzType="clock-circle"></span> Thời gian đến lấy</span>
+					<span class="summary-value store-address-highlight" style="color: #d4380d; font-weight: bold;">{{ pickupTime }}</span>
+				</div>
+			</ng-container>
 			@if (note) {
 				<div class="summary-row">
 					<span class="summary-label"><span nz-icon nzType="message"></span> Ghi chú</span>

@@ -16,6 +16,9 @@ import { InvoiceService } from '../../../services/invoice-service';
 import { ProductService } from '../../../services/product-service';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { SiteSettingsStore } from '../../../shared/site-settings';
 import { CART_PRODUCT_KEY, FAVOURITE_KEY, NOTIFICATION_TITLE_MAP, NOTIFICATION_TYPE_MAP, RESPONSE_STATUS, getProductImageUrl } from '../../../shared/common.config';
 
 
@@ -32,6 +35,8 @@ import { CART_PRODUCT_KEY, FAVOURITE_KEY, NOTIFICATION_TITLE_MAP, NOTIFICATION_T
 		NzFormModule,
 		NzInputModule,
 		NzDrawerModule,
+		NzRadioModule,
+		NzSelectModule,
 		RouterLink
 	],
 	templateUrl: './shopping-cart.html',
@@ -44,12 +49,23 @@ export class ShoppingCart implements OnInit {
 	private formBuilder = inject(NonNullableFormBuilder);
 	private notification = inject(NzNotificationService);
 	private router = inject(Router);
+	private siteSettings = inject(SiteSettingsStore);
+
 	favouriteKey = 'favourite_products';
 	cartProductKey = 'cart_products';
 	shopingCarts = signal<InvoiceDetailModel[]>([]);
 	totalAmount = signal<number>(0);
 	loading = signal<boolean>(true);
 	isMobileCheckoutVisible = false;
+
+	shippingType = 1; // 1: Delivery, 2: Pickup
+	shippingFee = 25000;
+	deliveryPolicy = '';
+	storePickupInfo = '';
+	businessHours = '';
+	pickupDate = 'today';
+	pickupTime = '';
+	timeSlots: string[] = [];
 
 	validateForm = this.formBuilder.group({
 		CustomerName: this.formBuilder.control('', [Validators.required, Validators.minLength(2)]),
@@ -60,6 +76,14 @@ export class ShoppingCart implements OnInit {
 
 	ngOnInit(): void {
 		this.loadShoppingCards();
+		this.siteSettings.load().then(() => {
+			this.shippingFee = parseInt(this.siteSettings.get('shipping_fee', '25000'), 10);
+			this.deliveryPolicy = this.siteSettings.get('delivery_policy', 'Giao hàng nhanh trong phạm vi giao hàng của nhà hàng. Phụ thu phí giao hàng từ 25,000đ với tất cả các đơn đặt hàng qua Website hoặc Hotline 19006066.');
+			this.storePickupInfo = this.siteSettings.get('store_pickup_info', 'Nhà hàng The Pizza Company');
+			this.businessHours = this.siteSettings.get('business_hours', '08:00 - 17:30');
+			this.generateTimeSlots();
+			this.recalculateTotal();
+		});
 
 		window.addEventListener('storage', this.onStorageChange);
 		window.addEventListener('cartUpdated', this.onCartUpdated);
@@ -123,7 +147,7 @@ export class ShoppingCart implements OnInit {
 							// imageUrl = getProductImageUrl(
 							// 	`Product/${primaryImage.ProductCode}/${primaryImage.FileName}`
 							// );
-              imageUrl = getProductImageUrl(
+							imageUrl = getProductImageUrl(
 								`${primaryImage.FileName}`
 							);
 						}
@@ -167,9 +191,79 @@ export class ShoppingCart implements OnInit {
 		});
 	}
 
-	private recalculateTotal() {
-		const sum = this.shopingCarts().reduce((s, i) => s + (i.TotalPrice || 0), 0);
+	public recalculateTotal() {
+		let sum = this.shopingCarts().reduce((s, i) => s + (i.TotalPrice || 0), 0);
+		if (this.shippingType === 1) {
+			sum += this.shippingFee;
+		}
 		this.totalAmount.set(sum);
+	}
+
+	generateTimeSlots(): void {
+		const hoursConfig = this.businessHours || '08:00 - 17:30';
+		const match = hoursConfig.match(/(\d{2}):(\d{2})\s*-\s*(\d{2}):(\d{2})/);
+		if (!match) {
+			this.timeSlots = ['08:00 - 08:30', '08:30 - 09:00', '09:00 - 09:30', '09:30 - 10:00', '10:00 - 10:30', '10:30 - 11:00', '11:00 - 11:30', '11:30 - 12:00', '13:00 - 13:30', '13:30 - 14:00', '14:00 - 14:30', '14:30 - 15:00', '15:00 - 15:30', '15:30 - 16:00', '16:00 - 16:30', '16:30 - 17:00', '17:00 - 17:30'];
+			return;
+		}
+
+		const startHour = parseInt(match[1], 10);
+		const startMin = parseInt(match[2], 10);
+		const endHour = parseInt(match[3], 10);
+		const endMin = parseInt(match[4], 10);
+
+		const slots: string[] = [];
+		let currentMin = startHour * 60 + startMin;
+		const limitMin = endHour * 60 + endMin;
+
+		while (currentMin + 30 <= limitMin) {
+			const sh = Math.floor(currentMin / 60);
+			const sm = currentMin % 60;
+			const eh = Math.floor((currentMin + 30) / 60);
+			const em = (currentMin + 30) % 60;
+
+			const startStr = `${String(sh).padStart(2, '0')}:${String(sm).padStart(2, '0')}`;
+			const endStr = `${String(eh).padStart(2, '0')}:${String(em).padStart(2, '0')}`;
+			slots.push(`${startStr} - ${endStr}`);
+			currentMin += 30;
+		}
+		this.timeSlots = slots;
+	}
+
+	getAvailableSlots(): string[] {
+		if (this.pickupDate !== 'today') {
+			return this.timeSlots;
+		}
+
+		const now = new Date();
+		const currentHour = now.getHours();
+		const currentMin = now.getMinutes();
+		const compareMin = currentHour * 60 + currentMin + 30; // 30 mins prep time
+
+		return this.timeSlots.filter(slot => {
+			const match = slot.match(/(\d{2}):(\d{2})/);
+			if (!match) return true;
+			const slotStartHour = parseInt(match[1], 10);
+			const slotStartMin = parseInt(match[2], 10);
+			const slotStartTotalMin = slotStartHour * 60 + slotStartMin;
+			return slotStartTotalMin > compareMin;
+		});
+	}
+
+	setShippingType(type: number): void {
+		this.shippingType = type;
+		this.recalculateTotal();
+
+		const addressControl = this.validateForm.get('Address');
+		if (addressControl) {
+			if (type === 2) {
+				addressControl.clearValidators();
+				addressControl.setValue('');
+			} else {
+				addressControl.setValidators([Validators.required, Validators.minLength(5)]);
+			}
+			addressControl.updateValueAndValidity();
+		}
 	}
 
 	isFavourite(item: any): boolean {
@@ -220,11 +314,30 @@ export class ShoppingCart implements OnInit {
 			return;
 		}
 
-		if (this.validateForm.valid) {
+		if (this.shippingType === 2 && !this.pickupTime) {
+			this.notification.warning('Chưa chọn giờ hẹn', 'Vui lòng chọn thời gian đến lấy hàng');
+			return;
+		}
 
-			// this.saveData(data);
+		if (this.validateForm.valid) {
+			let pickupTimeStr: string | null = null;
+			if (this.shippingType === 2) {
+				const today = new Date();
+				const targetDate = new Date();
+				if (this.pickupDate === 'tomorrow') {
+					targetDate.setDate(today.getDate() + 1);
+				}
+				const day = String(targetDate.getDate()).padStart(2, '0');
+				const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+				const year = targetDate.getFullYear();
+				pickupTimeStr = `${day}/${month}/${year} (${this.pickupTime})`;
+			}
 			const data = {
 				...this.validateForm.value,
+				ShippingType: this.shippingType,
+				ShippingFee: this.shippingType === 1 ? this.shippingFee : 0,
+				PickupTime: pickupTimeStr,
+				Address: this.shippingType === 2 ? `Nhận tại cửa hàng: ${this.storePickupInfo}` : this.validateForm.value.Address,
 				InvoiceDetails: this.shopingCarts()
 			}
 
@@ -248,7 +361,10 @@ export class ShoppingCart implements OnInit {
 							phoneNumber: data.PhoneNumber,
 							address: data.Address,
 							note: data.Note || '',
-							totalAmount
+							totalAmount,
+							shippingType: data.ShippingType,
+							shippingFee: data.ShippingFee,
+							pickupTime: data.PickupTime
 						}
 					});
 				},

@@ -25,6 +25,10 @@ export class CheckoutSuccess implements OnInit {
 	orderDate: Date = new Date();
 	paymentMethod: string = 'COD';
 
+	shippingType: number = 1;
+	shippingFee: number = 0;
+	pickupTime: string = '';
+
 	confettiPieces: Array<{ left: number; delay: number; duration: number; rotate: number; color: string }> = [];
 
 	private readonly colors = [
@@ -41,6 +45,12 @@ export class CheckoutSuccess implements OnInit {
 		this.note = params.get('note') || '';
 		const total = parseFloat(params.get('totalAmount') || '0');
 		this.totalAmount = isNaN(total) ? 0 : total;
+
+		const shipType = parseInt(params.get('shippingType') || '1', 10);
+		this.shippingType = isNaN(shipType) ? 1 : shipType;
+		const shipFee = parseFloat(params.get('shippingFee') || '0');
+		this.shippingFee = isNaN(shipFee) ? 0 : shipFee;
+		this.pickupTime = params.get('pickupTime') || '';
 
 		// Final cleanup of cart if not already cleared
 		localStorage.removeItem(CART_PRODUCT_KEY);
